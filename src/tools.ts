@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
-import { DATASET_FORMATS } from '@internetdata/internetdata';
+import { DATABASE_FORMATS } from '@internetdata/internetdata';
 
 import type { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import type { CallToolResult, Tool } from '@modelcontextprotocol/sdk/types.js';
-import type { DatasetFormat, InternetData } from '@internetdata/internetdata';
+import type { DatabaseFormat, InternetData } from '@internetdata/internetdata';
 
 import {
     CallToolRequestSchema, ListToolsRequestSchema,
@@ -31,7 +31,7 @@ export interface ToolDef {
 // package spells wrong does not compile, and one the API adds arrives with a
 // version bump instead of a silent divergence. The tuple cast is about z.enum
 // wanting a non-empty tuple, not a claim about the wire.
-const FORMATS = z.enum([...DATASET_FORMATS] as [DatasetFormat, ...DatasetFormat[]]);
+const FORMATS = z.enum([...DATABASE_FORMATS] as [DatabaseFormat, ...DatabaseFormat[]]);
 
 // Both spellings of a dataset id, stated wherever one is taken. `list_databases`
 // answers a `base` id (what a licence names) and a `versions[].id`; everything

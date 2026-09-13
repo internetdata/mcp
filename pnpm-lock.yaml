@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@internetdata/internetdata':
-        specifier: ^1.4.0
-        version: 1.4.0
+        specifier: ^2.0.0
+        version: 2.0.0
       '@modelcontextprotocol/sdk':
         specifier: ^1.20.2
         version: 1.30.0(zod@4.5.4)
@@ -39,8 +39,8 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@internetdata/internetdata@1.4.0':
-    resolution: {integrity: sha512-XGT4lwnFOHXmdqLOzEIfjTKGa+qHGzcppH4CLRHDE9JWYCwdoZidNIGT2JFzt/YZ6PT1C5MIu1SktvM39K2A7A==}
+  '@internetdata/internetdata@2.0.0':
+    resolution: {integrity: sha512-SXBe2bHO2t9oeR0sGNPqGqWv34nGVXUEWmcCEn8jGPMCZuivFpE2JRpowhqW/qDBCWuudJ9/7KVdKf/rL7cYuA==}
     engines: {node: '>=22'}
 
   '@modelcontextprotocol/sdk@1.30.0':
@@ -432,7 +432,7 @@ snapshots:
     dependencies:
       hono: 4.13.7
 
-  '@internetdata/internetdata@1.4.0':
+  '@internetdata/internetdata@2.0.0':
     dependencies:
       p-retry: 8.0.1
 

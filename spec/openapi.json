@@ -9,7 +9,7 @@
       "url": "https://internetdata.io"
     },
     "termsOfService": "https://internetdata.io/terms-of-service/",
-    "version": "2026.09.09"
+    "version": "2026.09.13"
   },
   "servers": [
     {
@@ -236,11 +236,7 @@
                       "type": "string"
                     },
                     "format": {
-                      "type": "string",
-                      "enum": [
-                        "csvgz",
-                        "mmdb"
-                      ]
+                      "$ref": "#/components/schemas/DatabaseFormat"
                     },
                     "checksums": {
                       "$ref": "#/components/schemas/DbChecksums"
@@ -519,12 +515,7 @@
         "required": true,
         "description": "Database file format.",
         "schema": {
-          "type": "string",
-          "enum": [
-            "csvgz",
-            "mmdb"
-          ],
-          "example": "mmdb"
+          "$ref": "#/components/schemas/DatabaseFormat"
         }
       }
     },
@@ -540,6 +531,24 @@
             "description": "A machine-readable result code. Deliberately not an enum: a code\nadded later must stay parseable by a client generated today.\n"
           }
         }
+      },
+      "DatabaseFormat": {
+        "type": "string",
+        "description": "A file format a database version is published in.",
+        "enum": [
+          "csvgz",
+          "mmdb"
+        ],
+        "example": "mmdb"
+      },
+      "Standing": {
+        "type": "string",
+        "description": "Where your licence for a database family stands today. `licensed` is a\nlive grant, `expired` one whose term has ended, and `unlicensed` a\ndatabase published but never bought.\n",
+        "enum": [
+          "licensed",
+          "expired",
+          "unlicensed"
+        ]
       },
       "Database": {
         "type": "object",
@@ -571,13 +580,7 @@
             "description": "One line on what the newest version contains."
           },
           "standing": {
-            "type": "string",
-            "enum": [
-              "licensed",
-              "expired",
-              "unlicensed"
-            ],
-            "description": "`licensed` is a live grant, `expired` one whose term has ended, and\n`unlicensed` a database published but never bought.\n"
+            "$ref": "#/components/schemas/Standing"
           },
           "license_type": {
             "type": "string",
@@ -588,7 +591,7 @@
               "redistribute",
               null
             ],
-            "description": "What your licence permits you to do with the data. Null when there\nis no licence.\n"
+            "description": "What your licence permits you to do with the data. Null when there\nis no licence, which is every family with standing `unlicensed`.\n"
           },
           "starts": {
             "type": "string",
@@ -647,11 +650,7 @@
             "type": "array",
             "description": "The formats this version is BUILT in. Asking for another is a 400,\nnot a gap - the `_provider` catalogs are keyed by provider id, so no\nMMDB exists for them.\n",
             "items": {
-              "type": "string",
-              "enum": [
-                "csvgz",
-                "mmdb"
-              ]
+              "$ref": "#/components/schemas/DatabaseFormat"
             }
           }
         }
