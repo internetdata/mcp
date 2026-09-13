@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
-import { DATASET_FORMATS, InternetData } from '@internetdata/internetdata';
+import { DATABASE_FORMATS, InternetData } from '@internetdata/internetdata';
 
 import { createTools } from '../dist/index.js';
 
@@ -81,7 +81,7 @@ test('a 4xx outside the enumerated ones is not retryable', async () => {
 });
 
 test('the published formats are the vocabulary the tools accept', async () => {
-    assert.deepEqual([...DATASET_FORMATS].sort(), [...data.formats].sort());
+    assert.deepEqual([...DATABASE_FORMATS].sort(), [...data.formats].sort());
 
     const def = toolsFor(serving({}).fetch).get('database_checksum');
     assert.deepEqual([...def.tool.inputSchema.properties.format.enum].sort(),
