@@ -1,0 +1,9 @@
+minimumReleaseAge: 10080
+minimumReleaseAgeExclude:
+  # Not a third-party exclusion. `@internetdata/internetdata` is our own SDK,
+  # published from its own repo's release workflow with npm provenance; it sits
+  # on public npm rather than an internal scope only because customers install
+  # it. The cooldown exists to blunt a compromised upstream publish, and pinning
+  # to the newest mature version instead would ship this server three releases
+  # behind its own client library for the week after every SDK release.
+  - "@internetdata/internetdata"

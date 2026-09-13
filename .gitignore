@@ -1,0 +1,12 @@
+node_modules/
+dist/
+
+# Generated from spec/openapi.json by `pnpm run generate`.
+src/schema.gen.ts
+
+# pnpm store, if a container run ever lands one here.
+.pnpm-store/
+
+# Resolved fresh on every integration run, so the daily run keeps testing
+# whatever is newest on the registry.
+integration/package-lock.json

@@ -1,0 +1,69 @@
+{
+  "name": "internetdata-mcp",
+  "version": "1.0.0",
+  "description": "Official MCP server for the InternetData API. Lets an LLM agent browse the IP databases an organization is licensed for, inspect what is inside one, and verify a copy it already holds.",
+  "type": "module",
+  "packageManager": "pnpm@11.1.0",
+  "license": "MIT",
+  "homepage": "https://internetdata.io",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/internetdata/mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/internetdata/mcp/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ip-database",
+    "ip-intelligence",
+    "ip-data",
+    "mmdb",
+    "maxmind-db",
+    "dataset",
+    "llm",
+    "agent"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "internetdata-mcp": "./dist/stdio.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./tools": {
+      "types": "./dist/tools.d.ts",
+      "default": "./dist/tools.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@internetdata/internetdata": "^1.2.1",
+    "@modelcontextprotocol/sdk": "^1.20.2",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "typescript": "^5.9.3"
+  },
+  "scripts": {
+    "generate": "node scripts/gen-schema.mjs",
+    "build": "rm -rf dist && pnpm run generate && tsc",
+    "test": "pnpm run build && node --test test/*.test.mjs",
+    "prepublishOnly": "pnpm run build"
+  }
+}
