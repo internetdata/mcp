@@ -12,10 +12,10 @@ import {
 
 import {
     DATABASE_METADATA_SCHEMA, DATABASE_SCHEMA, DB_CHECKSUMS_SCHEMA, DOWNLOAD_SCHEMA,
+    DOWNLOADS_LIMIT,
 } from './schema.gen.js';
 
-/** The most history rows one `list_downloads` call may ask for. The API clamps to the same. */
-export const DOWNLOADS_LIMIT = 200;
+export { DOWNLOADS_LIMIT };
 
 export interface ToolContext {
     client: InternetData;
@@ -41,6 +41,25 @@ const FORMATS = z.enum([...DATABASE_FORMATS] as [DatabaseFormat, ...DatabaseForm
 const VERSIONED_ID = 'A VERSIONED database id, from `versions[].id` in `list_databases` - '
     + '`bogon_ip_v1`, not `bogon_ip`. The unversioned base id is a licence reference and is '
     + 'not accepted here.';
+
+// Each tool's arguments, declared ONCE. `jsonSchema()` publishes the object and
+// the handler parses with the same one, so the cap a client is shown is the cap
+// it meets. Two lookalike declarations - a schema for the manifest and another
+// in the handler - is how an advertised bound and an enforced bound drift.
+const METADATA_INPUT = z.object({
+    dataset_id: z.string().describe(VERSIONED_ID),
+});
+
+const CHECKSUM_INPUT = z.object({
+    dataset_id: z.string().describe(VERSIONED_ID),
+    format: FORMATS.describe('Which published file to digest.'),
+});
+
+const DOWNLOADS_INPUT = z.object({
+    limit: z.number().int().min(1).max(DOWNLOADS_LIMIT).optional().describe(
+        `How many attempts to return, newest first. At most ${DOWNLOADS_LIMIT}; `
+        + 'the API defaults to 50.'),
+});
 
 /**
  * The tool manifest, and the single place either transport gets it from.
@@ -85,9 +104,7 @@ export function createTools(ctx: ToolContext): ToolDef[] {
                     + 'build date and the file sizes. Use this to answer questions about what a '
                     + 'database contains without downloading it - the files reach several GB - and '
                     + 'to budget a transfer before starting one.',
-                inputSchema: jsonSchema(z.object({
-                    dataset_id: z.string().describe(VERSIONED_ID),
-                })),
+                inputSchema: jsonSchema(METADATA_INPUT),
                 outputSchema: DATABASE_METADATA_SCHEMA,
                 annotations: {
                     readOnlyHint: true,
@@ -96,7 +113,7 @@ export function createTools(ctx: ToolContext): ToolDef[] {
                 },
             },
             handler: async (args) => {
-                const { dataset_id } = z.object({ dataset_id: z.string() }).parse(args);
+                const { dataset_id } = METADATA_INPUT.parse(args);
                 return ok(await ctx.client.database.metadata(dataset_id));
             },
         },
@@ -107,10 +124,7 @@ export function createTools(ctx: ToolContext): ToolDef[] {
                 description: 'The published digests for one database file, for verifying a copy '
                     + 'you already hold or deciding whether a build has changed since you last '
                     + 'fetched it.',
-                inputSchema: jsonSchema(z.object({
-                    dataset_id: z.string().describe(VERSIONED_ID),
-                    format: FORMATS.describe('Which published file to digest.'),
-                })),
+                inputSchema: jsonSchema(CHECKSUM_INPUT),
                 outputSchema: objectSchema({ checksums: DB_CHECKSUMS_SCHEMA }, ['checksums']),
                 annotations: {
                     readOnlyHint: true,
@@ -119,10 +133,7 @@ export function createTools(ctx: ToolContext): ToolDef[] {
                 },
             },
             handler: async (args) => {
-                const parsed = z.object({
-                    dataset_id: z.string(),
-                    format: FORMATS,
-                }).parse(args);
+                const parsed = CHECKSUM_INPUT.parse(args);
                 const checksums = await ctx.client.database.checksums(
                     parsed.dataset_id, parsed.format);
                 return ok({ checksums: checksums });
@@ -139,11 +150,7 @@ export function createTools(ctx: ToolContext): ToolDef[] {
                     + 'was theirs. This is a bounded WINDOW of at most '
                     + `${DOWNLOADS_LIMIT} rows, so a database missing from the answer means it is `
                     + 'not in this window - never that it was never downloaded.',
-                inputSchema: jsonSchema(z.object({
-                    limit: z.number().int().min(1).max(DOWNLOADS_LIMIT).optional().describe(
-                        `How many attempts to return, newest first. At most ${DOWNLOADS_LIMIT}; `
-                        + 'the API defaults to 50.'),
-                })),
+                inputSchema: jsonSchema(DOWNLOADS_INPUT),
                 outputSchema: objectSchema({
                     downloads: { type: 'array', items: DOWNLOAD_SCHEMA },
                 }, ['downloads']),
@@ -154,9 +161,7 @@ export function createTools(ctx: ToolContext): ToolDef[] {
                 },
             },
             handler: async (args) => {
-                const { limit } = z.object({
-                    limit: z.number().int().min(1).max(DOWNLOADS_LIMIT).optional(),
-                }).parse(args);
+                const { limit } = DOWNLOADS_INPUT.parse(args);
                 const downloads = await ctx.client.database.downloads(
                     limit === undefined ? {} : { limit: limit });
                 return ok({ downloads: downloads });
@@ -219,14 +224,31 @@ function ok(structured: Record<string, unknown>): CallToolResult {
  * act on. The text block is what it reads instead.
  */
 function toolError(err: unknown): CallToolResult {
-    const known = asClientError(err);
-    const detail = known !== undefined
-        ? { kind: known.kind, message: known.message, retryable: known.retryable === true }
-        : { kind: 'internal', message: err instanceof Error ? err.message : String(err) };
     return {
-        content: [{ type: 'text', text: JSON.stringify({ error: detail }, null, 2) }],
+        content: [{ type: 'text', text: JSON.stringify({ error: errorDetail(err) }, null, 2) }],
         isError: true,
     };
+}
+
+function errorDetail(err: unknown): Record<string, unknown> {
+    const known = asClientError(err);
+    if (known !== undefined) {
+        return { kind: known.kind, message: known.message, retryable: known.retryable === true };
+    }
+    const rejected = asZodError(err);
+    if (rejected !== undefined) {
+        // The MODEL's own mistake, and the one failure it can fix unaided - so
+        // it must not arrive as `internal`, which reads as "the server broke"
+        // and invites an identical retry. zod's formatter names the field and
+        // what was expected; the raw `issues` array is JSON a model has to
+        // decode before it can act on it.
+        return {
+            kind: 'invalid_argument',
+            message: z.prettifyError(rejected),
+            retryable: false,
+        };
+    }
+    return { kind: 'internal', message: err instanceof Error ? err.message : String(err) };
 }
 
 /**
@@ -254,6 +276,23 @@ interface ClientError {
     kind: string;
     message: string;
     retryable?: boolean;
+}
+
+/**
+ * Recognises a rejected ARGUMENT by shape, for the same reason `asClientError`
+ * does: zod is a peer of two packages here and each may resolve its own copy,
+ * so `instanceof z.ZodError` would quietly miss one and report a fixable
+ * argument error as an unfixable internal one.
+ */
+function asZodError(err: unknown): z.ZodError | undefined {
+    if (err === null || typeof err !== 'object') {
+        return undefined;
+    }
+    const e = err as { name?: unknown; issues?: unknown };
+    if (e.name !== 'ZodError' || !Array.isArray(e.issues)) {
+        return undefined;
+    }
+    return err as z.ZodError;
 }
 
 // One zod declaration yields both the published schema and the runtime parse, so

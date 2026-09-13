@@ -25,6 +25,9 @@ const out = `${banner()}
 
 export const SPEC_VERSION = '${spec.info.version}';
 
+/** The most history rows \`list_downloads\` may ask for. The API clamps to the same. */
+export const DOWNLOADS_LIMIT = ${queryParamMax('/api/v2/database/downloads', 'limit')};
+
 // Matches the shape the MCP Tool type wants for inputSchema/outputSchema, so a
 // generated schema can be handed straight to a tool definition.
 export interface ObjectSchema {
@@ -45,6 +48,20 @@ export const DOWNLOAD_SCHEMA: ObjectSchema = ${ts(schema('Download'))};
 
 writeFileSync(resolve(root, 'src/schema.gen.ts'), out);
 console.log(`src/schema.gen.ts  (spec ${spec.info.version})`);
+
+// A numeric bound the API enforces, read off the spec rather than restated in
+// the manifest. The cap reaches a tool description and its runtime check by
+// re-pinning the spec, which is the same contract the output schemas have; a
+// hand-written copy is free to keep advertising 200 after the API moves.
+function queryParamMax(path, name) {
+    const params = spec.paths[path]?.get?.parameters ?? [];
+    const param = params.find((q) => q.name === name && q.in === 'query');
+    const max = param?.schema?.maximum;
+    if (typeof max !== 'number') {
+        throw new Error(`spec has no numeric maximum for GET ${path} ?${name}`);
+    }
+    return max;
+}
 
 // Inlines every $ref. MCP clients validate tool output with an ordinary JSON
 // Schema validator that has no document to resolve a local $ref against, so a

@@ -89,6 +89,9 @@ test('the published formats are the vocabulary the tools accept', async () => {
 
     const out = await def.handler({ dataset_id: 'bogon_ip_v1', format: 'parquet' });
     assert.equal(out.isError, true, 'a format outside the vocabulary must be refused');
+    const { error } = JSON.parse(out.content[0].text);
+    assert.equal(error.kind, 'invalid_argument',
+        'a format the corpus does not publish is the caller\'s error, not ours');
 });
 
 // visibility.clientRules, one test each. The corpus does not name the private

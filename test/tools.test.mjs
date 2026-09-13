@@ -1,6 +1,7 @@
 // The manifest itself, and the behaviours a transport relies on.
 
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
 import Ajv from 'ajv';
@@ -219,6 +220,35 @@ test('an unrecognised throw still produces a readable error', async () => {
     const out = await throwingClient(new Error('socket exploded')).handler({});
     const { error } = JSON.parse(out.content[0].text);
     assert.equal(error.kind, 'internal');
+});
+
+// A bad argument is the model's OWN mistake and the only failure here it can
+// fix unaided, so it must not read as `internal` - which says the server broke
+// and invites the identical call again. The message has to name the field too:
+// a raw zod issue array is JSON the model must decode before it can act.
+test('a rejected argument is the model\'s to fix, not an internal failure', async () => {
+    const tools = byName(serving({}).fetch);
+    const cases = [
+        ['database_metadata', { dataset_id: 12345 }, 'dataset_id'],
+        ['database_checksum', { dataset_id: 'bogon_ip_v1', format: 'parquet' }, 'format'],
+        ['list_downloads', { limit: DOWNLOADS_LIMIT + 1 }, 'limit'],
+    ];
+    for (const [name, args, field] of cases) {
+        const out = await tools.get(name).handler(args);
+        const { error } = JSON.parse(out.content[0].text);
+        assert.equal(error.kind, 'invalid_argument', `${name} must not report internal`);
+        assert.equal(error.retryable, false, `${name}: the same call cannot succeed`);
+        assert.match(error.message, new RegExp(field), `${name} must name the field at fault`);
+    }
+});
+
+// The cap is READ off the spec, not restated here: the API clamps to it, and a
+// second hand-written copy is free to keep advertising the old number.
+test('the downloads cap comes from the spec', () => {
+    const spec = JSON.parse(readFileSync(new URL('../spec/openapi.json', import.meta.url), 'utf8'));
+    const limit = spec.paths['/api/v2/database/downloads'].get.parameters
+        .find((p) => p.name === 'limit' && p.in === 'query');
+    assert.equal(DOWNLOADS_LIMIT, limit.schema.maximum);
 });
 
 // Rejects from the CLIENT rather than from fetch: the SDK's own retry layer
