@@ -19,8 +19,8 @@ importers:
         version: 4.5.4
     devDependencies:
       '@mslmio/eslint-config':
-        specifier: ^1.0.0
-        version: 1.0.0(eslint@9.39.5)(typescript@5.9.3)
+        specifier: ^1.0.1
+        version: 1.0.1(eslint@9.39.5)(typescript@5.9.3)
       '@types/node':
         specifier: ^26.2.0
         version: 26.4.1
@@ -117,8 +117,8 @@ packages:
       '@cfworker/json-schema':
         optional: true
 
-  '@mslmio/eslint-config@1.0.0':
-    resolution: {integrity: sha512-itNWllNXcmCvUS5BhQ6i/c5hU6q8Ez+6kRYsVuUe6Yg+S5wXR7Rah91FjQX9kBWLIstGuvcBaswQen6hG4Xjpg==}
+  '@mslmio/eslint-config@1.0.1':
+    resolution: {integrity: sha512-Jxpt3dfURdq8FbKxXWHXg2nVznMDLUZ265ZSDM/0lC/rxb1aKf+q76LBx4IQ0e4dcAUDbudzyGJfbqkLbKSrSw==}
     peerDependencies:
       '@shadcn/lint': ^0.1.0
       eslint: '>=9.30.0'
@@ -944,7 +944,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@mslmio/eslint-config@1.0.0(eslint@9.39.5)(typescript@5.9.3)':
+  '@mslmio/eslint-config@1.0.1(eslint@9.39.5)(typescript@5.9.3)':
     dependencies:
       '@typescript-eslint/eslint-plugin': 8.70.0(@typescript-eslint/parser@8.70.0(eslint@9.39.5)(typescript@5.9.3))(eslint@9.39.5)(typescript@5.9.3)
       '@typescript-eslint/parser': 8.70.0(eslint@9.39.5)(typescript@5.9.3)
