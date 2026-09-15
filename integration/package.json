@@ -9,11 +9,14 @@
         "node": ">=22"
     },
     "dependencies": {
-        "internetdata-mcp": "^2.1.0",
-        "@modelcontextprotocol/sdk": "^1.20.2"
+        "@modelcontextprotocol/sdk": "^1.20.2",
+        "internetdata-mcp": "^2.1.0"
     },
     "scripts": {
         "test": "node --test test/*.test.mjs",
         "integration": "node scripts/run.mjs"
+    },
+    "devDependencies": {
+        "@mslm/libjs-eslint-config": "2.4.0"
     }
 }

@@ -95,7 +95,7 @@ test('the published formats are the vocabulary the tools accept', async () => {
 });
 
 // visibility.clientRules, one test each. The corpus does not name the private
-// families - it lands in public repos - so each rule is asserted as behaviour.
+// families - it lands in public repos - so each rule is asserted as behavior.
 test('listing-is-returned-as-served: nothing is filtered, reordered or invented', async () => {
     const served = {
         databases: data.standings.map((standing, i) => ({

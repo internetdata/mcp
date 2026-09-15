@@ -4,7 +4,7 @@
 // The unit suite stubs the network, so it cannot see what matters most here:
 // that the ids a model reads out of `list_databases` are the ids the other
 // tools actually accept. Everything below is derived from the live listing -
-// a hardcoded database id turns a licence change into a red build that says
+// a hardcoded database id turns a license change into a red build that says
 // nothing about the server.
 
 import assert from 'node:assert/strict';

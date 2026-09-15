@@ -1,4 +1,4 @@
-// The manifest itself, and the behaviours a transport relies on.
+// The manifest itself, and the behaviors a transport relies on.
 
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
