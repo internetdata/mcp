@@ -18,9 +18,9 @@ importers:
         specifier: ^4.1.12
         version: 4.5.4
     devDependencies:
-      '@mslm/libjs-eslint-config':
-        specifier: 2.4.0
-        version: 2.4.0(eslint@9.39.5)(typescript@5.9.3)
+      '@mslmio/eslint-config':
+        specifier: ^1.0.0
+        version: 1.0.0(eslint@9.39.5)(typescript@5.9.3)
       '@types/node':
         specifier: ^26.2.0
         version: 26.4.1
@@ -117,8 +117,8 @@ packages:
       '@cfworker/json-schema':
         optional: true
 
-  '@mslm/libjs-eslint-config@2.4.0':
-    resolution: {integrity: sha512-GOx0aEL++0Qcm1HgpTYkSsAEzN1CT5Q6Iy4G8yDPyi7rCAo9HULz4VNPjiSPvx41bI5IMO6AS/++bt57b4VYQQ==, tarball: https://gitea.mslm.io/api/packages/mslm/npm/%40mslm%2Flibjs-eslint-config/-/2.4.0/libjs-eslint-config-2.4.0.tgz}
+  '@mslmio/eslint-config@1.0.0':
+    resolution: {integrity: sha512-itNWllNXcmCvUS5BhQ6i/c5hU6q8Ez+6kRYsVuUe6Yg+S5wXR7Rah91FjQX9kBWLIstGuvcBaswQen6hG4Xjpg==}
     peerDependencies:
       '@shadcn/lint': ^0.1.0
       eslint: '>=9.30.0'
@@ -944,7 +944,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@mslm/libjs-eslint-config@2.4.0(eslint@9.39.5)(typescript@5.9.3)':
+  '@mslmio/eslint-config@1.0.0(eslint@9.39.5)(typescript@5.9.3)':
     dependencies:
       '@typescript-eslint/eslint-plugin': 8.70.0(@typescript-eslint/parser@8.70.0(eslint@9.39.5)(typescript@5.9.3))(eslint@9.39.5)(typescript@5.9.3)
       '@typescript-eslint/parser': 8.70.0(eslint@9.39.5)(typescript@5.9.3)
