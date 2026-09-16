@@ -242,13 +242,21 @@ test('a rejected argument is the model\'s to fix, not an internal failure', asyn
     }
 });
 
-// The cap is READ off the spec, not restated here: the API clamps to it, and a
-// second hand-written copy is free to keep advertising the old number.
-test('the downloads cap comes from the spec', () => {
+// Every bound is READ off the spec, not restated here: the API enforces them,
+// and a second hand-written copy is free to keep advertising the old number.
+// The default is the one a model reads as prose, so it is asserted against the
+// published description rather than against a constant.
+test('the downloads bounds and default come from the spec', () => {
     const spec = JSON.parse(readFileSync(new URL('../spec/openapi.json', import.meta.url), 'utf8'));
     const limit = spec.paths['/api/v2/database/downloads'].get.parameters
         .find((p) => p.name === 'limit' && p.in === 'query');
     assert.equal(DOWNLOADS_LIMIT, limit.schema.maximum);
+
+    const published = byName(serving({ downloads: [] }).fetch)
+        .get('list_downloads').tool.inputSchema.properties.limit;
+    assert.equal(published.maximum, limit.schema.maximum);
+    assert.equal(published.minimum, limit.schema.minimum);
+    assert.match(published.description, new RegExp(`defaults to ${limit.schema.default}\\.`));
 });
 
 // Rejects from the CLIENT rather than from fetch: the SDK's own retry layer

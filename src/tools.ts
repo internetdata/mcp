@@ -12,7 +12,7 @@ import {
 
 import {
     DATABASE_METADATA_SCHEMA, DATABASE_SCHEMA, DB_CHECKSUMS_SCHEMA, DOWNLOAD_SCHEMA,
-    DOWNLOADS_LIMIT,
+    DOWNLOADS_LIMIT, DOWNLOADS_LIMIT_DEFAULT, DOWNLOADS_LIMIT_MIN,
 } from './schema.gen.js';
 
 export { DOWNLOADS_LIMIT };
@@ -56,9 +56,9 @@ const CHECKSUM_INPUT = z.object({
 });
 
 const DOWNLOADS_INPUT = z.object({
-    limit: z.number().int().min(1).max(DOWNLOADS_LIMIT).optional().describe(
+    limit: z.number().int().min(DOWNLOADS_LIMIT_MIN).max(DOWNLOADS_LIMIT).optional().describe(
         `How many attempts to return, newest first. At most ${DOWNLOADS_LIMIT}; `
-        + 'the API defaults to 50.'),
+        + `the API defaults to ${DOWNLOADS_LIMIT_DEFAULT}.`),
 });
 
 /**
