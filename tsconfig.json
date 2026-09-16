@@ -5,6 +5,7 @@
         "moduleResolution": "NodeNext",
         "lib": ["ESNext"],
         "strict": true,
+        "types": ["*"],
         "declaration": true,
         "sourceMap": true,
         "outDir": "dist",
