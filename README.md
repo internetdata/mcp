@@ -9,7 +9,7 @@ InternetData publishes IP databases: VPN and proxy address space, hosting and CD
 
 ## Getting Started
 
-You need an API key carrying the `db.download` scope. Databases are licensed by contract rather than bought self-serve, so a key arrives with the licence; see the [API documentation](https://docs.internetdata.io/api) or write to [dev@internetdata.io](mailto:dev@internetdata.io).
+You need an API key carrying the `db.download` scope. Databases are licensed by contract rather than bought self-serve, so a key arrives with the license; see the [API documentation](https://docs.internetdata.io/api) or write to [dev@internetdata.io](mailto:dev@internetdata.io).
 
 Add this to your MCP client's config:
 
@@ -33,7 +33,7 @@ Requires Node.js 22 or newer. `INTERNETDATA_BASE_URL` overrides the endpoint if 
 
 | Tool | What it answers |
 |---|---|
-| `list_databases` | The databases your organization is licensed for, with the licence type and term. |
+| `list_databases` | The databases your organization is licensed for, with the license type and term. |
 | `database_metadata` | A database's columns, sample rows, row count, build date and file sizes. |
 | `database_checksum` | The published digests for one database file. |
 | `list_downloads` | Your organization's recent download attempts, refusals included. |
@@ -52,7 +52,7 @@ Every tool is read-only.
 }
 ```
 
-The `base` is what a **licence** names. `versions[].id` is what a **download** names, and it is the one `database_metadata` and `database_checksum` accept. The tools say so in their own descriptions, so an agent generally gets this right on its own; it is worth knowing when you read a transcript where one was refused.
+The `base` is what a **license** names. `versions[].id` is what a **download** names, and it is the one `database_metadata` and `database_checksum` accept. The tools say so in their own descriptions, so an agent generally gets this right on its own; it is worth knowing when you read a transcript where one was refused.
 
 ## There is no download tool, deliberately
 
