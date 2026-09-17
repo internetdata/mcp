@@ -184,6 +184,20 @@ test('no published schema leans on OpenAPI\'s nullable', () => {
     }
 });
 
+// Every output schema comes from the spec, never a free-form object this package
+// makes up (decided 2026-09-17). The one left is the spec's own: a sample row's
+// columns are whatever that database's are.
+const SPEC_FREE_FORM = {
+    database_metadata: ['/properties/sample/additionalProperties/items'],
+};
+
+test('no output schema is free-form unless the spec declares it', () => {
+    for (const { tool } of toolsFor(serving(CATALOG).fetch)) {
+        assert.deepEqual(freeFormPaths(tool.outputSchema), SPEC_FREE_FORM[tool.name] ?? [],
+            `${tool.name}: outputSchema`);
+    }
+});
+
 test('the downloads window is published and enforced', async () => {
     const tools = byName(serving({ downloads: [] }).fetch);
     const def = tools.get('list_downloads');
@@ -299,4 +313,19 @@ function keywordPaths(node, keyword, path = '') {
         }
         return keywordPaths(v, keyword, `${path}/${k}`);
     });
+}
+
+// Where a schema declares an object without saying what is in it: no `properties`,
+// and `additionalProperties` absent or `true`.
+function freeFormPaths(node, path = '') {
+    if (node === null || typeof node !== 'object') {
+        return [];
+    }
+    const types = Array.isArray(node.type) ? node.type : [node.type];
+    const freeForm = types.includes('object') && node.properties === undefined
+        && (node.additionalProperties === undefined || node.additionalProperties === true);
+    return [
+        ...(freeForm ? [path === '' ? '/' : path] : []),
+        ...Object.entries(node).flatMap(([k, v]) => freeFormPaths(v, `${path}/${k}`)),
+    ];
 }
