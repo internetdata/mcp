@@ -66,6 +66,7 @@
         "generate": "node scripts/gen-schema.mjs",
         "build": "rm -rf dist && pnpm run generate && tsc",
         "test": "pnpm run build && node --test test/*.test.mjs",
+        "lint": "eslint",
         "prepublishOnly": "pnpm run build"
     }
 }

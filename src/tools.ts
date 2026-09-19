@@ -180,7 +180,7 @@ export function createTools(ctx: ToolContext): ToolDef[] {
 export function registerTools(server: Server, defs: ToolDef[]): void {
     const byName = new Map(defs.map((d) => [d.tool.name, d]));
 
-    server.setRequestHandler(ListToolsRequestSchema, async () => {
+    server.setRequestHandler(ListToolsRequestSchema, () => {
         return { tools: defs.map((d) => d.tool) };
     });
 
