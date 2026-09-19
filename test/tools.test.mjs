@@ -293,6 +293,21 @@ test('the downloads bounds and default come from the spec', () => {
     assert.match(published.description, new RegExp(`defaults to ${limit.schema.default}\\.`));
 });
 
+// The list_databases description explains each standing in prose a model reads,
+// which no generator can write. So the prose is pinned to the spec's enum: a
+// standing the API adds reddens this at the re-pin that brings it, rather than
+// reaching models with no word of what it means.
+test('the list_databases description names every standing the spec declares', () => {
+    const spec = JSON.parse(readFileSync(new URL('../spec/openapi.json', import.meta.url), 'utf8'));
+    const standings = spec.components.schemas.Standing.enum;
+    assert.ok(standings.length > 0, 'the spec declares no standing');
+
+    const described = byName(serving(CATALOG).fetch).get('list_databases').tool.description;
+    for (const standing of standings) {
+        assert.ok(described.includes(`\`${standing}\``), `the description never names \`${standing}\``);
+    }
+});
+
 // Rejects from the CLIENT rather than from fetch: the SDK's own retry layer
 // turns a transport throw into its own `network` error, so a stub one level
 // lower would never reach the classifier under test.
