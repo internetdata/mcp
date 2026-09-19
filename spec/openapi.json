@@ -9,7 +9,7 @@
       "url": "https://internetdata.io"
     },
     "termsOfService": "https://internetdata.io/terms-of-service/",
-    "version": "2026.09.13"
+    "version": "2026.09.18"
   },
   "servers": [
     {
@@ -39,7 +39,7 @@
         ],
         "operationId": "listDatabases",
         "summary": "List",
-        "description": "The whole published catalog, with your organization's licence beside\neach entry, so `standing` says whether a database is yours today\n(`licensed`), was (`expired`), or has never been bought (`unlicensed`).\n",
+        "description": "The whole published catalog, with your organization's license beside\neach entry, so `standing` says whether a database is yours today\n(`licensed`), was (`expired`), or has never been bought (`unlicensed`).\n",
         "security": [
           {
             "ApiKeyQueryAuth": []
@@ -543,7 +543,7 @@
       },
       "Standing": {
         "type": "string",
-        "description": "Where your licence for a database family stands today. `licensed` is a\nlive grant, `expired` one whose term has ended, and `unlicensed` a\ndatabase published but never bought.\n",
+        "description": "Where your license for a database family stands today. `licensed` is a\nlive grant, `expired` one whose term has ended, and `unlicensed` a\ndatabase published but never bought.\n",
         "enum": [
           "licensed",
           "expired",
@@ -552,7 +552,7 @@
       },
       "Database": {
         "type": "object",
-        "description": "One database FAMILY, with your organization's licence beside it. A\nlicence covers the family, while a download names a specific version,\nso the ids passed to `download` and `checksum` come from `versions`.\n",
+        "description": "One database FAMILY, with your organization's license beside it. A\nlicense covers the family, while a download names a specific version,\nso the ids passed to `download` and `checksum` come from `versions`.\n",
         "required": [
           "base",
           "name",
@@ -568,7 +568,7 @@
         "properties": {
           "base": {
             "type": "string",
-            "description": "The family, e.g. `vpn_ip`. What a licence is held against.",
+            "description": "The family, e.g. `vpn_ip`. What a license is held against.",
             "example": "vpn_ip"
           },
           "name": {
@@ -591,7 +591,7 @@
               "redistribute",
               null
             ],
-            "description": "What your licence permits you to do with the data. Null when there\nis no licence, which is every family with standing `unlicensed`.\n"
+            "description": "What your license permits you to do with the data. Null when there\nis no license, which is every family with standing `unlicensed`.\n"
           },
           "starts": {
             "type": "string",
@@ -602,13 +602,13 @@
             "type": "string",
             "format": "date-time",
             "nullable": true,
-            "description": "A hard stop. Null when the licence has no end date, which is the normal case for a rolling agreement, and when there is no licence. A rolling licence reports its turnover date in renews_at instead."
+            "description": "A hard stop. Null when the license has no end date, which is the normal case for a rolling agreement, and when there is no license. A rolling license reports its turnover date in renews_at instead."
           },
           "renews_at": {
             "type": "string",
             "format": "date-time",
             "nullable": true,
-            "description": "When a rolling licence next renews. Null when the licence has no defined term, when expires sets a hard stop instead, and when there is no licence."
+            "description": "When a rolling license next renews. Null when the license has no defined term, when expires sets a hard stop instead, and when there is no license."
           },
           "notice_due_at": {
             "type": "string",
@@ -983,7 +983,7 @@
         }
       },
       "V2NotLicensed": {
-        "description": "Your organization holds no licence for this database, or its term has\nended.\n`rc`: `NOT_LICENSED`, `LICENSE_EXPIRED`.\n",
+        "description": "Your organization holds no license for this database, or its term has\nended.\n`rc`: `NOT_LICENSED`, `LICENSE_EXPIRED`.\n",
         "content": {
           "application/json": {
             "schema": {
