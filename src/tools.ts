@@ -123,7 +123,9 @@ export function createTools(ctx: ToolContext): ToolDef[] {
                 title: 'Get a database\'s checksums',
                 description: 'The published digests for one database file, for verifying a copy '
                     + 'you already hold or deciding whether a build has changed since you last '
-                    + 'fetched it.',
+                    + 'fetched it. It is licensed like the download itself, so a database this key '
+                    + 'cannot download is refused here too. Looking up a checksum is not a '
+                    + 'download and does not appear in `list_downloads`.',
                 inputSchema: jsonSchema(CHECKSUM_INPUT),
                 outputSchema: objectSchema({ checksums: DB_CHECKSUMS_SCHEMA }, ['checksums']),
                 annotations: {
