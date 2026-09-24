@@ -4,11 +4,15 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { ErrorCode } from '@modelcontextprotocol/sdk/types.js';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import { InternetData } from '@internetdata/internetdata';
 
-import { createTools, DOWNLOADS_LIMIT } from '../dist/index.js';
+import { createTools, DOWNLOADS_LIMIT, registerTools } from '../dist/index.js';
 
 // MCP names the allowed characters explicitly; a name outside them is a tool
 // some clients will refuse to surface at all.
@@ -273,6 +277,23 @@ test('a rejected argument is the model\'s to fix, not an internal failure', asyn
         assert.equal(error.kind, 'invalid_argument', `${name} must not report internal`);
         assert.equal(error.retryable, false, `${name}: the same call cannot succeed`);
         assert.match(error.message, new RegExp(field), `${name} must name the field at fault`);
+    }
+});
+
+// A tool name the model guessed, such as `list_datasets` from before 2.0.0, is its
+// mistake too: a protocol error, since no tool exists to answer it, but never -32603.
+test('an unknown tool is invalid params, not an internal error', async () => {
+    const server = new Server({ name: 'test', version: '0' }, { capabilities: { tools: {} } });
+    registerTools(server, toolsFor(serving({}).fetch));
+    const [serverSide, clientSide] = InMemoryTransport.createLinkedPair();
+    await server.connect(serverSide);
+    const client = new Client({ name: 'test', version: '0' });
+    await client.connect(clientSide);
+    try {
+        await assert.rejects(client.callTool({ name: 'list_datasets', arguments: {} }),
+            { code: ErrorCode.InvalidParams, message: /Unknown tool: list_datasets/ });
+    } finally {
+        await client.close();
     }
 });
 
