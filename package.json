@@ -1,6 +1,6 @@
 {
     "name": "internetdata-mcp",
-    "version": "2.1.6",
+    "version": "2.1.7",
     "description": "Official MCP server for the InternetData API. Lets an LLM agent browse the IP databases an organization is licensed for, inspect what is inside one, and verify a copy it already holds.",
     "type": "module",
     "packageManager": "pnpm@11.1.0",
