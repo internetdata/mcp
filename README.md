@@ -23,6 +23,15 @@ claude mcp add --transport http internetdata https://mcp.internetdata.io/mcp
 
 Then run `/mcp`, pick `internetdata` and sign in the same way. Once it's connected, ask something like *"which IP databases are we licensed for, and how big is the latest VPN build?"*.
 
+Or install the InternetData plugin. It adds the same server, with skills for reading a database's contents, checking its files and downloads, and analyzing a copy:
+
+```console
+/plugin marketplace add internetdata/claude-plugin
+/plugin install internetdata@internetdata
+```
+
+It asks you to sign in the first time one of its tools runs.
+
 Claude never sees the key; our server uses it on your behalf. The key needs the `db.download` scope, which your organization's `Default` key has. Approving needs permission to share your organization's API keys, and asks you to confirm it's you. You can disconnect it at any time from the console, under **Settings > Sessions & devices > Connected applications**.
 
 ### In any other MCP client
