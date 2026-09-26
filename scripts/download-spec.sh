@@ -11,7 +11,7 @@
 #
 # JSON rather than the YAML the other SDKs pin: this package's generator is the
 # only consumer and JSON.parse means the build needs no YAML dependency. Both
-# are published by the same sdk/common build, so there is nothing to drift.
+# are published by the same build, so there is nothing to drift.
 
 set -euo pipefail
 
