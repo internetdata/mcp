@@ -120,6 +120,16 @@ test('every tool is well formed', () => {
     }
 });
 
+// Claude's connector directory reads a tool's name from `annotations.title` and
+// flags every tool without one, however the top-level `title` reads. Both are
+// published, and they are the same string.
+test('every tool carries its title in its annotations too', () => {
+    for (const { tool } of toolsFor(serving(CATALOG).fetch)) {
+        assert.ok(tool.title, `${tool.name}: no title`);
+        assert.equal(tool.annotations.title, tool.title, `${tool.name}: annotations.title`);
+    }
+});
+
 // The databases reach several GB. An agent that treats a tool result as text
 // will try to read one, so the capability is absent rather than discouraged.
 test('no tool downloads a database', () => {

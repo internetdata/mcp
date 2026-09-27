@@ -175,7 +175,16 @@ export function createTools(ctx: ToolContext): ToolDef[] {
     // the model can read and correct itself from, while a JSON-RPC protocol error
     // is not. Wrapping here rather than in `registerTools` keeps that true for
     // any consumer of a ToolDef, including a transport that mounts its own.
-    return defs.map((d) => ({ tool: d.tool, handler: guard(d.handler) }));
+    return defs.map((d) => ({ tool: withAnnotatedTitle(d.tool), handler: guard(d.handler) }));
+}
+
+/**
+ * Publishes a tool's `title` in `annotations.title` too. MCP clients show the
+ * top-level one, while Claude's connector directory reads the annotation and
+ * flags every tool without it; copying it here writes each title once.
+ */
+function withAnnotatedTitle(tool: Tool): Tool {
+    return { ...tool, annotations: { title: tool.title, ...tool.annotations } };
 }
 
 /** Mounts a manifest on a server. Both transports use this and nothing else. */
