@@ -34,7 +34,10 @@ const CATALOG = {
             renews_at: null,
             notice_due_at: null,
             versions: [
-                { id: 'bogon_ip_v1', version: 1, summary: 'v1', formats: ['csvgz', 'mmdb'] },
+                {
+                    id: 'bogon_ip_v1', version: 1, summary: 'v1', formats: ['csvgz', 'mmdb'],
+                    sample_formats: [],
+                },
             ],
         },
         {
@@ -48,7 +51,10 @@ const CATALOG = {
             renews_at: null,
             notice_due_at: null,
             versions: [
-                { id: 'hosting_ip_v1', version: 1, summary: 'v1', formats: ['csvgz'] },
+                {
+                    id: 'hosting_ip_v1', version: 1, summary: 'v1', formats: ['csvgz'],
+                    sample_formats: ['csvgz'],
+                },
             ],
         },
     ],
@@ -69,9 +75,10 @@ const CHECKSUMS = {
 };
 
 // Every nullable field null at once, so the schema has to admit each of them.
+// `sample` is required as well, and not nullable.
 const NULL_DOWNLOADS = {
     downloads: [{
-        dataset_id: 'hosting_ip_v1', format: 'csvgz', outcome: 'unknown', bytes: null,
+        dataset_id: 'hosting_ip_v1', format: 'csvgz', outcome: 'unknown', sample: false, bytes: null,
         http_status: null, apikey_id: null, client_ip: null, user_agent: null,
         created: '2026-09-12T10:00:00.000Z',
     }],
@@ -217,7 +224,7 @@ test('the downloads window is published and enforced', async () => {
 test('a refused attempt is carried through, not filtered out', async () => {
     const refused = {
         downloads: [{
-            dataset_id: 'hosting_ip_v1', format: 'csvgz', outcome: 'denied', bytes: 0,
+            dataset_id: 'hosting_ip_v1', format: 'csvgz', outcome: 'denied', sample: false, bytes: 0,
             http_status: 403, apikey_id: 'k1', client_ip: '198.51.100.9',
             user_agent: 'curl/8', created: '2026-09-12T10:00:00.000Z',
         }],

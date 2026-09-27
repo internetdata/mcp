@@ -9,7 +9,7 @@
       "url": "https://internetdata.io"
     },
     "termsOfService": "https://internetdata.io/terms",
-    "version": "2026.09.21"
+    "version": "2026.09.26"
   },
   "servers": [
     {
@@ -927,7 +927,7 @@
           "Authorization"
         ],
         "summary": "Authorize",
-        "description": "The browser entry point for the authorization-code flow. This is a\nredirect target, not something to call from code.\n\nAn unknown `client_id` or an unregistered `redirect_uri` is shown to the\nUSER and never redirected, because sending an error to an address we\nhave not verified belongs to you is how an open redirector works.\nEverything else comes back to your `redirect_uri` with `error`, your\n`state`, and `iss`.\n",
+        "description": "The browser entry point for the authorization-code flow. This is a\nredirect target, not something to call from code.\n\nAny client may sign in without registering first by using a Client ID\nMetadata Document: make `client_id` an https URL that serves your\nclient's metadata as JSON, naming that same URL as its `client_id`,\nwith `token_endpoint_auth_method` `none` and your `redirect_uris`. An\nhttps redirect URI must be on the same origin as the `client_id`; a\nloopback one (`http://127.0.0.1`, `http://[::1]`, `http://localhost`)\nmatches on any port. Such a client is granted `apikeys.use` at most.\n\nAn unknown `client_id` or an unregistered `redirect_uri` is shown to the\nUSER and never redirected, because sending an error to an address we\nhave not verified belongs to you is how an open redirector works.\nEverything else comes back to your `redirect_uri` with `error`, your\n`state`, and `iss`.\n",
         "security": [],
         "parameters": [
           {
@@ -968,14 +968,14 @@
           {
             "name": "code_challenge_method",
             "in": "query",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "string",
               "enum": [
                 "S256"
               ]
             },
-            "description": "S256 only. `plain` is refused rather than downgraded."
+            "description": "S256, named explicitly. `plain`, or no method at all, is refused rather than downgraded."
           },
           {
             "name": "scope",
@@ -1001,7 +1001,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "RFC 8707. What the token is FOR, so it cannot be replayed elsewhere."
+            "description": "RFC 8707. What the token is FOR, so it cannot be replayed elsewhere:\nthis brand's MCP server, the only resource it issues tokens for.\nAnything else answers `invalid_target`. A client that names none is\ngiven that server.\n"
           }
         ],
         "responses": {
@@ -1010,6 +1010,9 @@
           },
           "400": {
             "description": "Shown to the user. An unverified redirect target is never sent an error."
+          },
+          "429": {
+            "description": "Shown to the user. Too many authorizations from one address."
           }
         }
       }
@@ -1021,7 +1024,7 @@
           "Authorization"
         ],
         "summary": "Token",
-        "description": "Three grant types.\n\n`urn:ietf:params:oauth:grant-type:device_code` polls a device\nauthorization. Until the person approves it answers\n`authorization_pending`; poll faster than `interval` and it answers\n`slow_down`, which means widen your interval and keep it widened.\n\n`authorization_code` exchanges a code from `/oauth/authorize`, with the\n`code_verifier` matching the challenge you sent.\n\n`refresh_token` exchanges a refresh token. The presented token is\nconsumed whatever happens next, so store the new one before using it.\n",
+        "description": "Three grant types.\n\n`urn:ietf:params:oauth:grant-type:device_code` polls a device\nauthorization. Until the person approves it answers\n`authorization_pending`; poll faster than `interval` and it answers\n`slow_down`, which means widen your interval and keep it widened.\n\n`authorization_code` exchanges a code from `/oauth/authorize`, with the\n`code_verifier` matching the challenge you sent and the same\n`redirect_uri`. A code works once: presenting it again also revokes\nwhat the first exchange issued.\n\n`refresh_token` exchanges a refresh token. The presented token is\nconsumed whatever happens next, so store the new one before using it.\nPresenting a consumed refresh token again ends the whole authorization,\nsince it means the token was copied.\n",
         "security": [],
         "requestBody": {
           "required": true,
@@ -1045,7 +1048,7 @@
             }
           },
           "400": {
-            "description": "An RFC 6749 error. `authorization_pending` and `slow_down` are\nnormal answers while polling a device authorization, not failures.\n`access_denied` means the person refused, and `expired_token` that\nthe device code is no longer valid: it expired, or it was already\nexchanged or refused. `invalid_grant` means the code, device code or\nrefresh token is not valid for this `client_id`. `slow_down` also\nanswers any grant when this address sends too many requests.\n",
+            "description": "An RFC 6749 error. `authorization_pending` and `slow_down` are\nnormal answers while polling a device authorization, not failures.\n`access_denied` means the person refused, and `expired_token` that\nthe device code is no longer valid: it expired, or it was already\nexchanged or refused. `invalid_grant` means the code, device code or\nrefresh token is not valid for this `client_id`. `invalid_target`\nmeans `resource` names something other than what was authorized.\n`slow_down` also answers any grant when this address sends too many\nrequests.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -1292,6 +1295,13 @@
             "items": {
               "$ref": "#/components/schemas/DatabaseFormat"
             }
+          },
+          "sample_formats": {
+            "type": "array",
+            "description": "The formats an evaluation sample is published in, if any.",
+            "items": {
+              "$ref": "#/components/schemas/DatabaseFormat"
+            }
           }
         }
       },
@@ -1302,6 +1312,7 @@
           "dataset_id",
           "format",
           "outcome",
+          "sample",
           "bytes",
           "http_status",
           "apikey_id",
@@ -1326,6 +1337,10 @@
               "unknown",
               "unavailable"
             ]
+          },
+          "sample": {
+            "type": "boolean",
+            "description": "The evaluation sample rather than the database itself."
           },
           "bytes": {
             "type": "integer",
@@ -1430,6 +1445,18 @@
               "type": "integer",
               "format": "int64"
             }
+          },
+          "sample_size": {
+            "type": "object",
+            "description": "Bytes per format of the evaluation sample, where one is published.",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "sample_entries": {
+            "type": "integer",
+            "description": "Row count in the evaluation sample."
           }
         }
       },
@@ -1908,6 +1935,10 @@
               "type": "string"
             }
           },
+          "client_id_metadata_document_supported": {
+            "type": "boolean",
+            "description": "Any client may sign in with an https `client_id` serving its own metadata."
+          },
           "token_endpoint_auth_methods_supported": {
             "type": "array",
             "items": {
@@ -2007,7 +2038,11 @@
           },
           "redirect_uri": {
             "type": "string",
-            "description": "Authorization code grant: the `redirect_uri` the code was issued against, exactly."
+            "description": "Required by the authorization code grant: the `redirect_uri` the code was issued against, exactly."
+          },
+          "resource": {
+            "type": "string",
+            "description": "Authorization code grant, optional: RFC 8707, and it must name what was authorized."
           },
           "refresh_token": {
             "type": "string",
@@ -2043,11 +2078,11 @@
           },
           "mslm:apikey_id": {
             "type": "string",
-            "description": "Not part of OAuth. The ID of the API key the person picked when they\napproved, returned by every grant while this authorization may still\nread that key back. Absent when no key was picked, or when the\nperson's role no longer allows reading keys back.\n"
+            "description": "Not part of OAuth, and only for our own clients. The ID of the API\nkey the person picked when they approved, returned by every grant\nwhile this authorization may still read that key back. Absent when\nno key was picked, or when the person's role no longer allows\nreading keys back.\n"
           },
           "mslm:apikey": {
             "type": "string",
-            "description": "Not part of OAuth. The API key itself, so a device ends up holding an\nordinary key. Returned by the device code and authorization code\ngrants only, never by a refresh, and only alongside\n`mslm:apikey_id`. Absent when that key's secret cannot be read back,\nwhich is the case for a key created before keys could be shown again\nin the console; a rotated key can be.\n"
+            "description": "Not part of OAuth, and only for our own clients: a client that signed\nin with a Client ID Metadata Document never receives a key. The API\nkey itself, so a device ends up holding an ordinary key. Returned by\nthe device code and authorization code grants only, never by a\nrefresh, and only alongside\n`mslm:apikey_id`. Absent when that key's secret cannot be read back,\nwhich is the case for a key created before keys could be shown again\nin the console; a rotated key can be.\n"
           }
         },
         "required": [
