@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 2.2.1 - 2026-09-29
+
+### Fixes
+
+- README: link the evaluation request, not a mailbox ([`c8418b9`](https://github.com/internetdata/mcp/commit/c8418b97490d28cb167f080d6c7fdf579c90a7a9))
+
 ## 2.2.0 - 2026-09-27
 
 ### Features
