@@ -9,7 +9,7 @@ InternetData publishes IP databases: VPN and proxy address space, hosting and CD
 
 ## Getting Started
 
-We host it at `https://mcp.internetdata.io/mcp`, and you sign in to it with your InternetData account. It also runs on your own machine from npm. Either way it sees the databases your organization is licensed for. Databases are licensed by contract rather than bought self-serve: see the [API documentation](https://docs.internetdata.io/api) or write to [dev@internetdata.io](mailto:dev@internetdata.io).
+We host it at `https://mcp.internetdata.io/mcp`, and you sign in to it with your InternetData account. It also runs on your own machine from npm. Either way it sees the databases your organization is licensed for. Databases are licensed by contract rather than bought self-serve: see the [API documentation](https://docs.internetdata.io/api), or [request an evaluation](https://internetdata.io/contact?purpose=evaluation&subject=Evaluation+license) if your organization doesn't have a license yet.
 
 ### In Claude
 
