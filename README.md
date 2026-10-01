@@ -5,11 +5,11 @@
 
 The official [Model Context Protocol](https://modelcontextprotocol.io) server for the [InternetData](https://internetdata.io) API.
 
-InternetData publishes IP databases: VPN and proxy address space, hosting and CDN ranges, provider catalogs, bogons and more, as gzipped CSV and as MMDB. This server gives an AI agent four read-only tools over them - which databases your organization is licensed for, what is inside one, the digests to verify a copy you already hold, and your recent download history.
+InternetData publishes IP databases: VPN and proxy address space, hosting and CDN ranges, provider catalogs, bogons and more, as gzipped CSV and as MMDB. This server gives an AI agent four read-only tools over them - every database we publish and where your organization's license for each one stands, what is inside one, the digests to verify a copy you already hold, and your recent download history.
 
 ## Getting Started
 
-We host it at `https://mcp.internetdata.io/mcp`, and you sign in to it with your InternetData account. It also runs on your own machine from npm. Either way it sees the databases your organization is licensed for. Databases are licensed by contract rather than bought self-serve: see the [API documentation](https://docs.internetdata.io/api), or [request an evaluation](https://internetdata.io/contact?purpose=evaluation&subject=Evaluation+license) if your organization doesn't have a license yet.
+We host it at `https://mcp.internetdata.io/mcp`, and you sign in to it with your InternetData account. It also runs on your own machine from npm. Either way it sees where your organization's license for each database stands. Databases are licensed by contract rather than bought self-serve: see the [API documentation](https://docs.internetdata.io/api), or [request an evaluation](https://internetdata.io/contact?purpose=evaluation&subject=Evaluation+license) if your organization doesn't have a license yet.
 
 ### In Claude
 
@@ -48,7 +48,7 @@ Requires Node.js 22 or newer. `INTERNETDATA_BASE_URL` overrides the endpoint if 
 
 | Tool | What it answers |
 |---|---|
-| `list_databases` | The databases your organization is licensed for, with the license type and term. |
+| `list_databases` | Every database we publish, with its `standing` for your organization (`licensed`, `expired` or `unlicensed`) and the type and term of any license. |
 | `database_metadata` | A database's columns, sample rows, row count, build date and file sizes. |
 | `database_checksum` | The published digests for one database file. |
 | `list_downloads` | Your organization's recent download attempts, refusals included. |
