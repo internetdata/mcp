@@ -1,0 +1,43 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.internetdata/mcp",
+  "title": "InternetData",
+  "description": "List InternetData's IP and ASN databases, your license for each, what one holds, and its digests.",
+  "websiteUrl": "https://internetdata.io",
+  "repository": {
+    "url": "https://github.com/internetdata/mcp",
+    "source": "github"
+  },
+  "version": "2.2.1",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "internetdata-mcp",
+      "version": "2.2.1",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "INTERNETDATA_API_KEY",
+          "description": "Your InternetData API key",
+          "isRequired": true,
+          "isSecret": true,
+          "format": "string"
+        },
+        {
+          "name": "INTERNETDATA_BASE_URL",
+          "description": "Overrides the API endpoint",
+          "isRequired": false,
+          "format": "string"
+        }
+      ]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.internetdata.io/mcp"
+    }
+  ]
+}

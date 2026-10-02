@@ -39,6 +39,35 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+  # Lists the version just published in the official MCP registry (registry.modelcontextprotocol.io),
+  # which VS Code, GitHub's MCP list and the directories that mirror it read. The registry checks
+  # the npm package's mcpName against server.json's name, so it waits for npm to serve the version.
+  # GitHub OIDC is what proves this repo owns the io.github.internetdata namespace: no secret.
+  mcp-registry:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Wait for npm to serve this version
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          for _ in $(seq 60) ; do
+            if [ "$(npm view "internetdata-mcp@${version}" mcpName 2> /dev/null)" = "$(jq -r .name server.json)" ] ; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "npm never served internetdata-mcp@${version} with its mcpName" >&2
+          exit 1
+      - name: Publish server.json
+        run: |
+          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/download/v1.8.1/mcp-publisher_linux_amd64.tar.gz" | tar -xz mcp-publisher
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish
+
   github-release:
     needs: publish
     runs-on: ubuntu-latest
