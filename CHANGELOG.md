@@ -2,6 +2,18 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 2.2.2 - 2026-10-03
+
+### Features
+
+- List the server in the official MCP registry on every release ([`b0ae688`](https://github.com/internetdata/mcp/commit/b0ae688c822fa35435ffbe792da78dee6724a3dd))
+
+### Fixes
+
+- Take spec 2026.10.03: database metadata needs no license ([`100f928`](https://github.com/internetdata/mcp/commit/100f9288cb84e24fb3cd6aa562cdfbfcee86d7a7))
+- README: name the languages InternetData publishes, not frameworks ([`b682ba8`](https://github.com/internetdata/mcp/commit/b682ba80ec3736cf74b3568d0cca3d4c717cd7c3))
+- README: list_databases answers every published database, with its standing ([`f0c84fe`](https://github.com/internetdata/mcp/commit/f0c84fe0bdb4afc149d9c75993f9179493836233))
+
 ## 2.2.1 - 2026-09-29
 
 ### Fixes

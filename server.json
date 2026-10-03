@@ -8,12 +8,12 @@
     "url": "https://github.com/internetdata/mcp",
     "source": "github"
   },
-  "version": "2.2.1",
+  "version": "2.2.2",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "internetdata-mcp",
-      "version": "2.2.1",
+      "version": "2.2.2",
       "transport": {
         "type": "stdio"
       },
