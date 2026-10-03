@@ -9,7 +9,7 @@
       "url": "https://internetdata.io"
     },
     "termsOfService": "https://internetdata.io/terms",
-    "version": "2026.09.26"
+    "version": "2026.10.03"
   },
   "servers": [
     {
@@ -166,7 +166,7 @@
         ],
         "operationId": "databaseMetadataV2",
         "summary": "Metadata",
-        "description": "Poll this to decide whether today's build is worth fetching: it carries\n`updated` and `entries` without downloading anything.\n\nNo `format` parameter - one document describes every format the database\nis built in.\n",
+        "description": "Poll this to decide whether today's build is worth fetching: it carries\n`updated` and `entries` without downloading anything.\n\nNo `format` parameter - one document describes every format the database\nis built in. Needs no license: it answers for every database `list`\nreturns, whatever its `standing`.\n",
         "security": [
           {
             "ApiKeyQueryAuth": []
@@ -196,9 +196,6 @@
           },
           "401": {
             "$ref": "#/components/responses/V2Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/V2NotLicensed"
           },
           "404": {
             "$ref": "#/components/responses/V2UnknownDatabase"
@@ -2154,7 +2151,7 @@
         }
       },
       "V2NotAvailable": {
-        "description": "Licensed, but the current build has not been published yet.\n`rc`: `NOT_AVAILABLE`.\n",
+        "description": "The current build has not been published yet.\n`rc`: `NOT_AVAILABLE`.\n",
         "content": {
           "application/json": {
             "schema": {
