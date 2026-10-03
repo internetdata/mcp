@@ -79,7 +79,7 @@ The published builds run to several GB, which is not something an agent should p
 
 ## Other Libraries
 
-There are official InternetData client libraries available for many languages including PHP, Python, Go, Java, Ruby, and many popular frameworks such as Django, Rails, and Laravel. See our GitHub at https://github.com/internetdata for more.
+There are official InternetData client libraries available for many languages including PHP, Python, Go, Java, and Ruby. See our GitHub at https://github.com/internetdata for more.
 
 ## About InternetData
 
