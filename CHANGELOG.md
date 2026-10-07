@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.0.0 - 2026-10-07
+
+### Breaking changes
+
+- Serve MCP 2026-07-28 too, on MCP SDK v2; registerTools takes its Server ([`67125d5`](https://github.com/internetdata/mcp/commit/67125d515bcf639d49355da3a9311f5f1f2a6e76))
+
 ## 2.2.2 - 2026-10-03
 
 ### Features
