@@ -52,10 +52,11 @@
     },
     "dependencies": {
         "@internetdata/internetdata": "^2.0.0",
-        "@modelcontextprotocol/sdk": "^1.20.2",
+        "@modelcontextprotocol/server": "^2.2.0",
         "zod": "^4.1.12"
     },
     "devDependencies": {
+        "@modelcontextprotocol/client": "^2.2.0",
         "@mslmio/eslint-config": "^1.1.0",
         "@types/node": "^26.2.0",
         "ajv": "^8.20.0",

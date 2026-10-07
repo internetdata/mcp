@@ -2,13 +2,10 @@ import { z } from 'zod';
 
 import { DATABASE_FORMATS } from '@internetdata/internetdata';
 
-import type { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import type { CallToolResult, Tool } from '@modelcontextprotocol/sdk/types.js';
+import type { CallToolResult, Server, Tool } from '@modelcontextprotocol/server';
 import type { DatabaseFormat, InternetData } from '@internetdata/internetdata';
 
-import {
-    CallToolRequestSchema, ErrorCode, ListToolsRequestSchema, McpError,
-} from '@modelcontextprotocol/sdk/types.js';
+import { ProtocolError, ProtocolErrorCode } from '@modelcontextprotocol/server';
 
 import {
     DATABASE_METADATA_SCHEMA, DATABASE_SCHEMA, DB_CHECKSUMS_SCHEMA, DOWNLOAD_SCHEMA,
@@ -191,17 +188,17 @@ function withAnnotatedTitle(tool: Tool): Tool {
 export function registerTools(server: Server, defs: ToolDef[]): void {
     const byName = new Map(defs.map((d) => [d.tool.name, d]));
 
-    server.setRequestHandler(ListToolsRequestSchema, () => {
+    server.setRequestHandler('tools/list', () => {
         return { tools: defs.map((d) => d.tool) };
     });
 
-    server.setRequestHandler(CallToolRequestSchema, async (req) => {
+    server.setRequestHandler('tools/call', async (req) => {
         const def = byName.get(req.params.name);
         if (def === undefined) {
             // The caller's mistake, as the MCP spec and the SDK's own McpServer
             // answer it. A plain Error would reach the client as -32603, "the
             // server broke", for a model that only guessed a tool name.
-            throw new McpError(ErrorCode.InvalidParams, `Unknown tool: ${req.params.name}`);
+            throw new ProtocolError(ProtocolErrorCode.InvalidParams, `Unknown tool: ${req.params.name}`);
         }
         return await def.handler(req.params.arguments ?? {});
     });

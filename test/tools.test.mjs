@@ -3,11 +3,11 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { ErrorCode } from '@modelcontextprotocol/sdk/types.js';
+import { Client, ProtocolErrorCode } from '@modelcontextprotocol/client';
+import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
+import { InMemoryTransport, Server } from '@modelcontextprotocol/server';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import { InternetData } from '@internetdata/internetdata';
@@ -308,11 +308,33 @@ test('an unknown tool is invalid params, not an internal error', async () => {
     await client.connect(clientSide);
     try {
         await assert.rejects(client.callTool({ name: 'list_datasets', arguments: {} }),
-            { code: ErrorCode.InvalidParams, message: /Unknown tool: list_datasets/ });
+            { code: ProtocolErrorCode.InvalidParams, message: /Unknown tool: list_datasets/ });
     } finally {
         await client.close();
     }
 });
+
+// The installed entry point serves both protocol eras: a 2025-11-25 client opens
+// with `initialize`, a 2026-07-28 one with `server/discover` and no handshake.
+for (const [era, versionNegotiation] of [
+    ['2025-11-25', undefined],
+    ['2026-07-28', { mode: { pin: '2026-07-28' } }],
+]) {
+    test(`the stdio server lists the manifest to a ${era} client`, async () => {
+        const client = new Client({ name: 'test', version: '0' }, { versionNegotiation: versionNegotiation });
+        await client.connect(new StdioClientTransport({
+            command: process.execPath,
+            args: [fileURLToPath(new URL('../dist/stdio.js', import.meta.url))],
+            env: { PATH: process.env.PATH ?? '' },
+        }));
+        try {
+            const { tools } = await client.listTools();
+            assert.deepEqual(tools.map((t) => t.name), TOOL_NAMES);
+        } finally {
+            await client.close();
+        }
+    });
+}
 
 // Every bound is READ off the spec, not restated here: the API enforces them,
 // and a second hand-written copy is free to keep advertising the old number.

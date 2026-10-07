@@ -8,33 +8,38 @@
 
 import { createRequire } from 'node:module';
 
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { Server } from '@modelcontextprotocol/server';
+import { serveStdio } from '@modelcontextprotocol/server/stdio';
 import { InternetData } from '@internetdata/internetdata';
 
 import { createTools, registerTools } from './tools.js';
 
 const version = createRequire(import.meta.url)('../package.json').version as string;
 
-async function main(): Promise<void> {
+function main(): void {
     const apiKey = process.env['INTERNETDATA_API_KEY'];
     const client = new InternetData({
         ...(apiKey === undefined || apiKey === '' ? {} : { apiKey: apiKey }),
         ...(process.env['INTERNETDATA_BASE_URL'] === undefined
             ? {} : { baseUrl: process.env['INTERNETDATA_BASE_URL'] }),
     });
+    const tools = createTools({ client: client });
 
-    const server = new Server(
-        { name: 'internetdata', version: version },
-        { capabilities: { tools: {} } },
-    );
-    registerTools(server, createTools({ client: client }));
-
-    await server.connect(new StdioServerTransport());
+    // The opening exchange picks the protocol era, 2025-11-25's `initialize` or
+    // 2026-07-28's `server/discover`, and the server this builds is pinned to it.
+    serveStdio(() => {
+        const server = new Server(
+            { name: 'internetdata', version: version },
+            { capabilities: { tools: {} } },
+        );
+        registerTools(server, tools);
+        return server;
+    }, {
+        // stdout carries the protocol, so a diagnostic can only go to stderr.
+        onerror: (err) => {
+            console.error(err);
+        },
+    });
 }
 
-main().catch((err: unknown) => {
-    // stdout carries the protocol, so a diagnostic can only go to stderr.
-    console.error(err);
-    process.exitCode = 1;
-});
+main();
