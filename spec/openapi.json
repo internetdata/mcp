@@ -9,7 +9,7 @@
       "url": "https://internetdata.io"
     },
     "termsOfService": "https://internetdata.io/terms",
-    "version": "2026.10.03"
+    "version": "2026.10.08"
   },
   "servers": [
     {
@@ -24,7 +24,7 @@
     },
     {
       "name": "Database v2",
-      "description": "The current database API. Authenticate with an API key carrying the\n`db.download` scope, presented any of three ways: `Authorization: Bearer\n<key>`, `X-Api-Key: <key>`, or `?apikey=<key>`. They are the same key;\nthe query parameter is there for curl and the browser, which is how a\ndatabase is usually fetched.\n\nAccess is granted by CONTRACT, one dataset family at a time: there is no\nself-service purchase and no subscription behind it.\n\nA successful download answers `302` with a time-limited URL pointing\nstraight at object storage. Follow the redirect (`curl -L`); the link\nauthorizes the START of a transfer, so a download already running is not\ninterrupted when it lapses.\n",
+      "description": "The current database API. Authenticate with an API key carrying the\n`db.download` scope, presented any of three ways: `Authorization: Bearer\n<key>`, `X-Api-Key: <key>`, or `?apikey=<key>`. They are the same key;\nthe query parameter is there for curl and the browser, which is how a\ndatabase is usually fetched.\n\nAccess is granted by CONTRACT, one dataset family at a time: there is no\nself-service purchase and no subscription behind it. The Open databases\nare the exception: any organization downloads one with its key, licensed\nor not, under CC BY-SA 4.0. `list` marks them `open`.\n\nA successful download answers `302` with a time-limited URL pointing\nstraight at object storage. Follow the redirect (`curl -L`); the link\nauthorizes the START of a transfer, so a download already running is not\ninterrupted when it lapses.\n",
       "x-displayName": "Database v2"
     },
     {
@@ -56,7 +56,7 @@
         ],
         "operationId": "listDatabases",
         "summary": "List",
-        "description": "The whole published catalog, with your organization's license beside\neach entry, so `standing` says whether a database is yours today\n(`licensed`), was (`expired`), or has never been bought (`unlicensed`).\n",
+        "description": "The whole published catalog, with your organization's license beside\neach entry, so `standing` says whether a database is yours today\n(`licensed`), was (`expired`), or has never been bought (`unlicensed`).\nAn `open` database downloads whatever its `standing`.\n",
         "security": [
           {
             "ApiKeyQueryAuth": []
@@ -1183,7 +1183,7 @@
       },
       "Standing": {
         "type": "string",
-        "description": "Where your license for a database family stands today. `licensed` is a\nlive grant, `expired` one whose term has ended, and `unlicensed` a\ndatabase published but never bought.\n",
+        "description": "Where your license for a database family stands today. `licensed` is a\nlive grant, `expired` one whose term has ended, and `unlicensed` a\ndatabase published but never bought. An Open database (`open`)\ndownloads whatever this says.\n",
         "enum": [
           "licensed",
           "expired",
@@ -1198,6 +1198,7 @@
           "name",
           "summary",
           "standing",
+          "open",
           "license_type",
           "starts",
           "expires",
@@ -1221,6 +1222,10 @@
           },
           "standing": {
             "$ref": "#/components/schemas/Standing"
+          },
+          "open": {
+            "type": "boolean",
+            "description": "An Open database: any organization downloads it, and fetches its\nchecksums, with no license, under CC BY-SA 4.0 (credit\nInternetData, https://internetdata.io, and share what you build\nfrom it under the same license). `standing` still reports your\nown license, which grants more where you hold one.\n"
           },
           "license_type": {
             "type": "string",
@@ -1310,6 +1315,7 @@
           "format",
           "outcome",
           "sample",
+          "open",
           "bytes",
           "http_status",
           "apikey_id",
@@ -1338,6 +1344,10 @@
           "sample": {
             "type": "boolean",
             "description": "The evaluation sample rather than the database itself."
+          },
+          "open": {
+            "type": "boolean",
+            "description": "Taken under the Open license rather than one of your licenses: an\nOpen database downloaded while your organization held no license\nin term for it.\n"
           },
           "bytes": {
             "type": "integer",
@@ -2131,7 +2141,7 @@
         }
       },
       "V2NotLicensed": {
-        "description": "Your organization holds no license for this database, or its term has\nended.\n`rc`: `NOT_LICENSED`, `LICENSE_EXPIRED`.\n",
+        "description": "Your organization holds no license for this database, or its term has\nended. Never for an Open database.\n`rc`: `NOT_LICENSED`, `LICENSE_EXPIRED`.\n",
         "content": {
           "application/json": {
             "schema": {

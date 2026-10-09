@@ -28,6 +28,7 @@ const CATALOG = {
             name: 'Bogon IP',
             summary: 'Non-routable address space.',
             standing: 'licensed',
+            open: true,
             license_type: 'standard',
             starts: '2026-01-01T00:00:00.000Z',
             expires: null,
@@ -45,6 +46,7 @@ const CATALOG = {
             name: 'Hosting IP',
             summary: 'Hosting provider address space.',
             standing: 'unlicensed',
+            open: false,
             license_type: null,
             starts: null,
             expires: null,
@@ -75,11 +77,11 @@ const CHECKSUMS = {
 };
 
 // Every nullable field null at once, so the schema has to admit each of them.
-// `sample` is required as well, and not nullable.
+// `sample` and `open` are required as well, and not nullable.
 const NULL_DOWNLOADS = {
     downloads: [{
-        dataset_id: 'hosting_ip_v1', format: 'csvgz', outcome: 'unknown', sample: false, bytes: null,
-        http_status: null, apikey_id: null, client_ip: null, user_agent: null,
+        dataset_id: 'hosting_ip_v1', format: 'csvgz', outcome: 'unknown', sample: false, open: false,
+        bytes: null, http_status: null, apikey_id: null, client_ip: null, user_agent: null,
         created: '2026-09-12T10:00:00.000Z',
     }],
 };
@@ -234,8 +236,8 @@ test('the downloads window is published and enforced', async () => {
 test('a refused attempt is carried through, not filtered out', async () => {
     const refused = {
         downloads: [{
-            dataset_id: 'hosting_ip_v1', format: 'csvgz', outcome: 'denied', sample: false, bytes: 0,
-            http_status: 403, apikey_id: 'k1', client_ip: '198.51.100.9',
+            dataset_id: 'hosting_ip_v1', format: 'csvgz', outcome: 'denied', sample: false, open: false,
+            bytes: 0, http_status: 403, apikey_id: 'k1', client_ip: '198.51.100.9',
             user_agent: 'curl/8', created: '2026-09-12T10:00:00.000Z',
         }],
     };
