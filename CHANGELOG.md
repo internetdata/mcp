@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.1.0 - 2026-10-09
+
+### Features
+
+- Take spec 2026.10.08: Open databases in two tools' answers ([`b8c1410`](https://github.com/internetdata/mcp/commit/b8c14109cf4254b94438c598959f789311aca870))
+
 ## 3.0.0 - 2026-10-07
 
 ### Breaking changes
