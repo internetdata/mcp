@@ -9,7 +9,7 @@
       "url": "https://internetdata.io"
     },
     "termsOfService": "https://internetdata.io/terms",
-    "version": "2026.10.08"
+    "version": "2026.10.09"
   },
   "servers": [
     {
@@ -712,11 +712,12 @@
           "API keys"
         ],
         "summary": "Rotate",
-        "description": "Replaces the secret behind a key, keeping its id, name and settings.\nThe previous secret stops working immediately.\n",
+        "description": "Replaces the secret behind a key, keeping its id, name and settings.\nThe previous secret stops working immediately. The new secret comes\nback in the answer, so this needs `apikeys.reveal` as well as\n`apikeys.manage`.\n",
         "security": [
           {
             "BearerAuth": [
-              "apikeys.manage"
+              "apikeys.manage",
+              "apikeys.reveal"
             ]
           }
         ],
