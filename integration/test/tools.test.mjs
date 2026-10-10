@@ -8,6 +8,7 @@
 // nothing about the server.
 
 import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
 import { test } from 'node:test';
 
 import { Client } from '@modelcontextprotocol/client';
@@ -19,6 +20,9 @@ const BASE_URL = 'https://staging.internetdata.io';
 const TOOL_NAMES = ['list_databases', 'database_metadata', 'database_checksum', 'list_downloads'];
 
 const NO_KEY = skipForNoKey();
+
+// Through the export map's own `./package.json` entry, as the runner installed it.
+const INSTALLED_VERSION = createRequire(import.meta.url)('internetdata-mcp/package.json').version;
 
 async function connect({ withKey = true } = {}) {
     const transport = new StdioClientTransport({
@@ -54,6 +58,10 @@ function structured(out) {
 // fails here and nowhere else.
 test('the server starts and lists its tools', async () => {
     await withClient(async (client) => {
+        // npx resolves the installed copy, and a server that is anything else -
+        // one npx fetched for itself, or an older one on the PATH - says so here.
+        assert.equal(client.getServerVersion()?.version, INSTALLED_VERSION,
+            'the server npx started is not the version the runner installed');
         const { tools } = await client.listTools();
         assert.deepEqual(tools.map((t) => t.name), TOOL_NAMES);
         assert.ok(!tools.some((t) => t.name.includes('download') && t.name !== 'list_downloads'));

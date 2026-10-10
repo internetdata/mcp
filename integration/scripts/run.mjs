@@ -7,13 +7,11 @@
 //
 //   node scripts/run.mjs
 //
-// Two conditions make the run meaningless rather than failing, and each one
-// skips with a reason instead:
-//
-//   1. Nothing on the registry satisfies the declared range. Before the first
-//      release there is no published artifact to test.
-//   2. The staging key is missing. Every endpoint this API has is authenticated,
-//      so without it there is nothing at all to exercise.
+// Nothing on the registry satisfying the declared range makes the run
+// meaningless rather than failing, so it skips with a reason instead: before the
+// first release there is no published artifact to test. A missing staging key
+// costs only the tests that need one, which skip from inside the suite with a
+// named reason; the keyless ones run regardless.
 //
 // npm, deliberately, not pnpm: the repo root carries a pnpm workspace whose
 // `minimumReleaseAge` would refuse a version published minutes ago, and a
@@ -28,12 +26,14 @@ import { fileURLToPath } from 'node:url';
 import { KEY_VAR, stagingKey } from '../lib/key.mjs';
 
 const PACKAGE = 'internetdata-mcp';
-// This package is unscoped, but its DEPENDENCY is not: it pulls in the public
-// `@internetdata/internetdata`. A developer machine may map that whole scope to
-// a private registry, in which case the install fails outright rather than
-// resolving something wrong. Stated here rather than inherited from the
-// environment; a CI runner has no such mapping and is unaffected.
-const REGISTRY = ['--@internetdata:registry=https://registry.npmjs.org/'];
+// The client library the server wraps, which a stranger's install fetches with it.
+const CLIENT = '@internetdata/internetdata';
+// Both are public, and this is the registry that serves them. Stated for each
+// name rather than inherited, because a developer machine may map the client's
+// SCOPE to a private registry, and that mapping outranks `--registry`: the
+// install then fails, or resolves something that is not what a stranger gets.
+const NPMJS = 'https://registry.npmjs.org/';
+const REGISTRY = [`--registry=${NPMJS}`, `--@internetdata:registry=${NPMJS}`];
 
 try {
     main();
@@ -54,8 +54,7 @@ function main() {
     console.log(`==> ${PACKAGE}@${range} matches published ${versions.join(', ')}`);
 
     if (stagingKey() === '') {
-        skip(`${KEY_VAR} is not set, so nothing can be exercised against staging`);
-        return;
+        notice(`${KEY_VAR} is not set, so the tests that need it skip`);
     }
 
     // Both removed so every run resolves the range afresh. A kept lockfile would
@@ -91,22 +90,33 @@ function publishedVersions(range) {
     return Array.isArray(parsed) ? parsed : [parsed];
 }
 
-// The suite is worthless if npm handed it a link to the working tree, and that
-// failure is silent: every test passes, against the wrong code.
+// The suite is worthless if npm handed it a link to the working tree, or an
+// artifact from anywhere but the registry a stranger installs from, and both
+// failures are silent: every test passes, against the wrong code. So the server
+// and the client library it wraps must each have come from npm, which a check
+// for any `https://` URL could not tell from a private registry.
 function assertInstalledFromRegistry(dir, versions) {
     const installed = join(dir, 'node_modules', PACKAGE);
     if (lstatSync(installed).isSymbolicLink()) {
         throw new Error(`${installed} is a symlink, so the tests would run against local source`);
     }
-    const entry = readJson(join(dir, 'package-lock.json')).packages[`node_modules/${PACKAGE}`];
-    if (entry === undefined || !String(entry.resolved).startsWith('https://')) {
-        throw new Error(`${PACKAGE} was not resolved from a registry: ${JSON.stringify(entry)}`);
+    const packages = readJson(join(dir, 'package-lock.json')).packages;
+    for (const name of [PACKAGE, CLIENT]) {
+        const entries = Object.entries(packages).filter(([path]) => path.endsWith(`node_modules/${name}`));
+        if (entries.length === 0) {
+            throw new Error(`${name} is not in the install at all`);
+        }
+        for (const [path, entry] of entries) {
+            if (!String(entry.resolved).startsWith(NPMJS)) {
+                throw new Error(`${path} was not resolved from ${NPMJS}: ${JSON.stringify(entry)}`);
+            }
+        }
     }
     const version = readJson(join(installed, 'package.json')).version;
     if (!versions.includes(version)) {
         throw new Error(`installed ${version}, which is not one of ${versions.join(', ')}`);
     }
-    console.log(`==> installed ${PACKAGE}@${version} from ${entry.resolved}`);
+    console.log(`==> installed ${PACKAGE}@${version} from ${packages[`node_modules/${PACKAGE}`].resolved}`);
 }
 
 function run(command, args, cwd) {
