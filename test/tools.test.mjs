@@ -301,6 +301,18 @@ test('a rejected argument is the model\'s to fix, not an internal failure', asyn
     }
 });
 
+// `list_databases` has always published `additionalProperties: false`, and it
+// holds to it: an argument it does not take is refused by name, before any request.
+test('an argument a tool does not take is refused before the API is asked', async () => {
+    const stub = serving(CATALOG);
+    const out = await byName(stub.fetch).get('list_databases').handler({ dataset_id: 'nope' });
+    const { error } = JSON.parse(out.content[0].text);
+    assert.equal(error.kind, 'invalid_argument');
+    assert.equal(error.retryable, false);
+    assert.match(error.message, /dataset_id/);
+    assert.equal(stub.state.calls, 0, 'a refused call must not reach the API');
+});
+
 // A tool name the model guessed, such as `list_datasets` from before 2.0.0, is its
 // mistake too: a protocol error, since no tool exists to answer it, but never -32603.
 test('an unknown tool is invalid params, not an internal error', async () => {

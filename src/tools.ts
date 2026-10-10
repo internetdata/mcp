@@ -43,6 +43,9 @@ const VERSIONED_ID = 'A VERSIONED database id, from `versions[].id` in `list_dat
 // the handler parses with the same one, so the cap a client is shown is the cap
 // it meets. Two lookalike declarations - a schema for the manifest and another
 // in the handler - is how an advertised bound and an enforced bound drift.
+// `list_databases` takes none, so an argument it is handed is refused by name.
+const LIST_INPUT = z.strictObject({});
+
 const METADATA_INPUT = z.object({
     dataset_id: z.string().describe(VERSIONED_ID),
 });
@@ -78,7 +81,7 @@ export function createTools(ctx: ToolContext): ToolDef[] {
                     + '`id` is what the other tools take - pass `versions[].id` (`bogon_ip_v1`), '
                     + 'never the `base` (`bogon_ip`). Ask again rather than holding on to this: it '
                     + 'is answered per key and is not the same for everyone.',
-                inputSchema: { type: 'object', additionalProperties: false },
+                inputSchema: jsonSchema(LIST_INPUT),
                 outputSchema: objectSchema({
                     databases: { type: 'array', items: DATABASE_SCHEMA },
                 }, ['databases']),
@@ -88,7 +91,8 @@ export function createTools(ctx: ToolContext): ToolDef[] {
                     openWorldHint: true,
                 },
             },
-            handler: async () => {
+            handler: async (args) => {
+                LIST_INPUT.parse(args);
                 return ok({ databases: await ctx.client.database.list() });
             },
         },
