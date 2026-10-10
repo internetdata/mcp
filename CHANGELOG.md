@@ -2,6 +2,15 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.1.1 - 2026-10-10
+
+### Fixes
+
+- Take spec 2026.10.09: rotating a key needs apikeys.reveal ([`5c5fcbf`](https://github.com/internetdata/mcp/commit/5c5fcbff547e1be5d5274f71e6be2b084276087e))
+- Trim the environment, and take a blank variable as unset ([`cb33f68`](https://github.com/internetdata/mcp/commit/cb33f68d33aed3ef332c6a2123f5c65de8ae8e5c))
+- Refuse an argument list_databases does not take ([`6d1bcd9`](https://github.com/internetdata/mcp/commit/6d1bcd96ead953c9f4589905c076ddf9cb4f8147))
+- README: name the Open databases, and show open in the example ([`89b2bbe`](https://github.com/internetdata/mcp/commit/89b2bbecc705e4b8d5e9e4b1521cf48adb632a35))
+
 ## 3.1.0 - 2026-10-09
 
 ### Features
