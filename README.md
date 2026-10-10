@@ -22,6 +22,18 @@ In claude.ai, the desktop app or Cowork, add `https://mcp.internetdata.io/mcp` a
 
 Either way you sign in with your InternetData account, and Claude never sees your API key. The steps, the skills and how to disconnect: [docs.internetdata.io/integrations/claude](https://docs.internetdata.io/integrations/claude).
 
+### In ChatGPT and Codex
+
+In ChatGPT on the web, add `https://mcp.internetdata.io/mcp` as a custom MCP server under Plugins and choose OAuth. In Codex, install our plugin, which adds the server with skills:
+
+```console
+codex plugin marketplace add internetdata/openai-plugin
+codex plugin add internetdata@internetdata
+codex mcp login internetdata
+```
+
+Either way you sign in with your InternetData account, and neither sees your API key. The steps: [docs.internetdata.io/integrations/chatgpt](https://docs.internetdata.io/integrations/chatgpt) and [docs.internetdata.io/integrations/codex](https://docs.internetdata.io/integrations/codex). On the OpenAI API, the Responses API's `mcp` tool takes the server as its `server_url` and your key as its `authorization`.
+
 ### In any other MCP client
 
 Point it at `https://mcp.internetdata.io/mcp`. A client that supports MCP authorization signs in the same way. One that doesn't can send a key instead, as `Authorization: Bearer your-key`.
