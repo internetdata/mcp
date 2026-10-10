@@ -9,7 +9,7 @@ InternetData publishes IP and ASN databases: geolocation, anonymity, ownership a
 
 ## Getting Started
 
-We host it at `https://mcp.internetdata.io/mcp`, and you sign in to it with your InternetData account. It also runs on your own machine from npm. Either way it sees where your organization's license for each database stands. Databases are licensed by contract rather than bought self-serve: see the [API documentation](https://docs.internetdata.io/api), or [request an evaluation](https://internetdata.io/contact?purpose=evaluation&subject=Evaluation+license) if your organization doesn't have a license yet.
+We host it at `https://mcp.internetdata.io/mcp`, and you sign in to it with your InternetData account. It also runs on your own machine from npm. Either way it sees where your organization's license for each database stands. Databases are licensed by contract, except the Open ones, `tor_ip_v1` among them, which any organization downloads under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). For the rest, see the [API documentation](https://docs.internetdata.io/api), or [request an evaluation](https://internetdata.io/contact?purpose=evaluation&subject=Evaluation+license) if your organization doesn't have a license yet.
 
 ### In Claude
 
@@ -63,6 +63,7 @@ Every tool is read-only.
 {
   "base": "vpn_ip",
   "standing": "licensed",
+  "open": false,
   "versions": [{ "id": "vpn_ip_v1", "version": 1, "formats": ["csvgz", "mmdb"] }]
 }
 ```
