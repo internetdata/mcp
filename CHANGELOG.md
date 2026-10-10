@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.1.2 - 2026-10-10
+
+### Fixes
+
+- State destructiveHint on every tool ([`14f718b`](https://github.com/internetdata/mcp/commit/14f718b01206cc7868614affc191077e6b154bf6))
+
 ## 3.1.1 - 2026-10-10
 
 ### Fixes
