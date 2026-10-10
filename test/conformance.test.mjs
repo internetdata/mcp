@@ -103,6 +103,7 @@ test('listing-is-returned-as-served: nothing is filtered, reordered or invented'
             name: `Family ${i}`,
             summary: 'x',
             standing: standing,
+            open: false,
             license_type: standing === 'licensed' ? data.license_type[0] : null,
             starts: null,
             expires: null,
@@ -135,7 +136,7 @@ test('a-listing-is-never-reused-across-clients: each call asks again', async () 
 
     const second = serving({
         databases: [{
-            base: 'other', name: 'Other', summary: 'x', standing: 'licensed',
+            base: 'other', name: 'Other', summary: 'x', standing: 'licensed', open: false,
             license_type: 'standard', starts: null, expires: null, renews_at: null,
             notice_due_at: null,
             versions: [{ id: 'other_v1', version: 1, summary: 'v1', formats: ['csvgz'] }],
