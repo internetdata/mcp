@@ -2,6 +2,7 @@
 
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { createServer } from 'node:http';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
@@ -13,6 +14,7 @@ import addFormats from 'ajv-formats';
 import { InternetData } from '@internetdata/internetdata';
 
 import { createTools, DOWNLOADS_LIMIT, registerTools } from '../dist/index.js';
+import { clientOptions } from '../dist/env.js';
 
 // MCP names the allowed characters explicitly; a name outside them is a tool
 // some clients will refuse to surface at all.
@@ -337,6 +339,53 @@ for (const [era, versionNegotiation] of [
         }
     });
 }
+
+test('a blank variable counts as unset, and every value is trimmed', () => {
+    assert.deepEqual(clientOptions({}), {});
+    assert.deepEqual(clientOptions({ INTERNETDATA_API_KEY: '', INTERNETDATA_BASE_URL: '' }), {});
+    assert.deepEqual(clientOptions({ INTERNETDATA_API_KEY: ' \t', INTERNETDATA_BASE_URL: '  ' }), {});
+    assert.deepEqual(
+        clientOptions({ INTERNETDATA_API_KEY: ' key-1\n', INTERNETDATA_BASE_URL: ' https://api.test/ ' }),
+        { apiKey: 'key-1', baseUrl: 'https://api.test/' });
+});
+
+// What reaches the API from the installed entry point, given a padded base URL
+// and a padded or blank key: a blank one sends no Authorization header at all.
+test('the stdio server trims its environment before the API sees it', async () => {
+    const seen = [];
+    const api = createServer((req, res) => {
+        seen.push(req.headers.authorization);
+        res.writeHead(200, { 'content-type': 'application/json' });
+        res.end(JSON.stringify(CATALOG));
+    });
+    await new Promise((resolve) => {
+        api.listen(0, '127.0.0.1', resolve);
+    });
+    try {
+        for (const [key, authorization] of [[' key-1 ', 'Bearer key-1'], ['   ', undefined]]) {
+            const client = new Client({ name: 'test', version: '0' });
+            await client.connect(new StdioClientTransport({
+                command: process.execPath,
+                args: [fileURLToPath(new URL('../dist/stdio.js', import.meta.url))],
+                env: {
+                    PATH: process.env.PATH ?? '',
+                    INTERNETDATA_BASE_URL: ` http://127.0.0.1:${api.address().port} `,
+                    INTERNETDATA_API_KEY: key,
+                },
+            }));
+            try {
+                const out = await client.callTool({ name: 'list_databases', arguments: {} });
+                assert.notEqual(out.isError, true, out.content?.[0]?.text);
+                assert.deepEqual(seen.splice(0), [authorization], JSON.stringify(key));
+            } finally {
+                await client.close();
+            }
+        }
+    } finally {
+        api.closeAllConnections();
+        api.close();
+    }
+});
 
 // Every bound is READ off the spec, not restated here: the API enforces them,
 // and a second hand-written copy is free to keep advertising the old number.

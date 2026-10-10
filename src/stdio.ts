@@ -12,17 +12,13 @@ import { Server } from '@modelcontextprotocol/server';
 import { serveStdio } from '@modelcontextprotocol/server/stdio';
 import { InternetData } from '@internetdata/internetdata';
 
+import { clientOptions } from './env.js';
 import { createTools, registerTools } from './tools.js';
 
 const version = createRequire(import.meta.url)('../package.json').version as string;
 
 function main(): void {
-    const apiKey = process.env['INTERNETDATA_API_KEY'];
-    const client = new InternetData({
-        ...(apiKey === undefined || apiKey === '' ? {} : { apiKey: apiKey }),
-        ...(process.env['INTERNETDATA_BASE_URL'] === undefined
-            ? {} : { baseUrl: process.env['INTERNETDATA_BASE_URL'] }),
-    });
+    const client = new InternetData(clientOptions(process.env));
     const tools = createTools({ client: client });
 
     // The opening exchange picks the protocol era, 2025-11-25's `initialize` or
