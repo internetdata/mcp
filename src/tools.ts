@@ -87,6 +87,7 @@ export function createTools(ctx: ToolContext): ToolDef[] {
                 }, ['databases']),
                 annotations: {
                     readOnlyHint: true,
+                    destructiveHint: false,
                     idempotentHint: true,
                     openWorldHint: true,
                 },
@@ -109,6 +110,7 @@ export function createTools(ctx: ToolContext): ToolDef[] {
                 outputSchema: DATABASE_METADATA_SCHEMA,
                 annotations: {
                     readOnlyHint: true,
+                    destructiveHint: false,
                     idempotentHint: true,
                     openWorldHint: true,
                 },
@@ -131,6 +133,7 @@ export function createTools(ctx: ToolContext): ToolDef[] {
                 outputSchema: objectSchema({ checksums: DB_CHECKSUMS_SCHEMA }, ['checksums']),
                 annotations: {
                     readOnlyHint: true,
+                    destructiveHint: false,
                     idempotentHint: true,
                     openWorldHint: true,
                 },
@@ -159,6 +162,7 @@ export function createTools(ctx: ToolContext): ToolDef[] {
                 }, ['downloads']),
                 annotations: {
                     readOnlyHint: true,
+                    destructiveHint: false,
                     idempotentHint: false,
                     openWorldHint: true,
                 },

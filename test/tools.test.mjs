@@ -134,6 +134,17 @@ test('every tool carries its title in its annotations too', () => {
     }
 });
 
+// OpenAI's plugin review requires all three hints as explicit booleans on every
+// tool; an absent destructiveHint means true to an MCP client.
+test('every tool states whether it reads, destroys and reaches the open world', () => {
+    for (const { tool } of toolsFor(serving(CATALOG).fetch)) {
+        for (const hint of ['readOnlyHint', 'destructiveHint', 'openWorldHint']) {
+            assert.equal(typeof tool.annotations[hint], 'boolean', `${tool.name}: ${hint}`);
+        }
+        assert.equal(tool.annotations.destructiveHint, false, `${tool.name}: destructiveHint`);
+    }
+});
+
 // The databases reach several GB. An agent that treats a tool result as text
 // will try to read one, so the capability is absent rather than discouraged.
 test('no tool downloads a database', () => {
