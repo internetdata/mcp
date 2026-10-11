@@ -1,6 +1,7 @@
 // server.json is what the official MCP registry lists, and the release workflow publishes it
 // right after npm. The registry takes its version as the npm version it points at, so the two
-// must agree before a tag, not after a failed publish.
+// must agree before a tag, not after a failed publish. The integration suite's range moves in
+// the same release commit, its floor at the version being released.
 
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -8,6 +9,7 @@ import { test } from 'node:test';
 
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 const server = JSON.parse(readFileSync(new URL('../server.json', import.meta.url), 'utf8'));
+const integration = JSON.parse(readFileSync(new URL('../integration/package.json', import.meta.url), 'utf8'));
 
 test('server.json names this package at its version', () => {
     assert.equal(server.name, pkg.mcpName);
@@ -15,4 +17,8 @@ test('server.json names this package at its version', () => {
     assert.equal(server.packages.length, 1);
     assert.equal(server.packages[0].identifier, pkg.name);
     assert.equal(server.packages[0].version, pkg.version);
+});
+
+test('integration/ pins the version being released', () => {
+    assert.equal(integration.dependencies[pkg.name], `^${pkg.version}`);
 });
