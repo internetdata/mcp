@@ -43,19 +43,21 @@ const VERSIONED_ID = 'A VERSIONED database id, from `versions[].id` in `list_dat
 // the handler parses with the same one, so the cap a client is shown is the cap
 // it meets. Two lookalike declarations - a schema for the manifest and another
 // in the handler - is how an advertised bound and an enforced bound drift.
-// `list_databases` takes none, so an argument it is handed is refused by name.
+// Each is strict, so an argument a tool does not take is refused by name: a
+// misspelled optional one (`max` for `limit`) would otherwise be dropped, and
+// the call answered as if it had never been passed.
 const LIST_INPUT = z.strictObject({});
 
-const METADATA_INPUT = z.object({
+const METADATA_INPUT = z.strictObject({
     dataset_id: z.string().describe(VERSIONED_ID),
 });
 
-const CHECKSUM_INPUT = z.object({
+const CHECKSUM_INPUT = z.strictObject({
     dataset_id: z.string().describe(VERSIONED_ID),
     format: FORMATS.describe('Which published file to digest.'),
 });
 
-const DOWNLOADS_INPUT = z.object({
+const DOWNLOADS_INPUT = z.strictObject({
     limit: z.number().int().min(DOWNLOADS_LIMIT_MIN).max(DOWNLOADS_LIMIT).optional().describe(
         `How many attempts to return, newest first. At most ${DOWNLOADS_LIMIT}; `
         + `the API defaults to ${DOWNLOADS_LIMIT_DEFAULT}.`),

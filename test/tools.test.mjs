@@ -312,17 +312,29 @@ test('a rejected argument is the model\'s to fix, not an internal failure', asyn
     }
 });
 
-// `list_databases` has always published `additionalProperties: false`, and it
-// holds to it: an argument it does not take is refused by name, before any request.
-test('an argument a tool does not take is refused before the API is asked', async () => {
-    const stub = serving(CATALOG);
-    const out = await byName(stub.fetch).get('list_databases').handler({ dataset_id: 'nope' });
-    const { error } = JSON.parse(out.content[0].text);
-    assert.equal(error.kind, 'invalid_argument');
-    assert.equal(error.retryable, false);
-    assert.match(error.message, /dataset_id/);
-    assert.equal(stub.state.calls, 0, 'a refused call must not reach the API');
-});
+// Every tool publishes `additionalProperties: false` and holds to it: an argument
+// it does not take is refused by name, before any request. A lenient tool dropped
+// a misspelled optional one and answered as if it had never been passed, so
+// `{max: 10}` came back as the default 50 rows.
+for (const [name, args, extra] of [
+    ['list_databases', { dataset_id: 'nope' }, 'dataset_id'],
+    ['database_metadata', { dataset_id: 'bogon_ip_v1', format: 'csvgz' }, 'format'],
+    ['database_checksum', { dataset_id: 'bogon_ip_v1', format: 'csvgz', algorithm: 'sha256' }, 'algorithm'],
+    ['list_downloads', { max: 10 }, 'max'],
+]) {
+    test(`${name} refuses an argument it does not take, before the API is asked`, async () => {
+        const stub = serving(CATALOG);
+        const def = byName(stub.fetch).get(name);
+        assert.equal(def.tool.inputSchema.additionalProperties, false, 'the published schema says so');
+
+        const out = await def.handler(args);
+        const { error } = JSON.parse(out.content[0].text);
+        assert.equal(error.kind, 'invalid_argument');
+        assert.equal(error.retryable, false);
+        assert.match(error.message, new RegExp(`Unrecognized key: "${extra}"`));
+        assert.equal(stub.state.calls, 0, 'a refused call must not reach the API');
+    });
+}
 
 // A tool name the model guessed, such as `list_datasets` from before 2.0.0, is its
 // mistake too: a protocol error, since no tool exists to answer it, but never -32603.
