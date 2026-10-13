@@ -2,6 +2,13 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.1.3 - 2026-10-13
+
+### Fixes
+
+- Take spec 2026.10.13: Open databases come with a license ([`9326a1b`](https://github.com/internetdata/mcp/commit/9326a1b173760a4b18a009eba55676dfe72d5dc2))
+- Refuse an argument a tool does not take, on every tool ([`55c824f`](https://github.com/internetdata/mcp/commit/55c824fb50d6841baa5686ed199501073ef749b5))
+
 ## 3.1.2 - 2026-10-10
 
 ### Fixes
