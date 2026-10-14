@@ -273,7 +273,7 @@ function errorDetail(err: unknown): Record<string, unknown> {
 }
 
 /**
- * Recognises an `InternetDataError` by SHAPE, not by `instanceof`.
+ * Recognizes an `InternetDataError` by SHAPE, not by `instanceof`.
  *
  * This package and whatever mounts it can each end up with their own copy of
  * the `@internetdata/internetdata` module - the hosted service depends on both -
@@ -300,7 +300,7 @@ interface ClientError {
 }
 
 /**
- * Recognises a rejected ARGUMENT by shape, for the same reason `asClientError`
+ * Recognizes a rejected ARGUMENT by shape, for the same reason `asClientError`
  * does: zod is a peer of two packages here and each may resolve its own copy,
  * so `instanceof z.ZodError` would quietly miss one and report a fixable
  * argument error as an unfixable internal one.
