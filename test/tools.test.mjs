@@ -286,7 +286,7 @@ test('an upstream error is classified by shape, not by class identity', async ()
     assert.equal(error.retryable, false);
 });
 
-test('an unrecognised throw still produces a readable error', async () => {
+test('an unrecognized throw still produces a readable error', async () => {
     const out = await throwingClient(new Error('socket exploded')).handler({});
     const { error } = JSON.parse(out.content[0].text);
     assert.equal(error.kind, 'internal');
