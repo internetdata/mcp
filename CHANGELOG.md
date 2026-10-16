@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.1.4 - 2026-10-16
+
+### Fixes
+
+- Take spec 2026.10.15: three descriptions in US spelling ([`f84c67a`](https://github.com/internetdata/mcp/commit/f84c67abdceed92f761e6fde1a09ecba24818cf5))
+
 ## 3.1.3 - 2026-10-13
 
 ### Fixes
