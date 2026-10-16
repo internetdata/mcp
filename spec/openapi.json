@@ -9,7 +9,7 @@
       "url": "https://internetdata.io"
     },
     "termsOfService": "https://internetdata.io/terms",
-    "version": "2026.10.13"
+    "version": "2026.10.15"
   },
   "servers": [
     {
@@ -596,7 +596,7 @@
           "Organization"
         ],
         "summary": "Members",
-        "description": "Read-only. Adding or removing a member is an invitation flow with email\nin the middle rather than a POST, and modelling it as one here would\npromise something this API does not do.\n",
+        "description": "Read-only. Adding or removing a member is an invitation flow with email\nin the middle rather than a POST, and modeling it as one here would\npromise something this API does not do.\n",
         "security": [
           {
             "BearerAuth": [
@@ -1781,7 +1781,7 @@
           },
           "key_prefix": {
             "type": "string",
-            "description": "The leading, non-secret part, so a key is recognisable without storing it."
+            "description": "The leading, non-secret part, so a key is recognizable without storing it."
           },
           "created": {
             "type": "string",
@@ -1832,7 +1832,7 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "A label you will recognise later. Shown wherever the key is listed."
+            "description": "A label you will recognize later. Shown wherever the key is listed."
           },
           "allowed_scopes": {
             "type": "array",
