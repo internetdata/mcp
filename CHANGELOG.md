@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.1.5 - 2026-10-17
+
+### Fixes
+
+- Take spec 2026.10.16: dynamic client registration ([`d1e3c67`](https://github.com/internetdata/mcp/commit/d1e3c67c7c9cc823b2202a636378f0d03e9719ad))
+
 ## 3.1.4 - 2026-10-16
 
 ### Fixes
