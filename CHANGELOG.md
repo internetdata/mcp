@@ -2,6 +2,13 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.1.6 - 2026-10-19
+
+### Fixes
+
+- Take spec 2026.10.18: client_id_issued_at is int64 ([`9f35d11`](https://github.com/internetdata/mcp/commit/9f35d111b133126faae720dfd6a0acfb9801441f))
+- List in the MCP registry as io.internetdata/mcp ([`3bd38e9`](https://github.com/internetdata/mcp/commit/3bd38e9e5ca24748db26cd5ddbfdf242c1928183))
+
 ## 3.1.5 - 2026-10-17
 
 ### Fixes
