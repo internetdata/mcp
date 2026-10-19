@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.internetdata/mcp",
+  "name": "io.internetdata/mcp",
   "title": "InternetData",
   "description": "List InternetData's IP and ASN databases, your license for each, what one holds, and its digests.",
   "websiteUrl": "https://internetdata.io",

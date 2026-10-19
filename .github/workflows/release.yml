@@ -42,13 +42,13 @@ jobs:
   # Lists the version just published in the official MCP registry (registry.modelcontextprotocol.io),
   # which VS Code, GitHub's MCP list and the directories that mirror it read. The registry checks
   # the npm package's mcpName against server.json's name, so it waits for npm to serve the version.
-  # GitHub OIDC is what proves this repo owns the io.github.internetdata namespace: no secret.
+  # The io.internetdata namespace is proven by an Ed25519 key: its public half is a TXT record on
+  # internetdata.io's apex, and MCP_REGISTRY_PRIVATE_KEY holds the private half, in hex.
   mcp-registry:
     needs: publish
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
     steps:
       - uses: actions/checkout@v7
       - name: Wait for npm to serve this version
@@ -63,9 +63,11 @@ jobs:
           echo "npm never served internetdata-mcp@${version} with its mcpName" >&2
           exit 1
       - name: Publish server.json
+        env:
+          MCP_REGISTRY_PRIVATE_KEY: ${{ secrets.MCP_REGISTRY_PRIVATE_KEY }}
         run: |
           curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/download/v1.8.1/mcp-publisher_linux_amd64.tar.gz" | tar -xz mcp-publisher
-          ./mcp-publisher login github-oidc
+          ./mcp-publisher login dns --domain internetdata.io --private-key "$MCP_REGISTRY_PRIVATE_KEY"
           ./mcp-publisher publish
 
   github-release:
