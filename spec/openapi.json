@@ -9,7 +9,7 @@
       "url": "https://internetdata.io"
     },
     "termsOfService": "https://internetdata.io/terms",
-    "version": "2026.10.18"
+    "version": "2026.10.21"
   },
   "servers": [
     {
@@ -92,6 +92,9 @@
           },
           "401": {
             "$ref": "#/components/responses/V2Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/V2IpNotAllowed"
           }
         }
       }
@@ -148,7 +151,7 @@
             "$ref": "#/components/responses/V2Unauthorized"
           },
           "403": {
-            "$ref": "#/components/responses/V2NotLicensed"
+            "$ref": "#/components/responses/V2Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/V2UnknownDatabase"
@@ -196,6 +199,9 @@
           },
           "401": {
             "$ref": "#/components/responses/V2Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/V2IpNotAllowed"
           },
           "404": {
             "$ref": "#/components/responses/V2UnknownDatabase"
@@ -274,7 +280,7 @@
             "$ref": "#/components/responses/V2Unauthorized"
           },
           "403": {
-            "$ref": "#/components/responses/V2NotLicensed"
+            "$ref": "#/components/responses/V2Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/V2UnknownDatabase"
@@ -342,6 +348,9 @@
           },
           "401": {
             "$ref": "#/components/responses/V2Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/V2IpNotAllowed"
           }
         }
       }
@@ -2267,7 +2276,7 @@
     },
     "responses": {
       "V2Unauthorized": {
-        "description": "Missing or invalid bearer key, the key lacks the `db.download` scope, or\nit belongs to no organization.\n`rc`: `UNAUTHORIZED`.\n",
+        "description": "Missing, invalid, revoked or expired key; the key lacks the\n`db.download` scope; or the key belongs to no active organization.\nEach answers the same.\n`rc`: `UNAUTHORIZED`.\n",
         "content": {
           "application/json": {
             "schema": {
@@ -2276,8 +2285,18 @@
           }
         }
       },
-      "V2NotLicensed": {
-        "description": "Your organization holds no license for this database, or its term has\nended.\n`rc`: `NOT_LICENSED`, `LICENSE_EXPIRED`.\n",
+      "V2IpNotAllowed": {
+        "description": "The request comes from an address outside the key's or its\norganization's allowed addresses. Change the allowlist or call from an\nallowed address: the key itself is fine.\n`rc`: `IP_NOT_ALLOWED`.\n",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "V2Forbidden": {
+        "description": "Your organization holds no license for this database (`NOT_LICENSED`),\nor its term has ended (`LICENSE_EXPIRED`); or the request comes from an\naddress outside the key's or its organization's allowed addresses\n(`IP_NOT_ALLOWED`).\n`rc`: `NOT_LICENSED`, `LICENSE_EXPIRED`, `IP_NOT_ALLOWED`.\n",
         "content": {
           "application/json": {
             "schema": {
