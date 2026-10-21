@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.1.7 - 2026-10-21
+
+### Fixes
+
+- Take spec 2026.10.21: a 403 for a refused address ([`dfa4ce3`](https://github.com/internetdata/mcp/commit/dfa4ce307910560abcdbffa76033901eb5c78a7d))
+
 ## 3.1.6 - 2026-10-19
 
 ### Fixes
