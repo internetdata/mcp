@@ -24,7 +24,7 @@ Either way you sign in with your InternetData account, and Claude never sees you
 
 ### In ChatGPT and Codex
 
-In ChatGPT on the web, add `https://mcp.internetdata.io/mcp` as a custom MCP server under Plugins and choose OAuth. In Codex, install our plugin, which adds the server with skills:
+InternetData is in the plugin directory ChatGPT and Codex share: [add it from its listing](https://chatgpt.com/plugins/plugin_asdk_app_6acf4061581c8191a113796b35d99bae). Codex also installs our plugin from the command line, which adds the server with skills:
 
 ```console
 codex plugin marketplace add internetdata/openai-plugin
