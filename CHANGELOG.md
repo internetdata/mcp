@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.1.8 - 2026-11-02
+
+### Fixes
+
+- Set openWorldHint false on every tool ([`b16c642`](https://github.com/internetdata/mcp/commit/b16c642d016650b81fb7049b41c7b51aff1ee78b))
+
 ## 3.1.7 - 2026-10-21
 
 ### Fixes
