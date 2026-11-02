@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.1.9 - 2026-11-02
+
+### Fixes
+
+- Write ID, not id, in the tool descriptions and README ([`1e01aed`](https://github.com/internetdata/mcp/commit/1e01aed7e45d50fd73630082155e3a1c41f4c22d))
+
 ## 3.1.8 - 2026-11-02
 
 ### Fixes
