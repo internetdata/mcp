@@ -71,7 +71,7 @@ test('the two 429s stay distinguishable at the tool boundary', async () => {
 
 // `unknown-dataset` is a 404. Three of the first four vpndetection SDKs let a
 // 4xx outside the enumerated list fall through to a retryable server_error, so
-// a misspelled id was retried twice before failing.
+// a misspelled ID was retried twice before failing.
 test('a 4xx outside the enumerated ones is not retryable', async () => {
     const c = data.errors.find((x) => x.name === 'unknown-dataset');
     const out = await toolsFor(serving(c.body, c.status).fetch)

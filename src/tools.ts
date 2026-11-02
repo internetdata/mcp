@@ -30,8 +30,8 @@ export interface ToolDef {
 // wanting a non-empty tuple, not a claim about the wire.
 const FORMATS = z.enum([...DATABASE_FORMATS] as [DatabaseFormat, ...DatabaseFormat[]]);
 
-// Both spellings of a dataset id, stated wherever one is taken. `list_databases`
-// answers a `base` id (what a license names) and a `versions[].id`; everything
+// Both spellings of a dataset ID, stated wherever one is taken. `list_databases`
+// answers a `base` ID (what a license names) and a `versions[].id`; everything
 // else accepts only the versioned one. A model that has just read
 // `base: "bogon_ip"` will otherwise pass it and get a refusal that reads like a
 // bad dataset rather than a wrong spelling.

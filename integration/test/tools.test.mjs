@@ -2,9 +2,9 @@
 // the staging API.
 //
 // The unit suite stubs the network, so it cannot see what matters most here:
-// that the ids a model reads out of `list_databases` are the ids the other
+// that the IDs a model reads out of `list_databases` are the IDs the other
 // tools actually accept. Everything below is derived from the live listing -
-// a hardcoded database id turns a license change into a red build that says
+// a hardcoded database ID turns a license change into a red build that says
 // nothing about the server.
 
 import assert from 'node:assert/strict';
@@ -100,7 +100,7 @@ test('the catalog answers what this key is entitled to see', { skip: NO_KEY }, a
 });
 
 // The trap the tool descriptions exist to close, checked against the real API
-// rather than a fixture: the versioned id works and the base id does not, so a
+// rather than a fixture: the versioned ID works and the base ID does not, so a
 // description that stopped saying so would be a silent regression.
 test('a versioned ID is accepted where the base ID is refused', { skip: NO_KEY }, async () => {
     await withClient(async (client) => {
