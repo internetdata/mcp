@@ -91,7 +91,7 @@ export function createTools(ctx: ToolContext): ToolDef[] {
                     readOnlyHint: true,
                     destructiveHint: false,
                     idempotentHint: true,
-                    openWorldHint: true,
+                    openWorldHint: false,
                 },
             },
             handler: async (args) => {
@@ -114,7 +114,7 @@ export function createTools(ctx: ToolContext): ToolDef[] {
                     readOnlyHint: true,
                     destructiveHint: false,
                     idempotentHint: true,
-                    openWorldHint: true,
+                    openWorldHint: false,
                 },
             },
             handler: async (args) => {
@@ -137,7 +137,7 @@ export function createTools(ctx: ToolContext): ToolDef[] {
                     readOnlyHint: true,
                     destructiveHint: false,
                     idempotentHint: true,
-                    openWorldHint: true,
+                    openWorldHint: false,
                 },
             },
             handler: async (args) => {
@@ -166,7 +166,7 @@ export function createTools(ctx: ToolContext): ToolDef[] {
                     readOnlyHint: true,
                     destructiveHint: false,
                     idempotentHint: false,
-                    openWorldHint: true,
+                    openWorldHint: false,
                 },
             },
             handler: async (args) => {

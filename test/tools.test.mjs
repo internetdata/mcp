@@ -145,6 +145,13 @@ test('every tool states whether it reads, destroys and reaches the open world', 
     }
 });
 
+// OpenAI's openWorldHint is a public or open-ended set of entities, where our own catalog and the
+// organization's own downloads are bounded.
+test('no tool reaches the open world', () => {
+    const open = toolsFor(serving(CATALOG).fetch).filter((d) => d.tool.annotations.openWorldHint);
+    assert.deepEqual(open.map((d) => d.tool.name), []);
+});
+
 // The databases reach several GB. An agent that treats a tool result as text
 // will try to read one, so the capability is absent rather than discouraged.
 test('no tool downloads a database', () => {
