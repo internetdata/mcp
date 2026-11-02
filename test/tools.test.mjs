@@ -171,12 +171,12 @@ test('the tool list is deterministic, so clients can cache it', () => {
 // Both spellings exist and only one is accepted, so the description is the only
 // thing standing between a model that has just read `base` and a refusal that
 // looks like a missing database.
-test('every id-taking tool names both spellings', () => {
+test('every ID-taking tool names both spellings', () => {
     const tools = byName(serving(CATALOG).fetch);
     for (const n of ['database_metadata', 'database_checksum']) {
         const described = tools.get(n).tool.inputSchema.properties.dataset_id.description;
-        assert.match(described, /versions\[\]\.id/, `${n}: does not name the versioned id`);
-        assert.match(described, /base/, `${n}: does not warn about the base id`);
+        assert.match(described, /versions\[\]\.id/, `${n}: does not name the versioned ID`);
+        assert.match(described, /base/, `${n}: does not warn about the base ID`);
     }
 });
 

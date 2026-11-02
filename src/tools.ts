@@ -35,8 +35,8 @@ const FORMATS = z.enum([...DATABASE_FORMATS] as [DatabaseFormat, ...DatabaseForm
 // else accepts only the versioned one. A model that has just read
 // `base: "bogon_ip"` will otherwise pass it and get a refusal that reads like a
 // bad dataset rather than a wrong spelling.
-const VERSIONED_ID = 'A VERSIONED database id, from `versions[].id` in `list_databases` - '
-    + '`bogon_ip_v1`, not `bogon_ip`. The unversioned base id is a license reference and is '
+const VERSIONED_ID = 'A VERSIONED database ID, from `versions[].id` in `list_databases` - '
+    + '`bogon_ip_v1`, not `bogon_ip`. The unversioned base ID is a license reference and is '
     + 'not accepted here.';
 
 // Each tool's arguments, declared ONCE. `jsonSchema()` publishes the object and
@@ -79,7 +79,7 @@ export function createTools(ctx: ToolContext): ToolDef[] {
                     + 'one entry per database FAMILY, with `standing` saying where their license '
                     + 'stands: `licensed` if the family is theirs today, `expired` if the term has '
                     + 'ended, `unlicensed` if it is published but has never been bought. Each entry '
-                    + 'has a `base` id, which is what a license names, and a `versions` array whose '
+                    + 'has a `base` ID, which is what a license names, and a `versions` array whose '
                     + '`id` is what the other tools take - pass `versions[].id` (`bogon_ip_v1`), '
                     + 'never the `base` (`bogon_ip`). Ask again rather than holding on to this: it '
                     + 'is answered per key and is not the same for everyone.',

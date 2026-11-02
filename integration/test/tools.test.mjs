@@ -102,7 +102,7 @@ test('the catalog answers what this key is entitled to see', { skip: NO_KEY }, a
 // The trap the tool descriptions exist to close, checked against the real API
 // rather than a fixture: the versioned id works and the base id does not, so a
 // description that stopped saying so would be a silent regression.
-test('a versioned id is accepted where the base id is refused', { skip: NO_KEY }, async () => {
+test('a versioned ID is accepted where the base ID is refused', { skip: NO_KEY }, async () => {
     await withClient(async (client) => {
         const { databases } = structured(
             await client.callTool({ name: 'list_databases', arguments: {} }));
@@ -123,7 +123,7 @@ test('a versioned id is accepted where the base id is refused', { skip: NO_KEY }
         const refused = await client.callTool({
             name: 'database_metadata', arguments: { dataset_id: family.base },
         });
-        assert.equal(refused.isError, true, `the base id ${family.base} was accepted`);
+        assert.equal(refused.isError, true, `the base ID ${family.base} was accepted`);
     });
 });
 

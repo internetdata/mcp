@@ -67,9 +67,9 @@ Requires Node.js 22 or newer. `INTERNETDATA_BASE_URL` overrides the endpoint if 
 
 Every tool is read-only.
 
-## Two spellings of a database id
+## Two spellings of a database ID
 
-`list_databases` answers a `base` id and a `versions` array:
+`list_databases` answers a `base` ID and a `versions` array:
 
 ```json
 {

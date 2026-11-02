@@ -77,7 +77,7 @@ test('a 4xx outside the enumerated ones is not retryable', async () => {
     const out = await toolsFor(serving(c.body, c.status).fetch)
         .get('database_metadata').handler({ dataset_id: 'nope' });
     const { error } = JSON.parse(out.content[0].text);
-    assert.equal(error.retryable, false, 'a bad id must not be retried');
+    assert.equal(error.retryable, false, 'a bad ID must not be retried');
 });
 
 test('the published formats are the vocabulary the tools accept', async () => {
