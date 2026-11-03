@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.1.10 - 2026-11-03
+
+### Fixes
+
+- Take spec 2026.11.02: ID, not id, in three output descriptions ([`8c6c4c0`](https://github.com/internetdata/mcp/commit/8c6c4c08cf0256197c9f2b63c5916f8f6e208218))
+
 ## 3.1.9 - 2026-11-02
 
 ### Fixes
