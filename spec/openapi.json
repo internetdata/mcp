@@ -9,7 +9,7 @@
       "url": "https://internetdata.io"
     },
     "termsOfService": "https://internetdata.io/terms",
-    "version": "2026.10.21"
+    "version": "2026.11.02"
   },
   "servers": [
     {
@@ -721,7 +721,7 @@
           "API keys"
         ],
         "summary": "Rotate",
-        "description": "Replaces the secret behind a key, keeping its id, name and settings.\nThe previous secret stops working immediately. The new secret comes\nback in the answer, so this needs `apikeys.reveal` as well as\n`apikeys.manage`.\n",
+        "description": "Replaces the secret behind a key, keeping its ID, name and settings.\nThe previous secret stops working immediately. The new secret comes\nback in the answer, so this needs `apikeys.reveal` as well as\n`apikeys.manage`.\n",
         "security": [
           {
             "BearerAuth": [
@@ -1160,7 +1160,7 @@
         "type": "apiKey",
         "in": "query",
         "name": "apikey",
-        "description": "UUID-format API key issued to the customer. Each key is authorized for a\nspecific set of database ids; requesting any other id returns 403.\n\nv1 only. The v2 endpoints take a console-issued key as a bearer token.\n"
+        "description": "UUID-format API key issued to the customer. Each key is authorized for a\nspecific set of database IDs; requesting any other ID returns 403.\n\nv1 only. The v2 endpoints take a console-issued key as a bearer token.\n"
       },
       "BearerAuth": {
         "type": "http",
@@ -1205,7 +1205,7 @@
         "name": "id",
         "in": "path",
         "required": true,
-        "description": "The key's id, as returned by the list endpoint. Never the key itself.",
+        "description": "The key's ID, as returned by the list endpoint. Never the key itself.",
         "schema": {
           "type": "string",
           "format": "uuid"
@@ -1245,7 +1245,7 @@
       },
       "Database": {
         "type": "object",
-        "description": "One database FAMILY, with your organization's license beside it. A\nlicense covers the family, while a download names a specific version,\nso the ids passed to `download` and `checksum` come from `versions`.\n",
+        "description": "One database FAMILY, with your organization's license beside it. A\nlicense covers the family, while a download names a specific version,\nso the IDs passed to `download` and `checksum` come from `versions`.\n",
         "required": [
           "base",
           "name",
@@ -1334,7 +1334,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "The versioned id. Pass this to `download`, `checksum` and `metadata`.",
+            "description": "The versioned ID. Pass this to `download`, `checksum` and `metadata`.",
             "example": "vpn_ip_v1"
           },
           "version": {
@@ -1346,7 +1346,7 @@
           },
           "formats": {
             "type": "array",
-            "description": "The formats this version is BUILT in. Asking for another is a 400,\nnot a gap - the `_provider` catalogs are keyed by provider id, so no\nMMDB exists for them.\n",
+            "description": "The formats this version is BUILT in. Asking for another is a 400,\nnot a gap - the `_provider` catalogs are keyed by provider ID, so no\nMMDB exists for them.\n",
             "items": {
               "$ref": "#/components/schemas/DatabaseFormat"
             }
@@ -2353,7 +2353,7 @@
         }
       },
       "Forbidden": {
-        "description": "The `apikey` is valid but is not authorized for the requested database id.",
+        "description": "The `apikey` is valid but is not authorized for the requested database ID.",
         "content": {
           "application/json": {
             "schema": {
