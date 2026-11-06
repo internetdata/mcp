@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.1.11 - 2026-11-06
+
+### Fixes
+
+- Take spec 2026.11.05: the download's build parameter ([`3ac948b`](https://github.com/internetdata/mcp/commit/3ac948b3030f1c9555e2d24aaa4c90d18dc5dbdc))
+
 ## 3.1.10 - 2026-11-03
 
 ### Fixes
