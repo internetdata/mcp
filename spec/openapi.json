@@ -9,7 +9,7 @@
       "url": "https://internetdata.io"
     },
     "termsOfService": "https://internetdata.io/terms",
-    "version": "2026.11.02"
+    "version": "2026.11.05"
   },
   "servers": [
     {
@@ -124,6 +124,9 @@
           },
           {
             "$ref": "#/components/parameters/DbFormat"
+          },
+          {
+            "$ref": "#/components/parameters/DbBuild"
           }
         ],
         "responses": {
@@ -138,7 +141,7 @@
             }
           },
           "400": {
-            "description": "The database is not built in the requested format.",
+            "description": "The database is not built in the requested format (`INVALID_FORMAT`),\nor `build` is not a build's name (`INVALID_BUILD`).\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -155,6 +158,16 @@
           },
           "404": {
             "$ref": "#/components/responses/V2UnknownDatabase"
+          },
+          "410": {
+            "description": "The build named in `build` is no longer kept (`BUILD_GONE`): builds are\nkept 7 days. Download without `build` for the live one.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "503": {
             "$ref": "#/components/responses/V2NotAvailable"
@@ -1199,6 +1212,17 @@
         "description": "Database file format.",
         "schema": {
           "$ref": "#/components/schemas/DatabaseFormat"
+        }
+      },
+      "DbBuild": {
+        "name": "build",
+        "in": "query",
+        "required": false,
+        "description": "One build of the database, by the name a `database.updated` webhook gives\nit, so the file is the one whose `sha256` the webhook carries. Without\nit, the build that is live.\n",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9]{8}\\.[a-z0-9]{6}$",
+          "example": "20261105.0t53s5"
         }
       },
       "ApikeyIdParam": {
