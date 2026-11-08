@@ -9,7 +9,7 @@
       "url": "https://internetdata.io"
     },
     "termsOfService": "https://internetdata.io/terms",
-    "version": "2026.11.05"
+    "version": "2026.11.08"
   },
   "servers": [
     {
@@ -1087,7 +1087,7 @@
           "Authorization"
         ],
         "summary": "Token",
-        "description": "Three grant types.\n\n`urn:ietf:params:oauth:grant-type:device_code` polls a device\nauthorization. Until the person approves it answers\n`authorization_pending`; poll faster than `interval` and it answers\n`slow_down`, which means widen your interval and keep it widened.\n\n`authorization_code` exchanges a code from `/oauth/authorize`, with the\n`code_verifier` matching the challenge you sent and the same\n`redirect_uri`. A code works once: presenting it again also revokes\nwhat the first exchange issued.\n\n`refresh_token` exchanges a refresh token. The presented token is\nconsumed whatever happens next, so store the new one before using it.\nPresenting a consumed refresh token again ends the whole authorization,\nsince it means the token was copied.\n",
+        "description": "Issues tokens for three grant types: a device code, an authorization\ncode and a refresh token.\n\n`urn:ietf:params:oauth:grant-type:device_code` polls a device\nauthorization. Until the person approves it answers\n`authorization_pending`; poll faster than `interval` and it answers\n`slow_down`, which means widen your interval and keep it widened.\n\n`authorization_code` exchanges a code from `/oauth/authorize`, with the\n`code_verifier` matching the challenge you sent and the same\n`redirect_uri`. A code works once: presenting it again also revokes\nwhat the first exchange issued.\n\n`refresh_token` exchanges a refresh token. The presented token is\nconsumed whatever happens next, so store the new one before using it.\nPresenting a consumed refresh token again ends the whole authorization,\nsince it means the token was copied.\n",
         "security": [],
         "requestBody": {
           "required": true,
@@ -1140,7 +1140,7 @@
           "Authorization"
         ],
         "summary": "Revoke",
-        "description": "RFC 7009. Always answers 200, including for a token that was never\nvalid - an endpoint that distinguished the two would be a way to test\nwhether a stolen string is a live credential.\n\nRevoking a REFRESH token ends the whole authorization and takes its\naccess tokens with it. Revoking an access token affects only that token.\n",
+        "description": "RFC 7009. Always answers 200, even for a token that was never valid, so\nit can't be used to test whether a token is live.\n\nRevoking a refresh token ends the whole authorization and takes its\naccess tokens with it. Revoking an access token affects only that token.\n",
         "security": [],
         "requestBody": {
           "required": true,
