@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.1.12 - 2026-11-08
+
+### Fixes
+
+- Take spec 2026.11.08: the token and revoke descriptions ([`44fbdd8`](https://github.com/internetdata/mcp/commit/44fbdd8b3ed6db74ab920934871584ff90389506))
+
 ## 3.1.11 - 2026-11-06
 
 ### Fixes
