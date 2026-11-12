@@ -11,6 +11,7 @@ const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url),
 const server = JSON.parse(readFileSync(new URL('../server.json', import.meta.url), 'utf8'));
 const integration = JSON.parse(readFileSync(new URL('../integration/package.json', import.meta.url), 'utf8'));
 const release = readFileSync(new URL('../.github/workflows/release.yml', import.meta.url), 'utf8');
+const gemini = JSON.parse(readFileSync(new URL('../gemini-extension.json', import.meta.url), 'utf8'));
 
 test('server.json names this package at its version', () => {
     assert.equal(server.name, pkg.mcpName);
@@ -31,4 +32,18 @@ test('server.json names a server the release may publish', () => {
     assert.ok(login, 'release.yml signs in to the registry by DNS');
     const namespace = login[1].split('.').reverse().join('.');
     assert.ok(server.name.startsWith(`${namespace}/`), `${server.name} is outside ${namespace}/`);
+});
+
+// Gemini CLI installs gemini-extension.json from the latest GitHub Release's source archive, and
+// shows its version beside that tag. It runs the package every other stdio client runs.
+test('gemini-extension.json runs this package at its version', () => {
+    assert.match(gemini.name, /^[a-z0-9-]+$/);
+    assert.equal(gemini.version, pkg.version);
+    assert.equal(gemini.description, server.description);
+    assert.deepEqual(Object.values(gemini.mcpServers), [{ command: 'npx', args: ['-y', pkg.name] }]);
+    const secrets = server.packages[0].environmentVariables.filter((v) => v.isSecret);
+    assert.deepEqual(
+        gemini.settings.map((s) => [s.envVar, s.description, s.sensitive]),
+        secrets.map((v) => [v.name, v.description, true]),
+    );
 });

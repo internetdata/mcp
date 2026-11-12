@@ -34,6 +34,16 @@ codex mcp login internetdata
 
 Either way you sign in with your InternetData account, and neither sees your API key. The steps: [docs.internetdata.io/integrations/chatgpt](https://docs.internetdata.io/integrations/chatgpt) and [docs.internetdata.io/integrations/codex](https://docs.internetdata.io/integrations/codex). On the OpenAI API, the Responses API's `mcp` tool takes the server as its `server_url` and your key as its `authorization`.
 
+### In Gemini CLI
+
+Install our extension, which runs the npm package below on your machine:
+
+```console
+gemini extensions install https://github.com/internetdata/mcp
+```
+
+It asks for your API key, which needs the `db.download` scope, and keeps it in your system keychain.
+
 ### In any other MCP client
 
 Point it at `https://mcp.internetdata.io/mcp`. A client that supports MCP authorization signs in the same way. One that doesn't can send a key instead, as `Authorization: Bearer your-key`.
