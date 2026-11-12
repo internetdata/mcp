@@ -1,6 +1,6 @@
 {
   "name": "internetdata",
-  "version": "3.1.12",
+  "version": "3.1.13",
   "description": "List InternetData's IP and ASN databases, your license for each, what one holds, and its digests.",
   "mcpServers": {
     "internetdata": {
