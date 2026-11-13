@@ -5,7 +5,7 @@
 
 The official [Model Context Protocol](https://modelcontextprotocol.io) server for the [InternetData](https://internetdata.io) API.
 
-It gives an AI agent nine read-only tools: what every database InternetData publishes says about an IP address, an AS or a domain - where an address is, which network announces it and who uses it, whether it is a VPN, a residential, datacenter, mobile or public proxy, a Tor node, a privacy relay, a hosting provider or a CDN, anycast, a mobile carrier's or satellite operator's space, or private and reserved space, and whether an SSH, mail, web, open DNS resolver or BitTorrent service answered on it - plus what your key's plan includes, the IP and ASN database catalog with where your organization's license for each one stands, what is inside a database, the digests to verify a copy you already hold, and your recent download history.
+It gives an AI agent nine read-only tools. Four look up an IP address, an AS or a domain in every database we publish: where an address is and who uses it, whether it is a VPN, a residential, datacenter, mobile or public proxy, a Tor node, a privacy relay, a hosting provider or a CDN, anycast, carrier, satellite or reserved space, and whether an SSH, mail, web, open DNS resolver or BitTorrent service answered on it. The rest cover your key's plan, the database catalog and your organization's license for each, what a database holds, its digests and your download history.
 
 ## Getting Started
 
