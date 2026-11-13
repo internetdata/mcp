@@ -2,6 +2,16 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.2.0 - 2026-11-13
+
+### Features
+
+- Look up addresses, ASes and domains, and the key's plan and usage ([`51a9e9f`](https://github.com/internetdata/mcp/commit/51a9e9f26f4c6d27d437318aba1aec4d0b5d231d))
+
+### Fixes
+
+- Take spec 2026.11.13: the lookup and entitlement operations ([`e428da2`](https://github.com/internetdata/mcp/commit/e428da2ca58fbe6c570e4fc18228cdabc7c3ccac))
+
 ## 3.1.13 - 2026-11-12
 
 ### Features
