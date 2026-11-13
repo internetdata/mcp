@@ -2,7 +2,7 @@
     "name": "internetdata-mcp",
     "mcpName": "io.internetdata/mcp",
     "version": "3.1.13",
-    "description": "Official MCP server for the InternetData API. Lets an LLM agent browse every IP database we publish and where an organization's license for each one stands, inspect what is inside one, and verify a copy it already holds.",
+    "description": "Official MCP server for the InternetData API. Lets an LLM agent look up any IP address, AS or domain, see what its key's plan includes, browse every IP database we publish and where an organization's license for each one stands, inspect what is inside one, and verify a copy it already holds.",
     "type": "module",
     "packageManager": "pnpm@12.12.1",
     "license": "MIT",
@@ -19,6 +19,10 @@
         "model-context-protocol",
         "ip-database",
         "ip-intelligence",
+        "ip-lookup",
+        "ip-geolocation",
+        "asn",
+        "domain-lookup",
         "ip-data",
         "mmdb",
         "maxmind-db",
@@ -51,7 +55,7 @@
         "node": ">=22"
     },
     "dependencies": {
-        "@internetdata/internetdata": "^2.0.0",
+        "@internetdata/internetdata": "^2.9.1",
         "@modelcontextprotocol/server": "^2.2.0",
         "zod": "^4.1.12"
     },

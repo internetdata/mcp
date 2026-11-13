@@ -5,11 +5,11 @@
 
 The official [Model Context Protocol](https://modelcontextprotocol.io) server for the [InternetData](https://internetdata.io) API.
 
-InternetData publishes IP and ASN databases: geolocation, anonymity, ownership and network data, as gzipped CSV and as MMDB. This server gives an AI agent four read-only tools over them - every database we publish and where your organization's license for each one stands, what is inside one, the digests to verify a copy you already hold, and your recent download history.
+It gives an AI agent nine read-only tools: what every database InternetData publishes says about an IP address, an AS or a domain - where an address is, which network announces it and who uses it, whether it is a VPN, a residential, datacenter, mobile or public proxy, a Tor node, a privacy relay, a hosting provider or a CDN, anycast, a mobile carrier's or satellite operator's space, or private and reserved space, and whether an SSH, mail, web, open DNS resolver or BitTorrent service answered on it - plus what your key's plan includes, the IP and ASN database catalog with where your organization's license for each one stands, what is inside a database, the digests to verify a copy you already hold, and your recent download history.
 
 ## Getting Started
 
-We host it at `https://mcp.internetdata.io/mcp`, and you sign in to it with your InternetData account. It also runs on your own machine from npm. Either way it sees where your organization's license for each database stands. Databases are licensed by contract. The Open ones, `tor_ip_v1` among them, are licensed to every organization from the start and are free under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). For the rest, see the [API documentation](https://docs.internetdata.io/api), or [request an evaluation](https://internetdata.io/contact?purpose=evaluation&subject=Evaluation+license) if your organization doesn't have a license yet.
+We host it at `https://mcp.internetdata.io/mcp`, and you sign in to it with your InternetData account. It also runs on your own machine from npm. Databases are licensed by contract. The Open ones, `tor_ip_v1` among them, are licensed to every organization from the start and are free under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). For the rest, see the [API documentation](https://docs.internetdata.io/api), or [request an evaluation](https://internetdata.io/contact?purpose=evaluation&subject=Evaluation+license) if your organization doesn't have a license yet.
 
 ### In Claude
 
@@ -42,7 +42,7 @@ Install our extension, which runs the npm package below on your machine:
 gemini extensions install https://github.com/internetdata/mcp
 ```
 
-It asks for your API key, which needs the `db.download` scope, and keeps it in your system keychain.
+It asks for your API key and keeps it in your system keychain. Leave it blank to look things up without one; the database tools need a key with the `db.download` scope.
 
 ### In any other MCP client
 
@@ -50,7 +50,24 @@ Point it at `https://mcp.internetdata.io/mcp`. A client that supports MCP author
 
 ### On your own machine
 
-You need an API key carrying the `db.download` scope. Add this to your MCP client's config:
+**No API key needed to look something up.** Unlimited, the free plan, answers with no daily or monthly cap, with a key or without one: an address's country-level location, the network that announces it, the company that uses it, its abuse email and reverse DNS name, and whether it is Tor, a relay, anycast, carrier or satellite space and which services answer on it; an AS's registration; and whether a domain is registered and which DNS record types it has. Every paid plan answers every field: VPN, proxy, hosting and CDN detection with the detail behind each flag, city-level location, Whois and RWHOIS, an AS's prefixes and RPKI status, and a domain's records, IP ranges and whether it is disposable. A free account tries every field, 100 lookups a day.
+
+Add this to your MCP client's config:
+
+```json
+{
+  "mcpServers": {
+    "internetdata": {
+      "command": "npx",
+      "args": ["-y", "internetdata-mcp"]
+    }
+  }
+}
+```
+
+Requires Node.js 22 or newer.
+
+A key on a paid plan unlocks every field, and the database tools need a key carrying the `db.download` scope. Put it in the environment:
 
 ```json
 {
@@ -64,18 +81,46 @@ You need an API key carrying the `db.download` scope. Add this to your MCP clien
 }
 ```
 
-Requires Node.js 22 or newer. `INTERNETDATA_BASE_URL` overrides the endpoint if you need to point somewhere else.
+`INTERNETDATA_BASE_URL` overrides the endpoint if you need to point somewhere else.
 
 ## Tools
 
 | Tool | What it answers |
 |---|---|
+| `lookup_ip` | What every database says about one address. |
+| `lookup_ips` | The same for a whole list of addresses in one call, keyed by address. A long list is batched for you. Needs a key on a paid plan; with a key on the free plan, a list of up to 10 addresses is looked up one address at a time instead. |
+| `lookup_asn` | What we know about one AS, by its number: its registration, and on a paid plan its prefixes, RPKI status and Whois record. |
+| `lookup_domain` | What we know about one domain: whether it is registered and which DNS record types it has, and on a paid plan the records, its organization's IP ranges and whether it is disposable. |
+| `my_entitlement` | What this key is entitled to and what it has spent: plan, field tier, requests so far, allowance, and when it resets. |
 | `list_databases` | Every database we publish, with its `standing` for your organization (`licensed`, `expired` or `unlicensed`) and the type and term of any license. |
 | `database_metadata` | A database's columns, sample rows, row count, build date and file sizes. |
 | `database_checksum` | The published digests for one database file. |
 | `list_downloads` | Your organization's recent download attempts, refusals included. |
 
-Every tool is read-only.
+Every tool is read-only. Answers come from our databases' latest builds: no lookup sends a DNS query, or opens a connection to the address or the domain.
+
+**There is deliberately no `my_ip` tool, although every client library has one.** Over a hosted transport the address our edge observes belongs to whatever proxied the call - Claude's infrastructure, not the person asking - so the tool would answer confidently and wrongly for the only reading anyone would put on it. `my_entitlement` has no such problem and is the same answer from any transport, because it describes the credential rather than the connection.
+
+A paid plan's usage counts against the anniversary of the subscription, not the calendar month and not the billing period, and the free plan's against the UTC day. A null `hard_limit` means we never stop serving; it is not a limit of zero.
+
+## Reading a result
+
+Each lookup comes back with a `coverage` block beside it:
+
+```json
+{
+  "result": { "ip": "146.70.116.130", "is_bogon": false, "is_tor": false, "location": { "country": "AT", "...": "..." }, "...": "..." },
+  "coverage": {
+    "included": ["ip", "is_bogon", "is_tor", "is_relay", "tor", "relay", "location", "asn", "..."],
+    "not_included": ["is_vpn", "is_hosting", "vpn", "whois", "location.city", "..."],
+    "note": "The fields in not_included were not returned, because this API key's plan does not include them. ..."
+  }
+}
+```
+
+This matters more here than in a normal client library. A field missing from a result means your plan doesn't include it, never "we checked and found nothing" - and a model reading the result on its own will otherwise treat the absence as a negative answer. `coverage` states the difference explicitly so it can't. A paid field inside an object every plan gets, such as `location.city`, is named by its path.
+
+An answer to a key on the free plan also carries `trial_expired`: false while its organization's daily trial of every field lasts, and true once the answer is Unlimited's, which `coverage.note` then says.
 
 ## Two spellings of a database ID
 
@@ -106,7 +151,7 @@ There are official InternetData client libraries available for many languages in
 
 ## About InternetData
 
-Geolocation, anonymity, ownership and network databases for IP addresses and AS numbers, licensed as files you download and query yourself.
+Geolocation, anonymity, ownership, network, service and domain data for any IP address, AS or domain, by API or as databases you download.
 
 [<img src="https://s3.internetdata.io/internetdata-public/brand/mark.svg" alt="InternetData" height="64"/>](https://internetdata.io/)
 

@@ -2,10 +2,11 @@
 // the staging API.
 //
 // The unit suite stubs the network, so it cannot see what matters most here:
-// that the IDs a model reads out of `list_databases` are the IDs the other
-// tools actually accept. Everything below is derived from the live listing -
-// a hardcoded database ID turns a license change into a red build that says
-// nothing about the server.
+// that a lookup's coverage note matches what the API really served, and that the
+// IDs a model reads out of `list_databases` are the IDs the other tools actually
+// accept. Everything below is derived from the live answers - a hardcoded
+// database ID turns a license change into a red build that says nothing about
+// the server.
 
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
@@ -16,8 +17,18 @@ import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 
 import { skipForNoKey, stagingKey } from '../lib/key.mjs';
 
-const BASE_URL = 'https://staging.internetdata.io';
-const TOOL_NAMES = ['list_databases', 'database_metadata', 'database_checksum', 'list_downloads'];
+const BASE_URL = 'https://api-staging.internetdata.io';
+const TOOL_NAMES = [
+    'lookup_ip', 'lookup_ips', 'lookup_asn', 'lookup_domain', 'my_entitlement', 'list_databases',
+    'database_metadata', 'database_checksum', 'list_downloads',
+];
+
+// One of each kind of lookup, the spec's own examples.
+const LOOKUPS = [
+    ['lookup_ip', { ip: '146.70.116.130' }],
+    ['lookup_asn', { asn: 9009 }],
+    ['lookup_domain', { domain: 'example.com' }],
+];
 
 const NO_KEY = skipForNoKey();
 
@@ -53,9 +64,8 @@ function structured(out) {
     return out.structuredContent;
 }
 
-// The one test that needs no credential: the package resolves, the `bin`
-// runs, and the manifest is what this version claims. A broken `files` list
-// fails here and nowhere else.
+// Needs no credential: the package resolves, the `bin` runs, and the manifest
+// is what this version claims. A broken `files` list fails here and nowhere else.
 test('the server starts and lists its tools', async () => {
     await withClient(async (client) => {
         // npx resolves the installed copy, and a server that is anything else -
@@ -71,8 +81,43 @@ test('the server starts and lists its tools', async () => {
     }, { withKey: false });
 });
 
-// Every endpoint is authenticated, so this is what a keyless caller sees. It
-// has to be a readable tool error the model can act on, not a crashed server.
+// The relation, not the counts: whatever the plan, a member the note calls included
+// came back and one it calls not included did not. Pinning which fields Unlimited
+// answers would turn a pricing change into a red build.
+test('a lookup without a key answers, and its coverage matches what came back', async () => {
+    await withClient(async (client) => {
+        for (const [name, args] of LOOKUPS) {
+            const { result, coverage } = structured(await client.callTool({ name: name, arguments: args }));
+            assertCoverageMatches(name, result, coverage);
+            assert.ok(coverage.not_included.length > 0, `${name}: Unlimited covered every field`);
+        }
+    }, { withKey: false });
+});
+
+test('a bogon is answered locally, and says so', async () => {
+    await withClient(async (client) => {
+        const { result, coverage } = structured(
+            await client.callTool({ name: 'lookup_ip', arguments: { ip: '10.0.0.1' } }));
+        assert.equal(result.is_bogon, true);
+        assert.match(coverage.note, /answered locally/);
+    }, { withKey: false });
+});
+
+test('a lookup with the key matches its coverage too', { skip: NO_KEY }, async () => {
+    await withClient(async (client) => {
+        for (const [name, args] of LOOKUPS) {
+            const { result, coverage } = structured(await client.callTool({ name: name, arguments: args }));
+            assertCoverageMatches(name, result, coverage);
+            assert.equal(typeof result.trial_expired, 'boolean',
+                `${name}: a free-plan key's answer says which`);
+        }
+        const { entitlement } = structured(await client.callTool({ name: 'my_entitlement', arguments: {} }));
+        assert.equal(typeof entitlement.plan.tier, 'string');
+    });
+});
+
+// Every database endpoint is authenticated, so this is what a keyless caller sees.
+// It has to be a readable tool error the model can act on, not a crashed server.
 test('no key gets a readable refusal, not a crash', async () => {
     await withClient(async (client) => {
         const out = await client.callTool({ name: 'list_databases', arguments: {} });
@@ -166,3 +211,19 @@ test('the download history is this org\'s own and stays bounded', { skip: NO_KEY
         assert.equal(over.isError, true, 'over the published cap must be refused here, not clamped');
     });
 });
+
+function assertCoverageMatches(name, result, coverage) {
+    for (const m of coverage.included) {
+        assert.ok(carries(result, m), `${name}: ${m} claimed as included but absent from the result`);
+    }
+    for (const m of coverage.not_included) {
+        assert.ok(!carries(result, m), `${name}: ${m} claimed as not included but present`);
+    }
+    assert.ok(coverage.note.length > 0, `${name}: no note`);
+}
+
+// Whether an answer carries a member, `location.city` naming one inside `location`.
+function carries(result, member) {
+    const [outer, inner] = member.split('.');
+    return Object.hasOwn(result, outer) && (inner === undefined || Object.hasOwn(result[outer], inner));
+}

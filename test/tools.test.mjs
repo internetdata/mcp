@@ -20,7 +20,20 @@ import { clientOptions } from '../dist/env.js';
 // some clients will refuse to surface at all.
 const NAME_CHARS = /^[A-Za-z0-9_.-]{1,128}$/;
 
-const TOOL_NAMES = ['list_databases', 'database_metadata', 'database_checksum', 'list_downloads'];
+const TOOL_NAMES = [
+    'lookup_ip', 'lookup_ips', 'lookup_asn', 'lookup_domain', 'my_entitlement', 'list_databases',
+    'database_metadata', 'database_checksum', 'list_downloads',
+];
+
+const data = JSON.parse(readFileSync(new URL('../testdata/testdata.json', import.meta.url), 'utf8'));
+
+// An Unlimited answer from the shared corpus, re-addressed: the client SDK refuses an
+// answer missing a member every plan is served, so a stub cannot serve less.
+const UNLIMITED = data.lookup.find((c) => c.name === 'unlimited-answer').body;
+
+function answerFor(ip, extra = {}) {
+    return { ...UNLIMITED, ip: ip, ...extra };
+}
 
 // One family, both standings, so a fixture cannot be tuned to a single shape.
 const CATALOG = {
@@ -89,7 +102,7 @@ const NULL_DOWNLOADS = {
 };
 
 function toolsFor(fetchImpl) {
-    const client = new InternetData({ apiKey: 'k', fetch: fetchImpl });
+    const client = new InternetData({ apiKey: 'k', cache: false, fetch: fetchImpl });
     return createTools({ client: client });
 }
 
@@ -145,11 +158,12 @@ test('every tool states whether it reads, destroys and reaches the open world', 
     }
 });
 
-// OpenAI's openWorldHint is a public or open-ended set of entities, where our own catalog and the
-// organization's own downloads are bounded.
-test('no tool reaches the open world', () => {
+// OpenAI's openWorldHint is a public or open-ended set of entities: any address, AS or domain is
+// one, where the account, our own catalog and the organization's own downloads are bounded.
+test('only the lookups reach the open world', () => {
     const open = toolsFor(serving(CATALOG).fetch).filter((d) => d.tool.annotations.openWorldHint);
-    assert.deepEqual(open.map((d) => d.tool.name), []);
+    assert.deepEqual(open.map((d) => d.tool.name),
+        ['lookup_ip', 'lookup_ips', 'lookup_asn', 'lookup_domain']);
 });
 
 // The databases reach several GB. An agent that treats a tool result as text
@@ -160,6 +174,234 @@ test('no tool downloads a database', () => {
     for (const n of names) {
         assert.doesNotMatch(n, /download(?!s$)/, 'a download tool would hand an agent a multi-GB file');
     }
+});
+
+// Uncapped by decision: the caller's whole list goes in one call and the SDK
+// splits it at the endpoint's own bound. A private address is answered locally,
+// so it never takes room in a batch.
+test('lookup_ips takes any number of addresses, one POST /batch per 1000', async () => {
+    const posts = [];
+    const batchServer = async (input) => {
+        const { ips } = JSON.parse(await input.text());
+        posts.push({ method: input.method, path: new URL(input.url).pathname, ips: ips });
+        const results = Object.fromEntries(ips.map((ip) => [ip, answerFor(ip)]));
+        return new Response(JSON.stringify({ results: results, errors: {} }), {
+            status: 200, headers: { 'content-type': 'application/json' },
+        });
+    };
+    const batch = toolsFor(batchServer).find((d) => d.tool.name === 'lookup_ips');
+    assert.equal(batch.tool.inputSchema.properties.ips.maxItems, undefined, 'no cap is published');
+
+    const routable = Array.from({ length: 2500 }, (_, i) => `9.9.${(i >> 8) & 255}.${i & 255}`);
+    const bogons = Array.from({ length: 100 }, (_, i) => `10.0.0.${i}`);
+    const out = await batch.handler({ ips: [...routable, ...bogons] });
+
+    assert.equal(out.isError, undefined, 'a long list must be answered, not refused');
+    assert.deepEqual(posts.map((p) => `${p.method} ${p.path}`), Array(3).fill('POST /batch'));
+    assert.deepEqual(posts.map((p) => p.ips.length).sort((a, b) => b - a), [1000, 1000, 500]);
+    assert.deepEqual(posts.flatMap((p) => p.ips).sort(), [...routable].sort(),
+        'every routable address is sent exactly once, and no private one is sent at all');
+
+    const { results } = out.structuredContent;
+    assert.equal(Object.keys(results).length, 2600, 'one entry per address');
+    assert.ok(routable.every((ip) => results[ip].is_bogon === false), 'a served answer per address');
+    assert.ok(bogons.every((ip) => results[ip].is_bogon === true), 'a local answer per bogon');
+});
+
+test('every lookup fixture validates against the published outputSchema', async () => {
+    const ajv = validator();
+    const tools = { lookup: 'lookup_ip', lookupAsn: 'lookup_asn', lookupDomain: 'lookup_domain' };
+    const args = { lookup: 'ip', lookupAsn: 'asn', lookupDomain: 'domain' };
+    for (const c of data.lookup) {
+        const def = byName(serving(c.body, c.status).fetch).get(tools[c.call]);
+        const validate = ajv.compile(def.tool.outputSchema);
+        const out = await def.handler({ [args[c.call]]: c.target });
+        assert.equal(out.isError, undefined, `${c.name}: ${out.content[0].text}`);
+        assert.ok(validate(out.structuredContent), `${c.name}: ${ajv.errorsText(validate.errors)}`);
+    }
+});
+
+test('a bogon answer also validates, and declares every member it carries', async () => {
+    const ajv = validator();
+    const tools = byName(serving({}).fetch);
+    const one = tools.get('lookup_ip');
+    const many = tools.get('lookup_ips');
+    const undeclared = (answer, schema) => Object.keys(answer).filter((k) => !(k in schema.properties));
+
+    const single = await one.handler({ ip: '10.0.0.1' });
+    const validate = ajv.compile(one.tool.outputSchema);
+    assert.ok(validate(single.structuredContent), ajv.errorsText(validate.errors));
+    const resultSchema = one.tool.outputSchema.properties.result;
+    assert.deepEqual(undeclared(single.structuredContent.result, resultSchema), []);
+
+    const entry = (await many.handler({ ips: ['10.0.0.1'] })).structuredContent.results['10.0.0.1'];
+    const entrySchema = many.tool.outputSchema.properties.results.additionalProperties.anyOf[0];
+    assert.deepEqual(undeclared(entry, entrySchema), []);
+});
+
+// What the API answers a free-plan key: a batch of two or more refused with a 402,
+// and a single lookup answered.
+function trialServer(calls) {
+    return async (input) => {
+        const path = new URL(input.url).pathname;
+        calls.push(`${input.method} ${path}`);
+        if (path === '/batch') {
+            return new Response('{"error":"POST /batch needs a paid plan"}', {
+                status: 402, headers: { 'content-type': 'application/json' },
+            });
+        }
+        return new Response(JSON.stringify(answerFor(path.slice(1), { trial_expired: true })), {
+            status: 200, headers: { 'content-type': 'application/json' },
+        });
+    };
+}
+
+test("a free-plan key's short list is looked up one address at a time", async () => {
+    const calls = [];
+    const batch = toolsFor(trialServer(calls)).find((d) => d.tool.name === 'lookup_ips');
+    const ips = ['9.9.9.1', '9.9.9.2', '10.0.0.1'];
+
+    const out = await batch.handler({ ips: ips });
+
+    assert.equal(out.isError, undefined);
+    const { results } = out.structuredContent;
+    assert.deepEqual(Object.keys(results), ips);
+    for (const ip of ['9.9.9.1', '9.9.9.2']) {
+        assert.equal(results[ip].ip, ip);
+        assert.equal(results[ip].trial_expired, true, `${ip} is the single lookup's answer`);
+    }
+    assert.equal(results['10.0.0.1'].is_bogon, true);
+    assert.deepEqual(calls, ['POST /batch', 'GET /9.9.9.1', 'GET /9.9.9.2']);
+});
+
+test("a free-plan key's long list keeps the refusal, and says what to pass instead", async () => {
+    const calls = [];
+    const batch = toolsFor(trialServer(calls)).find((d) => d.tool.name === 'lookup_ips');
+    const ips = Array.from({ length: 11 }, (_, i) => `9.9.9.${i + 1}`);
+
+    const out = await batch.handler({ ips: ips });
+
+    const { results } = out.structuredContent;
+    for (const ip of ips) {
+        assert.equal(results[ip].error.kind, 'bad_request', ip);
+        assert.match(results[ip].error.message, /POST \/batch needs a paid plan/, ip);
+        assert.match(results[ip].error.message, /at most 10 addresses/, ip);
+    }
+    assert.deepEqual(calls, ['POST /batch'], 'no address is looked up on its own');
+});
+
+// A batch answer holds results AND the package's own entry errors side by side,
+// so the map's value schema has to admit both shapes.
+test('a batch with a failed address validates against the published outputSchema', async () => {
+    const ajv = validator();
+    const body = {
+        results: { '9.9.9.9': answerFor('9.9.9.9') },
+        errors: { 'nope': { status: 400, error: 'not a valid IP address, AS number or domain' } },
+    };
+    const batch = byName(serving(body).fetch).get('lookup_ips');
+    const validate = ajv.compile(batch.tool.outputSchema);
+
+    const out = await batch.handler({ ips: ['9.9.9.9', 'nope'] });
+
+    assert.equal(out.isError, undefined, 'one failed address must not fail the batch');
+    const { results } = out.structuredContent;
+    assert.equal(results['9.9.9.9'].is_bogon, false, 'the served address carries its result');
+    assert.equal(results['nope'].error.kind, 'bad_request', 'the failed address carries its error');
+    assert.ok(validate(out.structuredContent), ajv.errorsText(validate.errors));
+});
+
+// An address is the caller's own string, and `__proto__` assigned to a plain object
+// sets its prototype rather than a key, which would drop that entry from the answer.
+test('lookup_ips answers every address it was given, __proto__ included', async () => {
+    const body = `{"results":{"9.9.9.9":${JSON.stringify(answerFor('9.9.9.9'))}},`
+        + '"errors":{"__proto__":{"status":400,"error":"not a valid IP address, AS number or domain"}}}';
+    const batch = toolsFor(async () => new Response(body, {
+        status: 200, headers: { 'content-type': 'application/json' },
+    })).find((d) => d.tool.name === 'lookup_ips');
+
+    const out = await batch.handler({ ips: ['9.9.9.9', '__proto__'] });
+
+    const { results } = out.structuredContent;
+    assert.deepEqual(Object.keys(results), ['9.9.9.9', '__proto__']);
+    assert.equal(Object.getPrototypeOf(results), Object.prototype, 'no address becomes a prototype');
+    // Its kind is the client SDK's classification, so only its presence is this package's.
+    assert.equal(typeof JSON.parse(out.content[0].text).results['__proto__'].error.kind, 'string',
+        'the text block carries the entry too');
+});
+
+const ENTITLEMENT_BODY = {
+    org_id: '85bb51e4-2eb6-4a31-8e4d-02ba8b98fe61',
+    apikey: { id: '0ab424cc-7619-4dad-b027-afacdc2cedb0', expires: null, allowed_cidrs: [] },
+    plan: { key: 'max', tier: 'max' },
+    usage: {
+        requests: 580,
+        quota: 5000000,
+        hard_limit: null,
+        window_start: '2026-09-04T07:00:00Z',
+        window_end: '2026-10-04T07:00:00Z',
+    },
+};
+
+// Each lookup reaches the path the API answers it at, through the SDK.
+test('each lookup calls its own route', async () => {
+    const bodies = {
+        '/9.9.9.9': answerFor('9.9.9.9'),
+        '/asn/9009': data.lookup.find((c) => c.name === 'asn-unlimited-answer').body,
+        '/domain/example.com': data.lookup.find((c) => c.name === 'domain-unlimited-answer').body,
+        '/api/v1/entitlement': ENTITLEMENT_BODY,
+    };
+    const paths = [];
+    const tools = byName(async (input) => {
+        const path = new URL(input.url).pathname;
+        paths.push(path);
+        return new Response(JSON.stringify(bodies[path]), {
+            status: 200, headers: { 'content-type': 'application/json' },
+        });
+    });
+    for (const [name, args] of [
+        ['lookup_ip', { ip: '9.9.9.9' }],
+        ['lookup_asn', { asn: 9009 }],
+        ['lookup_domain', { domain: 'example.com' }],
+        ['my_entitlement', {}],
+    ]) {
+        const out = await tools.get(name).handler(args);
+        assert.equal(out.isError, undefined, `${name}: ${out.content[0].text}`);
+    }
+    assert.deepEqual(paths, Object.keys(bodies));
+});
+
+test('my_entitlement reports the plan and the usage', async () => {
+    const result = await byName(serving(ENTITLEMENT_BODY).fetch).get('my_entitlement').handler({});
+
+    assert.equal(result.structuredContent.entitlement.plan.key, 'max');
+    assert.equal(result.structuredContent.entitlement.plan.tier, 'max');
+    assert.equal(result.structuredContent.entitlement.usage.requests, 580);
+    // Null means NEVER stop, which is not the same as a limit of zero, and the
+    // description says so because a model would otherwise read it as a stop.
+    assert.equal(result.structuredContent.entitlement.usage.hard_limit, null);
+});
+
+test('my_entitlement validates against the published outputSchema', async () => {
+    const ajv = validator();
+    const def = byName(serving(ENTITLEMENT_BODY).fetch).get('my_entitlement');
+    const validate = ajv.compile(def.tool.outputSchema);
+    const out = await def.handler({});
+    assert.equal(out.isError, undefined);
+    assert.ok(validate(out.structuredContent), ajv.errorsText(validate.errors));
+});
+
+// The number it reports moves with every other call, which is the whole point
+// of asking - a model told otherwise could cache it across a long session.
+test('my_entitlement is not advertised as idempotent', () => {
+    const def = byName(serving(ENTITLEMENT_BODY).fetch).get('my_entitlement');
+    assert.equal(def.tool.annotations.idempotentHint, false);
+});
+
+// Over a hosted transport the observed address belongs to whatever proxied the
+// call, so a my_ip tool would answer confidently and wrongly.
+test('there is no my_ip tool', () => {
+    const names = toolsFor(serving({}).fetch).map((d) => d.tool.name);
+    assert.ok(!names.includes('my_ip'), 'my_ip cannot mean what a model would read it to mean');
 });
 
 test('the tool list is deterministic, so clients can cache it', () => {
@@ -306,6 +548,13 @@ test('an unrecognized throw still produces a readable error', async () => {
 test('a rejected argument is the model\'s to fix, not an internal failure', async () => {
     const tools = byName(serving({}).fetch);
     const cases = [
+        ['lookup_ip', { ip: 12345 }, 'ip'],
+        ['lookup_ips', { ips: [] }, 'ips'],
+        ['lookup_asn', { asn: 'AS15169' }, 'asn'],
+        ['lookup_asn', { asn: 1.5 }, 'asn'],
+        ['lookup_asn', { asn: -1 }, 'asn'],
+        ['lookup_asn', { asn: 4294967296 }, 'asn'],
+        ['lookup_domain', { domain: 5 }, 'domain'],
         ['database_metadata', { dataset_id: 12345 }, 'dataset_id'],
         ['database_checksum', { dataset_id: 'bogon_ip_v1', format: 'parquet' }, 'format'],
         ['list_downloads', { limit: DOWNLOADS_LIMIT + 1 }, 'limit'],
@@ -316,19 +565,60 @@ test('a rejected argument is the model\'s to fix, not an internal failure', asyn
         assert.equal(error.kind, 'invalid_argument', `${name} must not report internal`);
         assert.equal(error.retryable, false, `${name}: the same call cannot succeed`);
         assert.match(error.message, new RegExp(field), `${name} must name the field at fault`);
+        assert.doesNotMatch(error.message, /"code":/, `${name} must not be a raw issue array`);
+    }
+});
+
+// zod rejects an array argument one issue per bad element. Spelled out in full, a
+// megabyte of numbers passed as `ips` would come back as tens of megabytes of text.
+test('a rejection lists its first ten issues and counts the rest', async () => {
+    const lookupIps = byName(serving({}).fetch).get('lookup_ips');
+    const cases = [
+        [1, undefined],
+        [10, undefined],
+        [11, '... and 1 more issue'],
+        [50000, '... and 49990 more issues'],
+    ];
+    for (const [bad, tail] of cases) {
+        const res = await lookupIps.handler({ ips: Array.from({ length: bad }, (_, i) => i) });
+        assert.equal(res.isError, true, `${bad} bad`);
+        const { error } = JSON.parse(res.content[0].text);
+        assert.equal(error.kind, 'invalid_argument', `${bad} bad`);
+
+        const at = [...error.message.matchAll(/→ at ips\[(\d+)\]/g)].map((m) => Number(m[1]));
+        const firstTen = Array.from({ length: Math.min(bad, 10) }, (_, i) => i);
+        assert.deepEqual(at, firstTen, `${bad} bad: the first ten are listed, in order`);
+        if (tail === undefined) {
+            assert.doesNotMatch(error.message, /more issue/, `${bad} bad: nothing is left to count`);
+        } else {
+            assert.equal(error.message.split('\n').at(-1), tail, `${bad} bad: the rest are counted`);
+        }
+        assert.ok(res.content[0].text.length < 2000, `${bad} bad: ${res.content[0].text.length} chars`);
     }
 });
 
 // Every tool publishes `additionalProperties: false` and holds to it: an argument
 // it does not take is refused by name, before any request. A lenient tool dropped
 // a misspelled optional one and answered as if it had never been passed, so
-// `{max: 10}` came back as the default 50 rows.
-for (const [name, args, extra] of [
+// `{max: 10}` came back as the default 50 rows. The lookups take a routable
+// address, AS or domain, which a lenient tool would have sent.
+const STRAY_ARGUMENTS = [
+    ['lookup_ip', { ip: '9.9.9.9', fields: 'vpn' }, 'fields'],
+    ['lookup_ips', { ips: ['9.9.9.9'], fields: 'vpn' }, 'fields'],
+    ['lookup_asn', { asn: 15169, fields: 'whois' }, 'fields'],
+    ['lookup_domain', { domain: 'example.com', fields: 'dns' }, 'fields'],
+    ['my_entitlement', { dataset_id: 'nope' }, 'dataset_id'],
     ['list_databases', { dataset_id: 'nope' }, 'dataset_id'],
     ['database_metadata', { dataset_id: 'bogon_ip_v1', format: 'csvgz' }, 'format'],
     ['database_checksum', { dataset_id: 'bogon_ip_v1', format: 'csvgz', algorithm: 'sha256' }, 'algorithm'],
     ['list_downloads', { max: 10 }, 'max'],
-]) {
+];
+
+test('every tool is held to refusing an argument it does not take', () => {
+    assert.deepEqual(STRAY_ARGUMENTS.map(([name]) => name), TOOL_NAMES);
+});
+
+for (const [name, args, extra] of STRAY_ARGUMENTS) {
     test(`${name} refuses an argument it does not take, before the API is asked`, async () => {
         const stub = serving(CATALOG);
         const def = byName(stub.fetch).get(name);
@@ -461,6 +751,82 @@ test('the list_databases description names every standing the spec declares', ()
     }
 });
 
+// Prose writes ID and IDs in every description a tool serves, its output schema's
+// included, which the generator copies from the spec. A code span is an identifier
+// and keeps its spelling (`versions[].id`).
+test('every description a tool serves writes ID, never id or ids', () => {
+    for (const { tool } of toolsFor(serving({}).fetch)) {
+        const bare = descriptions(tool)
+            .filter((text) => /\b(?:id|ids|Id|Ids)\b/.test(text.replace(/`[^`]*`/g, '')));
+        assert.deepEqual(bare, [], `${tool.name}: a bare id`);
+    }
+});
+
+// lookup_ip's description and the README's opening sentence name every family a
+// lookup flags, in prose no generator writes. Each flag the spec declares needs its
+// words here, so the re-pin that adds one reddens this until both texts name it.
+const FLAG_WORDS = {
+    is_bogon: 'reserved',
+    is_vpn: 'a VPN',
+    is_tor: 'a Tor node',
+    is_relay: 'a privacy relay',
+    is_resproxy: 'residential',
+    is_dcproxy: 'datacenter',
+    is_mobproxy: 'mobile or public proxy',
+    is_pubproxy: 'public proxy',
+    is_hosting: 'a hosting provider',
+    is_cdn: 'a CDN',
+    is_anycast: 'anycast',
+    is_carrier: 'carrier',
+    is_satellite: 'satellite',
+    is_ssh: 'SSH',
+    is_smtp: 'mail',
+    is_web: 'web',
+    is_dns_resolver: 'open DNS resolver',
+    is_bittorrent: 'BitTorrent',
+};
+
+test('lookup_ip and the README name every family the spec flags', () => {
+    const spec = JSON.parse(readFileSync(new URL('../spec/openapi.json', import.meta.url), 'utf8'));
+    const flags = Object.keys(spec.components.schemas.LookupResponse.properties)
+        .filter((m) => m.startsWith('is_'));
+    assert.deepEqual(Object.keys(FLAG_WORDS).sort(), flags.sort(),
+        'a flag with no words, or words with no flag');
+
+    const described = byName(serving({}).fetch).get('lookup_ip').tool.description;
+    const intro = readFileSync(new URL('../README.md', import.meta.url), 'utf8')
+        .split('\n').find((l) => l.startsWith('It gives an AI agent'));
+    assert.ok(intro, 'the README has no opening sentence to check');
+    for (const [flag, words] of Object.entries(FLAG_WORDS)) {
+        assert.ok(described.includes(words), `lookup_ip's description never says "${words}" (${flag})`);
+        assert.ok(intro.includes(words), `the README's intro never says "${words}" (${flag})`);
+    }
+});
+
+// An absent member reads as a negative finding unless the model is told otherwise,
+// so every tool that answers with a coverage block says to read its note.
+test('every tool that answers with coverage says to read its note', () => {
+    const withCoverage = toolsFor(serving({}).fetch)
+        .filter((d) => d.tool.outputSchema.properties?.coverage !== undefined);
+    assert.deepEqual(withCoverage.map((d) => d.tool.name),
+        ['lookup_ip', 'lookup_ips', 'lookup_asn', 'lookup_domain']);
+    for (const { tool } of withCoverage) {
+        assert.ok(tool.description.includes('Always read `coverage.note`'),
+            `${tool.name}: the description never says to read \`coverage.note\``);
+    }
+});
+
+// Each lookup's description states what Unlimited answers and what a paid plan does,
+// which is the spec's plan tables in a model's words.
+test('every lookup states what Unlimited and a paid plan answer', () => {
+    for (const name of ['lookup_ip', 'lookup_asn', 'lookup_domain']) {
+        const described = byName(serving({}).fetch).get(name).tool.description;
+        assert.match(described, /Unlimited, the free plan, answers/, `${name}: Unlimited's column`);
+        assert.match(described, /Every paid plan answers every field/, `${name}: the paid column`);
+        assert.doesNotMatch(described, /keyless/i, `${name}: the plan is Unlimited, never "keyless"`);
+    }
+});
+
 // Rejects from the CLIENT rather than from fetch: the SDK's own retry layer
 // turns a transport throw into its own `network` error, so a stub one level
 // lower would never reach the classifier under test.
@@ -480,6 +846,20 @@ function keywordPaths(node, keyword, path = '') {
             return [`${path}/${k}`];
         }
         return keywordPaths(v, keyword, `${path}/${k}`);
+    });
+}
+
+// Every description string anywhere in `node`. A property NAMED `description`
+// holds a schema, never a string, so it is walked rather than collected.
+function descriptions(node) {
+    if (node === null || typeof node !== 'object') {
+        return [];
+    }
+    return Object.entries(node).flatMap(([k, v]) => {
+        if (k === 'description' && typeof v === 'string') {
+            return [v];
+        }
+        return descriptions(v);
     });
 }
 

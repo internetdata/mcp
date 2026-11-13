@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.internetdata/mcp",
   "title": "InternetData",
-  "description": "List InternetData's IP and ASN databases, your license for each, what one holds, and its digests.",
+  "description": "Look up any IP address, AS or domain, and list InternetData's databases and your license for each.",
   "websiteUrl": "https://internetdata.io",
   "repository": {
     "url": "https://github.com/internetdata/mcp",
@@ -20,8 +20,8 @@
       "environmentVariables": [
         {
           "name": "INTERNETDATA_API_KEY",
-          "description": "Your InternetData API key",
-          "isRequired": true,
+          "description": "Your InternetData API key; lookups answer without one, with fewer fields",
+          "isRequired": false,
           "isSecret": true,
           "format": "string"
         },
