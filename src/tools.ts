@@ -421,9 +421,9 @@ function databaseTools(ctx: ToolContext): ToolDef[] {
                     + 'stands: `licensed` if the family is theirs today, `expired` if the term has '
                     + 'ended, `unlicensed` if it is published but has never been bought. Each entry '
                     + 'has a `base` ID, which is what a license names, and a `versions` array whose '
-                    + '`id` is what the other tools take - pass `versions[].id` (`bogon_ip_v1`), '
-                    + 'never the `base` (`bogon_ip`). Ask again rather than holding on to this: it '
-                    + 'is answered per key and is not the same for everyone.',
+                    + '`id` is what the other database tools take - pass `versions[].id` '
+                    + '(`bogon_ip_v1`), never the `base` (`bogon_ip`). Ask again rather than holding '
+                    + 'on to this: it is answered per key and is not the same for everyone.',
                 inputSchema: jsonSchema(NO_INPUT),
                 outputSchema: objectSchema({
                     databases: { type: 'array', items: DATABASE_SCHEMA },
