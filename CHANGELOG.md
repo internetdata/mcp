@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.3.1 - 2026-11-14
+
+### Fixes
+
+- list_databases: versions[].id is what the other database tools take ([`845da9e`](https://github.com/internetdata/mcp/commit/845da9e5fa431eede0d3da12a837341338a0aeb7))
+
 ## 3.3.0 - 2026-11-14
 
 ### Fixes
