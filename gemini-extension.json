@@ -1,6 +1,6 @@
 {
   "name": "internetdata",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "Look up any IP address, AS or domain, and list InternetData's databases and your license for each.",
   "mcpServers": {
     "internetdata": {

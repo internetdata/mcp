@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.3.0 - 2026-11-14
+
+### Fixes
+
+- lookup_asn answers a big AS's first 100 prefixes ([`d47e6cd`](https://github.com/internetdata/mcp/commit/d47e6cdc128f1df406e7504da7c98cb7852a9ec0))
+
 ## 3.2.0 - 2026-11-13
 
 ### Features
