@@ -877,3 +877,23 @@ function freeFormPaths(node, path = '') {
         ...Object.entries(node).flatMap(([k, v]) => freeFormPaths(v, `${path}/${k}`)),
     ];
 }
+
+test('lookup_asn answers a big AS\'s first 100 prefixes and says how many there are', async () => {
+    const paid = data.lookup.find((c) => c.name === 'asn-paid-answer').body;
+    const prefixes = Array.from({ length: 250 }, (_, i) => ({ ...paid.prefixes[0], prefix: `10.${i}.0.0/16` }));
+    const def = byName(serving({ ...paid, prefixes: prefixes }).fetch).get('lookup_asn');
+    const out = await def.handler({ asn: 16509 });
+    assert.equal(out.isError, undefined, out.content[0].text);
+    const { result, truncated } = out.structuredContent;
+    assert.equal(result.prefixes.length, 100);
+    assert.deepEqual(result.prefixes[99], prefixes[99]);
+    assert.deepEqual(truncated.prefixes, { shown: 100, total: 250 });
+    assert.match(truncated.note, /GET \/asn\/16509 returns every one/);
+    const ajv = validator();
+    assert.ok(ajv.compile(def.tool.outputSchema)(out.structuredContent), 'the cut answer validates');
+
+    const small = await byName(serving({ ...paid, prefixes: prefixes.slice(0, 3) }).fetch)
+        .get('lookup_asn').handler({ asn: 64500 });
+    assert.equal(small.structuredContent.truncated, undefined, 'a small AS answers whole');
+    assert.equal(small.structuredContent.result.prefixes.length, 3);
+});

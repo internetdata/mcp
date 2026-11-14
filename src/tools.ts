@@ -79,6 +79,28 @@ const DOMAIN_INPUT = z.strictObject({
 // single lookups.
 const TRIAL_SINGLE_LOOKUPS = 10;
 
+// How many of an AS's prefixes lookup_asn answers. A big AS announces thousands (AS16509's answer is 9 MB, AS9009's
+// 2 MB), past the official Python MCP SDK's 1 MiB limit on a streamed response and past any model's context
+// (Uman, 2026-11-14). The rest are one API call away, which the answer says.
+const ASN_PREFIXES_SHOWN = 100;
+
+// What lookup_asn adds when it cut the prefixes short: how many it carries, how many there are, and where the
+// rest are.
+const TRUNCATED_SCHEMA = {
+    type: 'object',
+    description: 'Present only when the answer was cut short: the prefixes it carries, how many the AS announces, '
+        + 'and where to get them all.',
+    properties: {
+        prefixes: {
+            type: 'object',
+            properties: { shown: { type: 'integer' }, total: { type: 'integer' } },
+            required: ['shown', 'total'],
+        },
+        note: { type: 'string' },
+    },
+    required: ['prefixes', 'note'],
+} as const;
+
 // The paid column of the spec's plan tables, the same for every lookup. Each tool
 // names Unlimited's column itself, and the coverage note says answer by answer
 // which fields a plan left out.
@@ -212,7 +234,8 @@ function lookupTools(ctx: ToolContext): ToolDef[] {
                 description: 'What InternetData knows about one autonomous system, by its number: its '
                     + 'operator, country, registry, allocation date and domain, the kind of network it runs, '
                     + 'how many IPv4 addresses and prefixes it announces with their RPKI counts, its ASN '
-                    + 'Whois record, and every prefix it announces in global BGP with its RPKI status. An AS '
+                    + 'Whois record, and the prefixes it announces in global BGP with their RPKI status: the first '
+                    + `${ASN_PREFIXES_SHOWN}, with \`truncated\` giving the total where it announces more. An AS `
                     + 'no database knows comes back as its number with empty values. Unlimited, the free '
                     + 'plan, answers its operator, country, registry, allocation date and domain, with a key '
                     + `or without one. ${PAID} `
@@ -222,6 +245,7 @@ function lookupTools(ctx: ToolContext): ToolDef[] {
                 outputSchema: objectSchema({
                     result: ASN_LOOKUP_RESULT_SCHEMA,
                     coverage: COVERAGE_SCHEMA,
+                    truncated: TRUNCATED_SCHEMA,
                 }, ['result', 'coverage']),
                 annotations: {
                     readOnlyHint: true,
@@ -233,7 +257,20 @@ function lookupTools(ctx: ToolContext): ToolDef[] {
             handler: async (args) => {
                 const { asn } = ASN_INPUT.parse(args);
                 const body = wireBody(await ctx.client.lookupAsn(asn));
-                return ok({ result: body, coverage: coverageOf(body, 'asn') });
+                const coverage = coverageOf(body, 'asn');
+                const prefixes = body['prefixes'];
+                if (!Array.isArray(prefixes) || prefixes.length <= ASN_PREFIXES_SHOWN) {
+                    return ok({ result: body, coverage: coverage });
+                }
+                return ok({
+                    result: { ...body, prefixes: prefixes.slice(0, ASN_PREFIXES_SHOWN) },
+                    coverage: coverage,
+                    truncated: {
+                        prefixes: { shown: ASN_PREFIXES_SHOWN, total: prefixes.length },
+                        note: `The first ${ASN_PREFIXES_SHOWN} of the ${prefixes.length} prefixes this AS announces. `
+                            + `The API's GET /asn/${asn} returns every one.`,
+                    },
+                });
             },
         },
         {
