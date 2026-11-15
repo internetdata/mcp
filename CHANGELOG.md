@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.3.2 - 2026-11-15
+
+### Fixes
+
+- Re-pin the spec to 2026.11.14: hosted_domains lists its 10 most popular ([`710917b`](https://github.com/internetdata/mcp/commit/710917bba0c426a1397675cccf360608397281f8))
+
 ## 3.3.1 - 2026-11-14
 
 ### Fixes
