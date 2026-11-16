@@ -15,6 +15,10 @@ import { InternetData } from '@internetdata/internetdata';
 
 import { createTools, DOWNLOADS_LIMIT, registerTools } from '../dist/index.js';
 import { clientOptions } from '../dist/env.js';
+import {
+    ASN_LOOKUP_RESULT_SCHEMA, DATABASE_METADATA_SCHEMA, DATABASE_SCHEMA, DB_CHECKSUMS_SCHEMA, DOMAIN_LOOKUP_RESULT_SCHEMA,
+    DOWNLOAD_SCHEMA, ENTITLEMENT_SCHEMA, LOOKUP_RESULT_SCHEMA,
+} from '../dist/schema.gen.js';
 
 // MCP names the allowed characters explicitly; a name outside them is a tool
 // some clients will refuse to surface at all.
@@ -484,6 +488,92 @@ test('no output schema is free-form unless the spec declares it', () => {
     }
 });
 
+// The API may add a value to a list in an answer, and every SDK hands one back as
+// served, so a tool's schema keeps an `enum` only where the spec says the list never
+// gains a value. Every other list must still reach a model, as prose naming each value.
+const GENERATED_FROM = {
+    LookupResponse: LOOKUP_RESULT_SCHEMA,
+    AsnLookupResponse: ASN_LOOKUP_RESULT_SCHEMA,
+    DomainLookupResponse: DOMAIN_LOOKUP_RESULT_SCHEMA,
+    Database: DATABASE_SCHEMA,
+    DatabaseMetadata: DATABASE_METADATA_SCHEMA,
+    DbChecksums: DB_CHECKSUMS_SCHEMA,
+    Download: DOWNLOAD_SCHEMA,
+    Entitlement: ENTITLEMENT_SCHEMA,
+};
+
+test("an answer's list stays closed only where the spec says it never grows", () => {
+    const spec = JSON.parse(readFileSync(new URL('../spec/openapi.json', import.meta.url), 'utf8'));
+    const lists = Object.entries(GENERATED_FROM)
+        .flatMap(([name, generated]) => specEnums(spec, spec.components.schemas[name], generated, name));
+    assert.ok(lists.some((l) => !/never gains a value/.test(l.spec.description ?? '')),
+        'the spec declares no list the API may add to, so this test checks nothing');
+
+    for (const { path, spec: declared, generated } of lists) {
+        if (/never gains a value/.test(declared.description ?? '')) {
+            assert.deepEqual(generated.enum, declared.enum, `${path}: the spec closes this list`);
+            continue;
+        }
+        assert.equal(generated.enum, undefined, `${path}: the API may add a value`);
+        assert.match(generated.description, /the API may add more\.$/, path);
+        for (const value of declared.enum.filter((v) => v !== null)) {
+            assert.ok(generated.description.includes(`\`${value}\``), `${path}: never names \`${value}\``);
+        }
+    }
+});
+
+// Each answer serves a value no published list holds, at the paths named. Every tool
+// hands it back as served and its schema admits it, but for a list the spec says never
+// gains a value (a plan's tier), which its `enum` alone refuses. The shared corpus has
+// no such cases for this package, so they are written here.
+const UNKNOWN_VALUES = [
+    {
+        tool: 'list_databases',
+        body: {
+            databases: [{
+                ...CATALOG.databases[0], standing: 'suspended', license_type: 'oem',
+                versions: [{ ...CATALOG.databases[0].versions[0], formats: ['parquet'], sample_formats: ['parquet'] }],
+            }],
+        },
+        served: {
+            '/databases/0/standing': 'suspended',
+            '/databases/0/license_type': 'oem',
+            '/databases/0/versions/0/formats/0': 'parquet',
+            '/databases/0/versions/0/sample_formats/0': 'parquet',
+        },
+        refused: [],
+    },
+    {
+        tool: 'list_downloads',
+        body: { downloads: [{ ...NULL_DOWNLOADS.downloads[0], outcome: 'throttled' }] },
+        served: { '/downloads/0/outcome': 'throttled' },
+        refused: [],
+    },
+    {
+        tool: 'my_entitlement',
+        body: { ...ENTITLEMENT_BODY, plan: { ...ENTITLEMENT_BODY.plan, tier: 'data' } },
+        served: { '/entitlement/plan/tier': 'data' },
+        refused: ['/entitlement/plan/tier'],
+    },
+];
+
+test('a value the API adds to a list comes back as served, and only a closed list refuses it', async () => {
+    const ajv = validator();
+    for (const c of UNKNOWN_VALUES) {
+        const def = byName(serving(c.body).fetch).get(c.tool);
+        const out = await def.handler({});
+        assert.equal(out.isError, undefined, `${c.tool}: ${out.content[0].text}`);
+        for (const [path, want] of Object.entries(c.served)) {
+            const got = path.split('/').slice(1).reduce((v, seg) => v[seg], out.structuredContent);
+            assert.equal(got, want, `${c.tool}: ${path}`);
+        }
+        const validate = ajv.compile(def.tool.outputSchema);
+        validate(out.structuredContent);
+        assert.deepEqual((validate.errors ?? []).map((e) => [e.keyword, e.instancePath]),
+            c.refused.map((p) => ['enum', p]), `${c.tool}: ${ajv.errorsText(validate.errors)}`);
+    }
+});
+
 test('the downloads window is published and enforced', async () => {
     const tools = byName(serving({ downloads: [] }).fetch);
     const def = tools.get('list_downloads');
@@ -834,6 +924,32 @@ test('every lookup states what Unlimited and a paid plan answer', () => {
 function throwingClient(err) {
     const client = { database: { list: async () => { throw err } } };
     return createTools({ client: client }).find((d) => d.tool.name === 'list_databases');
+}
+
+// Every list the spec declares under `node`, its properties' and items' included, beside
+// the schema generated at the same place. A $ref and a single-member allOf are folded in
+// as gen-schema.mjs folds them, the member's own keywords winning.
+function specEnums(spec, node, generated, path) {
+    const declared = specNode(spec, node);
+    return [
+        ...(Array.isArray(declared.enum) ? [{ path: path, spec: declared, generated: generated }] : []),
+        ...Object.entries(declared.properties ?? {})
+            .flatMap(([k, v]) => specEnums(spec, v, generated.properties[k], `${path}.${k}`)),
+        ...(declared.items === undefined
+            ? []
+            : specEnums(spec, declared.items, generated.items, `${path}[]`)),
+    ];
+}
+
+function specNode(spec, node) {
+    if (typeof node.$ref === 'string') {
+        return specNode(spec, node.$ref.replace(/^#\//, '').split('/').reduce((n, p) => n[p], spec));
+    }
+    if (Array.isArray(node.allOf) && node.allOf.length === 1) {
+        const { allOf, ...own } = node;
+        return { ...specNode(spec, allOf[0]), ...own };
+    }
+    return node;
 }
 
 // Where a keyword appears in a schema. A keyword's value is never an object, so

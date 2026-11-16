@@ -19,8 +19,11 @@ const schema = (name) => {
     if (node === undefined) {
         throw new Error(`spec has no components.schemas.${name}`);
     }
-    return toJsonSchema(spec, node);
+    return openVocabularies(toJsonSchema(spec, node));
 };
+
+// How the spec says a list in an answer is closed, in its own words.
+const CLOSED_LIST = /\bnever gains a value\b/;
 
 const lookup = schema('LookupResponse');
 const asnLookup = schema('AsnLookupResponse');
@@ -210,6 +213,33 @@ function flattenSingleAllOf(node) {
     }
     const { allOf, ...rest } = node;
     return { ...allOf[0], ...rest };
+}
+
+// A list in an answer is the API's to extend, and an `enum` makes every validating
+// client refuse the whole answer once it does. So a list stays an `enum` only where the
+// spec says it never gains a value (a plan's tier); every other one names today's values
+// in its description. Runs after the translation, to read a flattened member's own.
+function openVocabularies(node) {
+    if (node === null || typeof node !== 'object') {
+        return node;
+    }
+    if (Array.isArray(node)) {
+        return node.map(openVocabularies);
+    }
+    const out = Object.fromEntries(Object.entries(node).map(([k, v]) => [k, openVocabularies(v)]));
+    if (!Array.isArray(node.enum) || CLOSED_LIST.test(node.description ?? '')) {
+        return out;
+    }
+    if (node.type === undefined) {
+        throw new Error(`an enum with no type to keep once it opens: ${JSON.stringify(node)}`);
+    }
+    const { enum: values, ...open } = out;
+    const known = values.filter((v) => v !== null).map((v) => `\`${v}\``).join(', ');
+    const said = `Known values: ${known}; the API may add more.`;
+    return {
+        ...open,
+        description: open.description === undefined ? said : `${open.description.trimEnd()} ${said}`,
+    };
 }
 
 function list(names) {
