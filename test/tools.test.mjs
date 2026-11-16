@@ -16,8 +16,8 @@ import { InternetData } from '@internetdata/internetdata';
 import { createTools, DOWNLOADS_LIMIT, registerTools } from '../dist/index.js';
 import { clientOptions } from '../dist/env.js';
 import {
-    ASN_LOOKUP_RESULT_SCHEMA, DATABASE_METADATA_SCHEMA, DATABASE_SCHEMA, DB_CHECKSUMS_SCHEMA, DOMAIN_LOOKUP_RESULT_SCHEMA,
-    DOWNLOAD_SCHEMA, ENTITLEMENT_SCHEMA, LOOKUP_RESULT_SCHEMA,
+    ASN_LOOKUP_RESULT_SCHEMA, DATABASE_METADATA_SCHEMA, DATABASE_SCHEMA, DB_CHECKSUMS_SCHEMA,
+    DOMAIN_LOOKUP_RESULT_SCHEMA, DOWNLOAD_SCHEMA, ENTITLEMENT_SCHEMA, LOOKUP_RESULT_SCHEMA,
 } from '../dist/schema.gen.js';
 
 // MCP names the allowed characters explicitly; a name outside them is a tool
@@ -995,22 +995,57 @@ function freeFormPaths(node, path = '') {
     ];
 }
 
-test('lookup_asn answers a big AS\'s first 100 prefixes and says how many there are', async () => {
+test('lookup_asn answers a big AS\'s first 100 of each long list and says how many there are', async () => {
     const paid = data.lookup.find((c) => c.name === 'asn-paid-answer').body;
     const prefixes = Array.from({ length: 250 }, (_, i) => ({ ...paid.prefixes[0], prefix: `10.${i}.0.0/16` }));
-    const def = byName(serving({ ...paid, prefixes: prefixes }).fetch).get('lookup_asn');
-    const out = await def.handler({ asn: 16509 });
+    const peers = Array.from({ length: 8006 }, (_, i) => i + 1);
+    const downstreams = Array.from({ length: 101 }, (_, i) => 64512 + i);
+    const upstreams = Array.from({ length: 100 }, (_, i) => 1000 + i);
+    const big = { ...paid, prefixes: prefixes, upstreams: upstreams, peers: peers, downstreams: downstreams };
+    const def = byName(serving(big).fetch).get('lookup_asn');
+    const out = await def.handler({ asn: 6939 });
     assert.equal(out.isError, undefined, out.content[0].text);
     const { result, truncated } = out.structuredContent;
-    assert.equal(result.prefixes.length, 100);
-    assert.deepEqual(result.prefixes[99], prefixes[99]);
-    assert.deepEqual(truncated.prefixes, { shown: 100, total: 250 });
-    assert.match(truncated.note, /GET \/asn\/16509 returns every one/);
+    assert.deepEqual(result.prefixes, prefixes.slice(0, 100));
+    assert.deepEqual(result.peers, peers.slice(0, 100));
+    assert.deepEqual(result.downstreams, downstreams.slice(0, 100));
+    assert.deepEqual(result.upstreams, upstreams, 'a list of exactly 100 answers whole');
+    assert.equal(result.num_peers, paid.num_peers, 'the counts beside the lists are served as they are');
+    assert.deepEqual(truncated, {
+        prefixes: { shown: 100, total: 250 },
+        peers: { shown: 100, total: 8006 },
+        downstreams: { shown: 100, total: 101 },
+        note: truncated.note,
+    });
+    assert.ok(truncated.note.startsWith('For AS6939, this answer holds the first 100 of the 250 prefixes it '
+        + 'announces, the first 100 of the 8006 AS numbers it peers with, and the first 100 of the 101 AS numbers '
+        + 'it provides transit to.'), truncated.note);
+    assert.match(truncated.note, /lowest-numbered/);
+    assert.match(truncated.note, /GET \/asn\/6939 returns every one/);
     const ajv = validator();
     assert.ok(ajv.compile(def.tool.outputSchema)(out.structuredContent), 'the cut answer validates');
+
+    const onlyPrefixes = await byName(serving({ ...paid, prefixes: prefixes }).fetch)
+        .get('lookup_asn').handler({ asn: 16509 });
+    assert.deepEqual(Object.keys(onlyPrefixes.structuredContent.truncated), ['prefixes', 'note']);
+    assert.doesNotMatch(onlyPrefixes.structuredContent.truncated.note, /lowest-numbered/,
+        'a cut that keeps every AS number says nothing of their order');
 
     const small = await byName(serving({ ...paid, prefixes: prefixes.slice(0, 3) }).fetch)
         .get('lookup_asn').handler({ asn: 64500 });
     assert.equal(small.structuredContent.truncated, undefined, 'a small AS answers whole');
     assert.equal(small.structuredContent.result.prefixes.length, 3);
+    assert.deepEqual(Object.keys(small.structuredContent), ['result', 'coverage']);
+});
+
+// Each list lookup_asn may cut is one the spec answers, so a renamed member fails here
+// rather than passing through whole.
+test('every list lookup_asn cuts is a list the AS answer declares', () => {
+    const def = byName(serving(CATALOG).fetch).get('lookup_asn');
+    const cuttable = Object.keys(def.tool.outputSchema.properties.truncated.properties).filter((k) => k !== 'note');
+    assert.deepEqual(cuttable, ['prefixes', 'upstreams', 'peers', 'downstreams']);
+    for (const name of cuttable) {
+        assert.equal(ASN_LOOKUP_RESULT_SCHEMA.properties[name]?.type, 'array', name);
+    }
+    assert.deepEqual(def.tool.outputSchema.properties.truncated.required, ['note']);
 });

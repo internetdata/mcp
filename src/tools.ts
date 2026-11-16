@@ -79,27 +79,39 @@ const DOMAIN_INPUT = z.strictObject({
 // single lookups.
 const TRIAL_SINGLE_LOOKUPS = 10;
 
-// How many of an AS's prefixes lookup_asn answers. A big AS announces thousands (AS16509's answer is 9 MB, AS9009's
-// 2 MB), past the official Python MCP SDK's 1 MiB limit on a streamed response and past any model's context
-// (Uman, 2026-11-14). The rest are one API call away, which the answer says.
-const ASN_PREFIXES_SHOWN = 100;
+// How many entries of each long list lookup_asn answers. A big AS announces thousands of prefixes (AS16509's
+// answer is 9 MB, AS9009's 2 MB), past the official Python MCP SDK's 1 MiB limit on a streamed response and past
+// any model's context (Uman, 2026-11-14). A transit network's neighbors run to thousands of bare AS numbers too
+// (AS6939 peers with 8,006), which a model can do little with, and their counts are whole beside them (Uman,
+// 2026-11-16). The rest are one API call away, which the answer says.
+const ASN_LIST_SHOWN = 100;
 
-// What lookup_asn adds when it cut the prefixes short: how many it carries, how many there are, and where the
-// rest are.
+// Each list lookup_asn cuts, and how its note names the whole list.
+const ASN_LISTS = {
+    prefixes: 'prefixes it announces',
+    upstreams: 'AS numbers it gets transit from',
+    peers: 'AS numbers it peers with',
+    downstreams: 'AS numbers it provides transit to',
+} as const;
+
+const CUT_LIST_SCHEMA = {
+    type: 'object',
+    properties: { shown: { type: 'integer' }, total: { type: 'integer' } },
+    required: ['shown', 'total'],
+} as const;
+
+// What lookup_asn adds when it cut a list short: for each list it cut, how many it carries and how many there
+// are, and where the rest are.
 const TRUNCATED_SCHEMA = {
     type: 'object',
-    description: 'Present only when the answer was cut short: the prefixes it carries, how many the AS announces, '
-        + 'and where to get them all.',
+    description: 'Present only when the answer was cut short: for each list it cut, how many entries it carries '
+        + 'and how many there are, and where to get them all.',
     properties: {
-        prefixes: {
-            type: 'object',
-            properties: { shown: { type: 'integer' }, total: { type: 'integer' } },
-            required: ['shown', 'total'],
-        },
+        ...Object.fromEntries(Object.keys(ASN_LISTS).map((name) => [name, CUT_LIST_SCHEMA])),
         note: { type: 'string' },
     },
-    required: ['prefixes', 'note'],
-} as const;
+    required: ['note'],
+};
 
 // The paid column of the spec's plan tables, the same for every lookup. Each tool
 // names Unlimited's column itself, and the coverage note says answer by answer
@@ -236,11 +248,12 @@ function lookupTools(ctx: ToolContext): ToolDef[] {
                     + 'how many IPv4 addresses and prefixes it announces with their RPKI counts, its ASN '
                     + 'Whois record, its rank and whether it is Tier 1, the AS numbers it gets transit from, '
                     + 'peers with and provides transit to, how many domains it hosts with the most popular, and '
-                    + 'the prefixes it announces in global BGP with their RPKI status: the first '
-                    + `${ASN_PREFIXES_SHOWN}, with \`truncated\` giving the total where it announces more. An AS `
-                    + 'no database knows comes back as its number with empty values. Unlimited, the free '
-                    + 'plan, answers its operator, country, registry, allocation date and domain, with a key '
-                    + `or without one. ${PAID} `
+                    + 'the prefixes it announces in global BGP with their RPKI status. The prefixes and each '
+                    + `list of AS numbers hold their first ${ASN_LIST_SHOWN}, the AS numbers ascending, with `
+                    + '`truncated` giving the total where there are more. An AS no database knows comes back as '
+                    + 'its number with empty values. Unlimited, the free plan, answers its operator, country, '
+                    + 'registry, allocation date and domain, with a key or without one. '
+                    + `${PAID} `
                     + 'Always read `coverage.note` before concluding anything from a field that is not in '
                     + 'the result.',
                 inputSchema: jsonSchema(ASN_INPUT),
@@ -259,20 +272,9 @@ function lookupTools(ctx: ToolContext): ToolDef[] {
             handler: async (args) => {
                 const { asn } = ASN_INPUT.parse(args);
                 const body = wireBody(await ctx.client.lookupAsn(asn));
+                const { result, truncated } = cutAsnLists(asn, body);
                 const coverage = coverageOf(body, 'asn');
-                const prefixes = body['prefixes'];
-                if (!Array.isArray(prefixes) || prefixes.length <= ASN_PREFIXES_SHOWN) {
-                    return ok({ result: body, coverage: coverage });
-                }
-                return ok({
-                    result: { ...body, prefixes: prefixes.slice(0, ASN_PREFIXES_SHOWN) },
-                    coverage: coverage,
-                    truncated: {
-                        prefixes: { shown: ASN_PREFIXES_SHOWN, total: prefixes.length },
-                        note: `The first ${ASN_PREFIXES_SHOWN} of the ${prefixes.length} prefixes this AS announces. `
-                            + `The API's GET /asn/${asn} returns every one.`,
-                    },
-                });
+                return ok({ result: result, coverage: coverage, ...(truncated && { truncated: truncated }) });
             },
         },
         {
@@ -367,6 +369,36 @@ async function lookupOne(ctx: ToolContext, addr: string): Promise<unknown> {
  */
 function wireBody(answer: { raw: object }): Record<string, unknown> {
     return answer.raw as Record<string, unknown>;
+}
+
+// An AS's answer with each list in ASN_LISTS cut to its first ASN_LIST_SHOWN, and, where one was, `truncated`
+// saying how long each cut list is and where to get it whole.
+function cutAsnLists(asn: number, body: Record<string, unknown>): {
+    result: Record<string, unknown>;
+    truncated?: Record<string, unknown>;
+} {
+    const cut = Object.entries(ASN_LISTS).flatMap(([name, whole]) => {
+        const list = body[name];
+        if (!Array.isArray(list) || list.length <= ASN_LIST_SHOWN) {
+            return [];
+        }
+        return [{ name: name, whole: whole, list: list }];
+    });
+    if (cut.length === 0) {
+        return { result: body };
+    }
+    const held = cut.map((c) => `the first ${ASN_LIST_SHOWN} of the ${c.list.length} ${c.whole}`);
+    const neighbors = cut.some((c) => c.name !== 'prefixes')
+        ? ' Each list of AS numbers ascends, so those are the lowest-numbered, not the most significant.'
+        : '';
+    return {
+        result: { ...body, ...Object.fromEntries(cut.map((c) => [c.name, c.list.slice(0, ASN_LIST_SHOWN)])) },
+        truncated: {
+            ...Object.fromEntries(cut.map((c) => [c.name, { shown: ASN_LIST_SHOWN, total: c.list.length }])),
+            note: `For AS${asn}, this answer holds ${new Intl.ListFormat('en').format(held)}.${neighbors} `
+                + `The API's GET /asn/${asn} returns every one.`,
+        },
+    };
 }
 
 /**
