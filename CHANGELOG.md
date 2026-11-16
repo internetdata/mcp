@@ -2,6 +2,13 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.5.0 - 2026-11-16
+
+### Fixes
+
+- lookup_asn answers the first 100 of each neighbor list too ([`f7844c2`](https://github.com/internetdata/mcp/commit/f7844c290adced4a644c5cf76275aa2d6a1a7ca2))
+- Admit a value the API adds to a list in an answer ([`07ff792`](https://github.com/internetdata/mcp/commit/07ff79276d45538968660127bb92a6053239911e))
+
 ## 3.4.0 - 2026-11-16
 
 ### Features
