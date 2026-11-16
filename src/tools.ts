@@ -234,7 +234,9 @@ function lookupTools(ctx: ToolContext): ToolDef[] {
                 description: 'What InternetData knows about one autonomous system, by its number: its '
                     + 'operator, country, registry, allocation date and domain, the kind of network it runs, '
                     + 'how many IPv4 addresses and prefixes it announces with their RPKI counts, its ASN '
-                    + 'Whois record, and the prefixes it announces in global BGP with their RPKI status: the first '
+                    + 'Whois record, its rank and whether it is Tier 1, the AS numbers it gets transit from, '
+                    + 'peers with and provides transit to, how many domains it hosts with the most popular, and '
+                    + 'the prefixes it announces in global BGP with their RPKI status: the first '
                     + `${ASN_PREFIXES_SHOWN}, with \`truncated\` giving the total where it announces more. An AS `
                     + 'no database knows comes back as its number with empty values. Unlimited, the free '
                     + 'plan, answers its operator, country, registry, allocation date and domain, with a key '

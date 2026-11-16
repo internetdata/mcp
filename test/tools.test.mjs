@@ -332,7 +332,7 @@ test('lookup_ips answers every address it was given, __proto__ included', async 
 const ENTITLEMENT_BODY = {
     org_id: '85bb51e4-2eb6-4a31-8e4d-02ba8b98fe61',
     apikey: { id: '0ab424cc-7619-4dad-b027-afacdc2cedb0', expires: null, allowed_cidrs: [] },
-    plan: { key: 'max', tier: 'max' },
+    plan: { key: 'max', name: 'Max', tier: 'max' },
     usage: {
         requests: 580,
         quota: 5000000,
@@ -374,6 +374,7 @@ test('my_entitlement reports the plan and the usage', async () => {
     const result = await byName(serving(ENTITLEMENT_BODY).fetch).get('my_entitlement').handler({});
 
     assert.equal(result.structuredContent.entitlement.plan.key, 'max');
+    assert.equal(result.structuredContent.entitlement.plan.name, 'Max');
     assert.equal(result.structuredContent.entitlement.plan.tier, 'max');
     assert.equal(result.structuredContent.entitlement.usage.requests, 580);
     // Null means NEVER stop, which is not the same as a limit of zero, and the

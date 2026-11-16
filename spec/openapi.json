@@ -9,7 +9,7 @@
       "url": "https://internetdata.io"
     },
     "termsOfService": "https://internetdata.io/terms",
-    "version": "2026.11.14"
+    "version": "2026.11.15"
   },
   "servers": [
     {
@@ -2196,7 +2196,7 @@
           "Lookup"
         ],
         "summary": "ASN lookup",
-        "description": "Answers what InternetData knows about one autonomous system: its registration on every plan,\nand on a paid one its ASN Whois record and every prefix it announces in global BGP, with RPKI status,\nup to 20000 per address family (the counts beside them are always whole). An AS no database knows answers\nits number with empty values.\n",
+        "description": "Answers what InternetData knows about one autonomous system: its registration on every plan,\nand on a paid one its ASN Whois record, every prefix it announces in global BGP, with RPKI status,\nup to 20000 per address family, its rank, Tier 1 flag, upstreams, peers and downstreams from ASN\nExtended, up to 20000 each (the counts beside them are always whole), and the domains it hosts. An AS no\ndatabase knows answers its number with empty values.\n",
         "parameters": [
           {
             "in": "path",
@@ -2237,7 +2237,7 @@
                     }
                   },
                   "paid": {
-                    "summary": "A paid plan, two of its prefixes shown",
+                    "summary": "A paid plan, two of each list shown",
                     "value": {
                       "asn": 9009,
                       "name": "M247 Europe SRL",
@@ -2312,7 +2312,31 @@
                           "size": 0,
                           "other_origins": []
                         }
-                      ]
+                      ],
+                      "rank": 341,
+                      "tier1": false,
+                      "num_upstreams": 18,
+                      "upstreams": [
+                        174,
+                        260
+                      ],
+                      "num_peers": 1018,
+                      "peers": [
+                        42,
+                        286
+                      ],
+                      "num_downstreams": 146,
+                      "downstreams": [
+                        3210,
+                        3503
+                      ],
+                      "hosted_domains": {
+                        "total": 51759,
+                        "domains": [
+                          "fotopedia.com",
+                          "kissfm.ro"
+                        ]
+                      }
                     }
                   }
                 }
@@ -3134,6 +3158,7 @@
                       },
                       "plan": {
                         "key": "max",
+                        "name": "Max",
                         "tier": "max"
                       },
                       "usage": {
@@ -3156,6 +3181,7 @@
                       },
                       "plan": {
                         "key": "free",
+                        "name": "Unlimited",
                         "tier": "free"
                       },
                       "usage": {
@@ -5329,6 +5355,26 @@
         ],
         "description": "From IP Hosted Domains: how many registered domains resolve to the address, and the 10 most popular. Its database lists up to 1,000 an address. Paid plans and the trial."
       },
+      "AsnHostedDomains": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "How many registered domains resolve to an address the AS announces."
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Up to 10 of them, the most popular first; `[]` when none does."
+          }
+        },
+        "required": [
+          "total"
+        ],
+        "description": "From ASN Hosted Domains: how many registered domains the AS hosts, and the 10 most popular. Its database lists up to 1,000 an AS. Paid plans and the trial."
+      },
       "AsnLookupResponse": {
         "type": "object",
         "properties": {
@@ -5397,6 +5443,50 @@
               "$ref": "#/components/schemas/AsnPrefix"
             },
             "description": "What it announces, IPv4 then IPv6, up to 20000 a family. Paid plans and the trial."
+          },
+          "rank": {
+            "type": "integer",
+            "description": "Its rank in ASN Extended, by customer cone, 1 the largest; `0` for an AS seen in no AS path. Paid plans and the trial."
+          },
+          "tier1": {
+            "type": "boolean",
+            "description": "Whether it is one of the transit-free networks at the top of the hierarchy, which get transit from no one and peer with each other. Paid plans and the trial."
+          },
+          "num_upstreams": {
+            "type": "integer",
+            "description": "How many AS numbers it gets transit from. Paid plans and the trial."
+          },
+          "upstreams": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Those AS numbers, ascending, up to 20000. Paid plans and the trial."
+          },
+          "num_peers": {
+            "type": "integer",
+            "description": "How many AS numbers it exchanges its own and its customers' routes with. Paid plans and the trial."
+          },
+          "peers": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Those AS numbers, ascending, up to 20000. Paid plans and the trial."
+          },
+          "num_downstreams": {
+            "type": "integer",
+            "description": "How many AS numbers it provides transit to. Paid plans and the trial."
+          },
+          "downstreams": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Those AS numbers, ascending, up to 20000. Paid plans and the trial."
+          },
+          "hosted_domains": {
+            "$ref": "#/components/schemas/AsnHostedDomains"
           },
           "trial_expired": {
             "type": "boolean",
@@ -5867,13 +5957,19 @@
         "type": "object",
         "required": [
           "key",
+          "name",
           "tier"
         ],
         "properties": {
           "key": {
             "type": "string",
-            "description": "The plan the organization is on: `free` for the free plan,\nUnlimited, or a paid plan's key. On `free`, usage counts the\nday's lookups answered with every field, its daily trial.\n",
+            "description": "The plan the organization is on, as an identifier that is never\nrenamed or reused: `free` for the free plan, or a paid plan's key.\nCompare against it and show `name`. On `free`, usage counts the\nday's lookups answered with every field, its daily trial.\n",
             "example": "max"
+          },
+          "name": {
+            "type": "string",
+            "description": "The plan's name, as the site and console show it: `Unlimited` for\nthe free plan. Show this rather than a name built from `key`: a\nplan's name can change, and its key never does.\n",
+            "example": "Max"
           },
           "tier": {
             "type": "string",
@@ -5883,7 +5979,7 @@
               "scale",
               "max"
             ],
-            "description": "The field tier, which decides how much of a lookup answer comes\nback; `free` is the free plan's. What each tier includes is documented\non the lookup endpoint rather than repeated here, so there is one\nplace it can be wrong.\n"
+            "description": "The field tier, which decides how much of a lookup answer comes\nback; `free` is the free plan's. This list never gains a value: a\nnew plan reports one of these. What each tier includes is documented\non the lookup endpoint rather than repeated here, so there is one\nplace it can be wrong.\n"
           }
         }
       },

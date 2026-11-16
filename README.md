@@ -50,7 +50,7 @@ Point it at `https://mcp.internetdata.io/mcp`. A client that supports MCP author
 
 ### On your own machine
 
-**No API key needed to look something up.** Unlimited, the free plan, answers with no daily or monthly cap, with a key or without one: an address's country-level location, the network that announces it, the company that uses it, its abuse email and reverse DNS name, and whether it is Tor, a relay, anycast, carrier or satellite space and which services answer on it; an AS's registration; and whether a domain is registered and which DNS record types it has. Every paid plan answers every field: VPN, proxy, hosting and CDN detection with the detail behind each flag, city-level location, Whois and RWHOIS, an AS's prefixes and RPKI status, and a domain's records, IP ranges and whether it is disposable. A free account tries every field, 100 lookups a day.
+**No API key needed to look something up.** Unlimited, the free plan, answers with no daily or monthly cap, with a key or without one: an address's country-level location, the network that announces it, the company that uses it, its abuse email and reverse DNS name, and whether it is Tor, a relay, anycast, carrier or satellite space and which services answer on it; an AS's registration; and whether a domain is registered and which DNS record types it has. Every paid plan answers every field: VPN, proxy, hosting and CDN detection with the detail behind each flag, city-level location, Whois and RWHOIS, an AS's prefixes, RPKI status, neighbors and hosted domains, and a domain's records, IP ranges and whether it is disposable. A free account tries every field, 100 lookups a day.
 
 Add this to your MCP client's config:
 
@@ -89,7 +89,7 @@ A key on a paid plan unlocks every field, and the database tools need a key carr
 |---|---|
 | `lookup_ip` | What every database says about one address. |
 | `lookup_ips` | The same for a whole list of addresses in one call, keyed by address. A long list is batched for you. Needs a key on a paid plan; with a key on the free plan, a list of up to 10 addresses is looked up one address at a time instead. |
-| `lookup_asn` | What we know about one AS, by its number: its registration, and on a paid plan its prefixes, RPKI status and Whois record. |
+| `lookup_asn` | What we know about one AS, by its number: its registration, and on a paid plan its prefixes, RPKI status and Whois record, its rank and Tier 1 flag, its upstreams, peers and downstreams, and the domains it hosts. |
 | `lookup_domain` | What we know about one domain: whether it is registered and which DNS record types it has, and on a paid plan the records, its organization's IP ranges and whether it is disposable. |
 | `my_entitlement` | What this key is entitled to and what it has spent: plan, field tier, requests so far, allowance, and when it resets. |
 | `list_databases` | Every database we publish, with its `standing` for your organization (`licensed`, `expired` or `unlicensed`) and the type and term of any license. |
