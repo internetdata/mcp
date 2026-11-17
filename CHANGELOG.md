@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.6.0 - 2026-11-17
+
+### Features
+
+- Take spec 2026.11.17: cap_reached on a paid answer past its overage cap ([`5760c57`](https://github.com/internetdata/mcp/commit/5760c57fb9288e81ec48a578eda4595998c654b8))
+
 ## 3.5.0 - 2026-11-16
 
 ### Fixes
