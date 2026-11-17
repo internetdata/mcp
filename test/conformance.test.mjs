@@ -17,6 +17,7 @@ import { DATABASE_FORMATS, InternetData } from '@internetdata/internetdata';
 import {
     ASN_LOOKUP_GATED_MEMBERS, createTools, DOMAIN_LOOKUP_GATED_MEMBERS, LOOKUP_GATED_MEMBERS,
 } from '../dist/index.js';
+import { LOOKUP_MARKERS } from '../dist/schema.gen.js';
 
 const data = JSON.parse(readFileSync(new URL('../testdata/testdata.json', import.meta.url), 'utf8'));
 
@@ -79,8 +80,9 @@ test('every lookup fixture reports exactly the members it did not cover', async 
         const expected = CALLS[c.call].gated.filter((m) => !carries(c.body, m));
         assert.deepEqual(got.coverage.not_included, expected, `${c.name}: not_included`);
         assert.deepEqual(got.result, c.body, `${c.name}: result is the served body, verbatim`);
-        // trial_expired marks the answer rather than reporting on a dataset, so no list names it.
-        for (const m of c.expect.absent.filter((x) => x !== 'trial_expired')) {
+        // trial_expired and cap_reached mark the answer rather than report on a dataset, so no
+        // list names them.
+        for (const m of c.expect.absent.filter((x) => !LOOKUP_MARKERS.includes(x))) {
             assert.ok(got.coverage.not_included.includes(m), `${c.name}: ${m} is absent but not reported`);
         }
         for (const m of got.coverage.included) {
@@ -138,6 +140,35 @@ test("a free-plan key's spent trial says so beside what was not covered", async 
     assert.ok(coverage.not_included.includes('is_hosting'));
     assert.match(coverage.note, /trial/);
     assert.match(coverage.note, /not a negative result/);
+});
+
+// cap_reached says a paid key's answer turned to Unlimited's at its organization's overage
+// cap, so like trial_expired it is neither covered nor left out, and the note says why the
+// fields are missing.
+test('an answer past the overage cap says so beside what was not covered', async () => {
+    const cases = [['cap-reached-answer', 'address'], ['asn-cap-reached-answer', 'AS'],
+        ['domain-cap-reached-answer', 'domain']];
+    for (const [name, subject] of cases) {
+        const { structuredContent: { result, coverage } } = await lookedUp(lookupCase(name));
+
+        assert.equal(result.cap_reached, true, name);
+        assert.ok(!coverage.included.includes('cap_reached'), name);
+        assert.ok(!coverage.not_included.includes('cap_reached'), name);
+        assert.ok(coverage.not_included.length > 0, name);
+        assert.match(coverage.note, /overage cap/, name);
+        assert.match(coverage.note, new RegExp(`the ${subject} was never checked`), name);
+    }
+});
+
+test('a paid answer below the overage cap reports full coverage and keeps cap_reached', async () => {
+    for (const name of ['paid-full-shape', 'asn-paid-answer', 'domain-paid-answer']) {
+        const { structuredContent: { result, coverage } } = await lookedUp(lookupCase(name));
+
+        assert.equal(result.cap_reached, false, name);
+        assert.ok(!coverage.included.includes('cap_reached'), name);
+        assert.deepEqual(coverage.not_included, [], name);
+        assert.doesNotMatch(coverage.note, /overage cap/, name);
+    }
 });
 
 test('the note reaches a client that only renders content', async () => {
@@ -214,6 +245,24 @@ test('batch coverage comes from a served answer, never from a bogon', async () =
     assert.deepEqual(out.structuredContent.coverage.not_included, [...LOOKUP_GATED_MEMBERS],
         'the bogon\'s full shape must not be read as full plan coverage');
     assert.equal(Object.keys(out.structuredContent.results).length, 2);
+});
+
+// An overage cap reached part way through a batch answers the rest with Unlimited's fields.
+// The full answer comes first, so reading coverage off it would call every field checked.
+test('a batch the overage cap closes part way through reports its narrowest answer', async () => {
+    const paid = { ...lookupCase('paid-full-shape').body, ip: '1.1.1.1' };
+    const capped = { ...lookupCase('cap-reached-answer').body, ip: '8.8.8.8' };
+    const answer = { results: { '1.1.1.1': paid, '8.8.8.8': capped }, errors: {} };
+    const fetchImpl = async () => new Response(JSON.stringify(answer), {
+        status: 200, headers: { 'content-type': 'application/json' },
+    });
+    const out = await toolsFor(fetchImpl).get('lookup_ips').handler({ ips: ['1.1.1.1', '8.8.8.8'] });
+    const { results, coverage } = out.structuredContent;
+
+    assert.deepEqual(results, answer.results);
+    assert.deepEqual(coverage.not_included, LOOKUP_GATED_MEMBERS.filter((m) => !carries(capped, m)));
+    assert.match(coverage.note, /do not all carry the same fields/);
+    assert.match(coverage.note, /overage cap/);
 });
 
 test('an all-bogon batch declines to claim coverage', async () => {

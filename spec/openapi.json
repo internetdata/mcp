@@ -9,7 +9,7 @@
       "url": "https://internetdata.io"
     },
     "termsOfService": "https://internetdata.io/terms",
-    "version": "2026.11.15"
+    "version": "2026.11.17"
   },
   "servers": [
     {
@@ -24,7 +24,7 @@
     },
     {
       "name": "Database v2",
-      "description": "The current database API. Authenticate with an API key carrying the\n`db.download` scope, presented any of three ways: `Authorization: Bearer\n<key>`, `X-Api-Key: <key>`, or `?apikey=<key>`. They are the same key;\nthe query parameter is there for curl and the browser, which is how a\ndatabase is usually fetched.\n\nAccess is granted by CONTRACT, one dataset family at a time: there is no\nself-service purchase and no subscription behind it. The Open databases\nare licensed to every organization from the start, a `standard` license\nto each, and are free under CC BY-SA 4.0 besides. `list` marks them\n`open`.\n\nA successful download answers `302` with a time-limited URL pointing\nstraight at object storage. Follow the redirect (`curl -L`); the link\nauthorizes the START of a transfer, so a download already running is not\ninterrupted when it lapses.\n",
+      "description": "The current database API. Authenticate with an API key carrying the\n`db.download` scope, presented any of three ways: `Authorization: Bearer\n<key>`, `X-Api-Key: <key>`, or `?apikey=<key>`. They are the same key;\nthe query parameter is there for curl and the browser, which is how a\ndatabase is usually fetched.\n\nAccess is granted by contract, one dataset family at a time: there is no\nself-service purchase and no subscription behind it. The Open databases\nare licensed to every organization from the start, a `standard` license\nto each, and are free under CC BY-SA 4.0 besides. `list` marks them\n`open`.\n\nA successful download answers `302` with a time-limited URL pointing\nstraight at object storage. Follow the redirect (`curl -L`). The link only\nhas to be valid when a transfer starts, so one already running isn't cut\noff when it lapses.\n",
       "x-displayName": "Database v2"
     },
     {
@@ -538,7 +538,7 @@
           "Account"
         ],
         "summary": "Identity",
-        "description": "The identity behind this credential: what it is, the organization it is\nscoped to, and the scopes it currently holds.\n\n`user` is present for an OAuth token and ABSENT for an API key, which\nhas an organization but no person behind it. `credential.kind` says\nwhich you are holding, so a client can branch without guessing from a\nmissing field.\n\nNarrower than what the console shows its own user on purpose: an\nintegration needs a name to display and an organization to address, not\na profile. The `scopes` array is what the credential may do RIGHT NOW,\nso a client can render its own capabilities rather than discovering\nthem from a 403.\n",
+        "description": "The identity behind this credential: what it is, the organization it is\nscoped to, and the scopes it currently holds.\n\n`user` is present for an OAuth token and absent for an API key, which\nhas an organization but no person behind it. `credential.kind` says\nwhich you are holding, so a client can branch without guessing from a\nmissing field.\n\nNarrower than what the console shows its own user on purpose: an\nintegration needs a name to display and an organization to address, not\na profile. The `scopes` array is what the credential may do right now,\nso a client can render its own capabilities rather than discovering\nthem from a 403.\n",
         "security": [
           {
             "BearerAuth": [
@@ -696,7 +696,7 @@
           "API keys"
         ],
         "summary": "Create",
-        "description": "Creates a key and returns its secret.\n\nThis is the ONLY response that ever carries the secret, and only\nbecause this is the moment it comes into existence. Store it now.\n",
+        "description": "Creates a key and returns its secret.\n\nThis is the only response that ever carries the secret, and only\nbecause this is the moment it comes into existence. Store it now.\n",
         "security": [
           {
             "BearerAuth": [
@@ -1545,7 +1545,8 @@
                       "hosted_domains": {
                         "total": 0,
                         "domains": []
-                      }
+                      },
+                      "cap_reached": false
                     }
                   },
                   "paidServices": {
@@ -1712,7 +1713,55 @@
                           "medicinanet.com.br",
                           "imgup.net"
                         ]
-                      }
+                      },
+                      "cap_reached": false
+                    }
+                  },
+                  "capReached": {
+                    "summary": "A key on a paid plan past its organization's overage cap, with Unlimited's fields",
+                    "value": {
+                      "ip": "146.70.116.130",
+                      "is_bogon": false,
+                      "is_tor": false,
+                      "is_relay": false,
+                      "is_anycast": false,
+                      "is_carrier": false,
+                      "is_satellite": false,
+                      "is_ssh": false,
+                      "is_smtp": false,
+                      "is_web": false,
+                      "is_dns_resolver": false,
+                      "is_bittorrent": false,
+                      "location": {
+                        "continent": "EU",
+                        "continent_name": "Europe",
+                        "country": "AT",
+                        "country_name": "Austria",
+                        "timezone": "Europe/Vienna",
+                        "currency_code": "EUR",
+                        "currency_name": "Euro",
+                        "currency_symbol": "€",
+                        "flag_emoji": "🇦🇹",
+                        "flag_unicode": "U+1F1E6 U+1F1F9"
+                      },
+                      "tor": {},
+                      "relay": {},
+                      "asn": {
+                        "asn": 9009,
+                        "name": "M247 Europe SRL",
+                        "domain": "m247global.com",
+                        "type": "hosting",
+                        "prefix": "146.70.116.0/24"
+                      },
+                      "company": {
+                        "name": "M247 LTD Vienna Infrastructure",
+                        "domain": "m247.ro"
+                      },
+                      "hostname": "",
+                      "abuse": {
+                        "email": "abuse@m247.ro"
+                      },
+                      "cap_reached": true
                     }
                   },
                   "bogon": {
@@ -1823,7 +1872,8 @@
                       "hosted_domains": {
                         "total": 0,
                         "domains": []
-                      }
+                      },
+                      "cap_reached": false
                     }
                   }
                 }
@@ -1909,7 +1959,7 @@
             }
           },
           "429": {
-            "description": "A rate limit, with `Retry-After` (this API protecting itself, or Unlimited's per-minute\nlimit), or, with none, a paid plan's overage cap.\n",
+            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or Unlimited's\nper-minute limit. A paid plan's overage cap is never a `429`: it answers `200` with\nUnlimited's fields and `cap_reached` `true`.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -1927,19 +1977,13 @@
                     "value": {
                       "error": "per-minute limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
                     }
-                  },
-                  "e3": {
-                    "summary": "overage cap reached; raise or remove it in Billing",
-                    "value": {
-                      "error": "overage cap reached; raise or remove it in Billing"
-                    }
                   }
                 }
               }
             },
             "headers": {
               "Retry-After": {
-                "description": "Seconds until a rate limit lets the request through. Absent on an overage cap.",
+                "description": "Seconds until a rate limit lets the request through.",
                 "schema": {
                   "type": "integer"
                 }
@@ -2113,7 +2157,7 @@
             }
           },
           "429": {
-            "description": "A rate limit, with `Retry-After` (this API protecting itself, or Unlimited's per-minute\nlimit), or, with none, a paid plan's overage cap.\n",
+            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or Unlimited's\nper-minute limit. A paid plan's overage cap is never a `429`: it answers `200` with\nUnlimited's fields and `cap_reached` `true`.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -2131,19 +2175,13 @@
                     "value": {
                       "error": "per-minute limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
                     }
-                  },
-                  "e3": {
-                    "summary": "overage cap reached; raise or remove it in Billing",
-                    "value": {
-                      "error": "overage cap reached; raise or remove it in Billing"
-                    }
                   }
                 }
               }
             },
             "headers": {
               "Retry-After": {
-                "description": "Seconds until a rate limit lets the request through. Absent on an overage cap.",
+                "description": "Seconds until a rate limit lets the request through.",
                 "schema": {
                   "type": "integer"
                 }
@@ -2336,7 +2374,20 @@
                           "fotopedia.com",
                           "kissfm.ro"
                         ]
-                      }
+                      },
+                      "cap_reached": false
+                    }
+                  },
+                  "capReached": {
+                    "summary": "A key on a paid plan past its organization's overage cap, with Unlimited's fields",
+                    "value": {
+                      "asn": 9009,
+                      "name": "M247 Europe SRL",
+                      "country": "RO",
+                      "registry": "ripe",
+                      "allocated": "2005-06-06",
+                      "domain": "m247global.com",
+                      "cap_reached": true
                     }
                   }
                 }
@@ -2422,7 +2473,7 @@
             }
           },
           "429": {
-            "description": "A rate limit, with `Retry-After` (this API protecting itself, or Unlimited's per-minute\nlimit), or, with none, a paid plan's overage cap.\n",
+            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or Unlimited's\nper-minute limit. A paid plan's overage cap is never a `429`: it answers `200` with\nUnlimited's fields and `cap_reached` `true`.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -2440,19 +2491,13 @@
                     "value": {
                       "error": "per-minute limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
                     }
-                  },
-                  "e3": {
-                    "summary": "overage cap reached; raise or remove it in Billing",
-                    "value": {
-                      "error": "overage cap reached; raise or remove it in Billing"
-                    }
                   }
                 }
               }
             },
             "headers": {
               "Retry-After": {
-                "description": "Seconds until a rate limit lets the request through. Absent on an overage cap.",
+                "description": "Seconds until a rate limit lets the request through.",
                 "schema": {
                   "type": "integer"
                 }
@@ -2599,7 +2644,21 @@
                           }
                         ]
                       },
-                      "disposable": {}
+                      "disposable": {},
+                      "cap_reached": false
+                    }
+                  },
+                  "capReached": {
+                    "summary": "A key on a paid plan past its organization's overage cap, with Unlimited's fields",
+                    "value": {
+                      "domain": "example.com",
+                      "is_registered": true,
+                      "has_a": true,
+                      "has_aaaa": true,
+                      "has_mx": true,
+                      "has_ns": true,
+                      "has_cname": false,
+                      "cap_reached": true
                     }
                   }
                 }
@@ -2685,7 +2744,7 @@
             }
           },
           "429": {
-            "description": "A rate limit, with `Retry-After` (this API protecting itself, or Unlimited's per-minute\nlimit), or, with none, a paid plan's overage cap.\n",
+            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or Unlimited's\nper-minute limit. A paid plan's overage cap is never a `429`: it answers `200` with\nUnlimited's fields and `cap_reached` `true`.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -2703,19 +2762,13 @@
                     "value": {
                       "error": "per-minute limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
                     }
-                  },
-                  "e3": {
-                    "summary": "overage cap reached; raise or remove it in Billing",
-                    "value": {
-                      "error": "overage cap reached; raise or remove it in Billing"
-                    }
                   }
                 }
               }
             },
             "headers": {
               "Retry-After": {
-                "description": "Seconds until a rate limit lets the request through. Absent on an overage cap.",
+                "description": "Seconds until a rate limit lets the request through.",
                 "schema": {
                   "type": "integer"
                 }
@@ -2768,7 +2821,7 @@
           "Lookup"
         ],
         "summary": "Batch",
-        "description": "Up to 1000 addresses, AS numbers and domains in one call, each answered exactly as its own\nlookup would be and each counted as one lookup. Answers and failures are keyed by the string you sent, in\nthe order you sent them; duplicates collapse. Needs a paid plan: a batch of one item is answered as the\nlookup it is on any plan.\n",
+        "description": "Up to 1000 addresses, AS numbers and domains in one call, each answered exactly as its own\nlookup would be and each counted as one lookup. Answers and failures are keyed by the string you sent, in\nthe order you sent them; duplicates collapse. Needs a paid plan: a batch of one item is answered as the\nlookup it is on any plan. An overage cap reached part way through answers the remaining items with\nUnlimited's fields and `cap_reached` `true`, in `results`.\n",
         "requestBody": {
           "required": true,
           "content": {
@@ -2920,7 +2973,8 @@
                           "hosted_domains": {
                             "total": 0,
                             "domains": []
-                          }
+                          },
+                          "cap_reached": false
                         }
                       },
                       "errors": {
@@ -2932,14 +2986,20 @@
                     }
                   },
                   "failures": {
-                    "summary": "Entries past the overage cap, and one our data could not answer",
+                    "summary": "An AS answered past the overage cap with Unlimited's fields, and a domain our data could not answer",
                     "value": {
-                      "results": {},
-                      "errors": {
+                      "results": {
                         "AS9009": {
-                          "status": 429,
-                          "error": "overage cap reached; raise or remove it in Billing"
-                        },
+                          "asn": 9009,
+                          "name": "M247 Europe SRL",
+                          "country": "RO",
+                          "registry": "ripe",
+                          "allocated": "2005-06-06",
+                          "domain": "m247global.com",
+                          "cap_reached": true
+                        }
+                      },
+                      "errors": {
                         "example.com": {
                           "status": 500,
                           "error": "lookup failed"
@@ -3081,7 +3141,7 @@
             "description": "A rate limit; retry after `Retry-After`.",
             "headers": {
               "Retry-After": {
-                "description": "Seconds until a rate limit lets the request through. Absent on an overage cap.",
+                "description": "Seconds until a rate limit lets the request through.",
                 "schema": {
                   "type": "integer"
                 }
@@ -3230,14 +3290,23 @@
             }
           },
           "403": {
-            "description": "The key restricts which source addresses may use it, and this\nrequest did not come from one of them.\n",
+            "description": "The key restricts which source addresses may use it, and this\nrequest did not come from one of them; or the key was sent over\nplain HTTP, which is refused whatever the key.\n",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/EntitlementError"
                 },
-                "example": {
-                  "error": "source address not allowed for this API key"
+                "examples": {
+                  "source": {
+                    "value": {
+                      "error": "source address not allowed for this API key"
+                    }
+                  },
+                  "plain_http": {
+                    "value": {
+                      "error": "API key sent over plain HTTP; use https://"
+                    }
+                  }
                 }
               }
             }
@@ -3395,7 +3464,7 @@
       },
       "Database": {
         "type": "object",
-        "description": "One database FAMILY, with your organization's license beside it. A\nlicense covers the family, while a download names a specific version,\nso the IDs passed to `download` and `checksum` come from `versions`.\n",
+        "description": "One database family, with your organization's license beside it. A\nlicense covers the family, while a download names a specific version,\nso the IDs passed to `download` and `checksum` come from `versions`.\n",
         "required": [
           "base",
           "name",
@@ -3496,7 +3565,7 @@
           },
           "formats": {
             "type": "array",
-            "description": "The formats this version is BUILT in. Asking for another is a 400,\nnot a gap - the `_provider` catalogs are keyed by provider ID, so no\nMMDB exists for them.\n",
+            "description": "The formats this version is built in. Asking for another is a 400,\nnot a gap - the `_provider` catalogs are keyed by provider ID, so no\nMMDB exists for them.\n",
             "items": {
               "$ref": "#/components/schemas/DatabaseFormat"
             }
@@ -3512,7 +3581,7 @@
       },
       "Download": {
         "type": "object",
-        "description": "One download ATTEMPT, refusals included.",
+        "description": "One download attempt, refusals included.",
         "required": [
           "dataset_id",
           "format",
@@ -3556,7 +3625,7 @@
             "type": "integer",
             "format": "int64",
             "nullable": true,
-            "description": "Object size at redirect time, NOT bytes delivered: the transfer is a\npresigned redirect straight to object storage, so we never observe\nhow much of it was taken.\n"
+            "description": "Object size at redirect time, not bytes delivered: the transfer is a\npresigned redirect straight to object storage, so we never observe\nhow much of it was taken.\n"
           },
           "http_status": {
             "type": "integer",
@@ -3971,7 +4040,7 @@
         ]
       },
       "ApikeyDetail": {
-        "description": "Key METADATA. Never the key itself.",
+        "description": "Key metadata. Never the key itself.",
         "type": "object",
         "properties": {
           "id": {
@@ -4009,7 +4078,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Source-IP allowlist. EMPTY MEANS UNRESTRICTED, not deny-all."
+            "description": "Source-IP allowlist. Empty means unrestricted, not deny-all."
           },
           "allowed_scopes": {
             "type": "array",
@@ -4657,6 +4726,10 @@
           "trial_expired": {
             "type": "boolean",
             "description": "On every answer to a key on the free plan, and on no other: `false` while the day's trial of every field lasts, `true` once the answer has Unlimited's fields."
+          },
+          "cap_reached": {
+            "type": "boolean",
+            "description": "On every answer to a key on a paid plan, and on no other: `false` while the answer has every field, `true` once its organization's overage cap is reached and the answer has Unlimited's. Lookups answered past the cap are not billed; raising or removing the cap in Billing turns it `false` again."
           }
         },
         "required": [
@@ -5491,6 +5564,10 @@
           "trial_expired": {
             "type": "boolean",
             "description": "On every answer to a key on the free plan, and on no other: `false` while the day's trial of every field lasts, `true` once the answer has Unlimited's fields."
+          },
+          "cap_reached": {
+            "type": "boolean",
+            "description": "On every answer to a key on a paid plan, and on no other: `false` while the answer has every field, `true` once its organization's overage cap is reached and the answer has Unlimited's. Lookups answered past the cap are not billed; raising or removing the cap in Billing turns it `false` again."
           }
         },
         "required": [
@@ -5600,6 +5677,10 @@
           "trial_expired": {
             "type": "boolean",
             "description": "On every answer to a key on the free plan, and on no other: `false` while the day's trial of every field lasts, `true` once the answer has Unlimited's fields."
+          },
+          "cap_reached": {
+            "type": "boolean",
+            "description": "On every answer to a key on a paid plan, and on no other: `false` while the answer has every field, `true` once its organization's overage cap is reached and the answer has Unlimited's. Lookups answered past the cap are not billed; raising or removing the cap in Billing turns it `false` again."
           }
         },
         "required": [
@@ -5949,7 +6030,7 @@
             "items": {
               "type": "string"
             },
-            "description": "The source addresses this key may be used from. EMPTY means\nunrestricted, never \"deny all\".\n"
+            "description": "The source addresses this key may be used from. Empty means\nunrestricted, never \"deny all\".\n"
           }
         }
       },
@@ -6007,7 +6088,7 @@
             "type": "integer",
             "format": "int64",
             "nullable": true,
-            "description": "Where we stop serving. NULL means never, which is the normal state\nof an uncapped paid plan and is not the same as zero. Above the\nquota and below this, requests are served and billed as overage.\n"
+            "description": "Where full answers stop: past it, a paid key is answered with\nUnlimited's fields and `cap_reached: true`, uncharged, until the\nwindow ends or the cap is raised. `null` means never, which is the\nnormal state of an uncapped paid plan and is not the same as zero.\nAbove the quota and below this, requests are served and billed as\noverage.\n"
           },
           "window_start": {
             "type": "string",
@@ -6045,7 +6126,7 @@
         }
       },
       "V2IpNotAllowed": {
-        "description": "The request comes from an address outside the key's or its\norganization's allowed addresses. Change the allowlist or call from an\nallowed address: the key itself is fine.\n`rc`: `IP_NOT_ALLOWED`.\n",
+        "description": "The request comes from an address outside the key's or its\norganization's allowed addresses. Change the allowlist or call from an\nallowed address: the key itself is fine. Or the key was sent over\nplain HTTP, refused whatever the key: use `https://`.\n`rc`: `IP_NOT_ALLOWED`, `KEY_OVER_HTTP`.\n",
         "content": {
           "application/json": {
             "schema": {
@@ -6055,7 +6136,7 @@
         }
       },
       "V2Forbidden": {
-        "description": "Your organization holds no license for this database (`NOT_LICENSED`),\nor its term has ended (`LICENSE_EXPIRED`); or the request comes from an\naddress outside the key's or its organization's allowed addresses\n(`IP_NOT_ALLOWED`).\n`rc`: `NOT_LICENSED`, `LICENSE_EXPIRED`, `IP_NOT_ALLOWED`.\n",
+        "description": "Your organization holds no license for this database (`NOT_LICENSED`),\nor its term has ended (`LICENSE_EXPIRED`); or the request comes from an\naddress outside the key's or its organization's allowed addresses\n(`IP_NOT_ALLOWED`); or the key was sent over plain HTTP, refused\nwhatever the key (`KEY_OVER_HTTP`): use `https://`.\n`rc`: `NOT_LICENSED`, `LICENSE_EXPIRED`, `IP_NOT_ALLOWED`, `KEY_OVER_HTTP`.\n",
         "content": {
           "application/json": {
             "schema": {

@@ -116,8 +116,8 @@ const TRUNCATED_SCHEMA = {
 // The paid column of the spec's plan tables, the same for every lookup. Each tool
 // names Unlimited's column itself, and the coverage note says answer by answer
 // which fields a plan left out.
-const PAID = 'Every paid plan answers every field, and so does a key on the free plan while its '
-    + 'organization\'s daily trial lasts.';
+const PAID = 'Every paid plan answers every field up to any overage cap its organization sets, and so '
+    + 'does a key on the free plan while its organization\'s daily trial lasts.';
 
 const METADATA_INPUT = z.strictObject({
     dataset_id: z.string().describe(VERSIONED_ID),
@@ -422,8 +422,9 @@ function accountTool(ctx: ToolContext): ToolDef {
                 + 'why a field is missing from a lookup, or before a large batch. A paid plan\'s '
                 + 'usage counts against the anniversary of the subscription rather than the '
                 + 'calendar month; the free plan\'s counts the lookups its daily trial answered with '
-                + 'every field, against the UTC day. Either can lag a few seconds behind. A null '
-                + '`hard_limit` means we never stop serving - it is NOT a limit of zero.',
+                + 'every field, against the UTC day. Either can lag a few seconds behind. '
+                + '`hard_limit` is where full answers stop, and a null one means they never do - it is '
+                + 'NOT a limit of zero.',
             inputSchema: jsonSchema(NO_INPUT),
             outputSchema: objectSchema({
                 entitlement: ENTITLEMENT_SCHEMA,

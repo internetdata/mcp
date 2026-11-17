@@ -101,7 +101,7 @@ Every tool is read-only. Answers come from our databases' latest builds: no look
 
 **There is deliberately no `my_ip` tool, although every client library has one.** Over a hosted transport the address our edge observes belongs to whatever proxied the call - Claude's infrastructure, not the person asking - so the tool would answer confidently and wrongly for the only reading anyone would put on it. `my_entitlement` has no such problem and is the same answer from any transport, because it describes the credential rather than the connection.
 
-A paid plan's usage counts against the anniversary of the subscription, not the calendar month and not the billing period, and the free plan's against the UTC day. A null `hard_limit` means we never stop serving; it is not a limit of zero.
+A paid plan's usage counts against the anniversary of the subscription, not the calendar month and not the billing period, and the free plan's against the UTC day. `hard_limit` is where full answers stop, and a null one means they never do; it is not a limit of zero.
 
 ## Reading a result
 
@@ -121,6 +121,8 @@ Each lookup comes back with a `coverage` block beside it:
 This matters more here than in a normal client library. A field missing from a result means your plan doesn't include it, never "we checked and found nothing" - and a model reading the result on its own will otherwise treat the absence as a negative answer. `coverage` states the difference explicitly so it can't. A paid field inside an object every plan gets, such as `location.city`, is named by its path.
 
 An answer to a key on the free plan also carries `trial_expired`: false while its organization's daily trial of every field lasts, and true once the answer is Unlimited's, which `coverage.note` then says.
+
+An answer to a key on a paid plan carries `cap_reached` instead: false while it has every field, and true once its organization's overage cap is reached and the answer has Unlimited's fields, unbilled, which `coverage.note` says too. Raising or removing the cap in Billing turns it false again. The API never answers a reached cap with an error, and in `lookup_ips` a cap reached part way through answers the rest of the list this way, so `coverage` then gives the narrowest answer's lists and says the answers differ.
 
 ## Two spellings of a database ID
 

@@ -30,11 +30,11 @@ const asnLookup = schema('AsnLookupResponse');
 const domainLookup = schema('DomainLookupResponse');
 
 // Members that mark an answer rather than report on a dataset. `trial_expired` is on
-// a free-plan key's answers only, so it is neither something a plan covers nor
-// something whose absence means anything: it stays out of every coverage list.
-// Checked against the spec, so a rename there fails this script rather than
-// quietly turning the marker into a dataset.
-const markers = ['trial_expired'];
+// a free-plan key's answers only and `cap_reached` on a paid key's only, so neither is
+// something a plan covers nor something whose absence means anything: both stay out
+// of every coverage list. Checked against the spec, so a rename there fails this
+// script rather than quietly turning a marker into a dataset.
+const markers = ['trial_expired', 'cap_reached'];
 const ip = coverageMembers('LookupResponse', lookup);
 const asn = coverageMembers('AsnLookupResponse', asnLookup);
 const domain = coverageMembers('DomainLookupResponse', domainLookup);
