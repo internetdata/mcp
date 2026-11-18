@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.6.1 - 2026-11-18
+
+### Fixes
+
+- Name the server in every request's User-Agent ([`343c584`](https://github.com/internetdata/mcp/commit/343c5840a04a47d1a11b8c68d77cb54295e9da2b))
+
 ## 3.6.0 - 2026-11-17
 
 ### Features
