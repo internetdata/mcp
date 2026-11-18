@@ -6223,7 +6223,7 @@
         }
       },
       "AccountForbidden": {
-        "description": "The credential does not hold the scope this endpoint requires. The\nmissing scope is deliberately not named.\n",
+        "description": "The credential does not hold the scope this endpoint requires\n(`FORBIDDEN`); the missing scope is deliberately not named. Or the\ncredential was sent over plain HTTP, refused whatever it is\n(`KEY_OVER_HTTP`): use `https://`.\n`rc`: `FORBIDDEN`, `KEY_OVER_HTTP`.\n",
         "content": {
           "application/json": {
             "schema": {
