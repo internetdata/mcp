@@ -13,6 +13,8 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
 import { DATABASE_FORMATS, InternetData } from '@internetdata/internetdata';
+import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
 
 import {
     ASN_LOOKUP_GATED_MEMBERS, createTools, DOMAIN_LOOKUP_GATED_MEMBERS, LOOKUP_GATED_MEMBERS,
@@ -234,6 +236,47 @@ test('an IPv4-mapped address is the IPv4 address it carries, keyed as passed', a
     assert.deepEqual(Object.keys(out.structuredContent.results), ips);
     for (const c of data.ipv4Mapped) {
         assert.equal(out.structuredContent.results[c.ip].ip, c.carries, c.ip);
+    }
+});
+
+// Each case serves a value no published list holds. Every tool hands it back as served,
+// and its schema admits it, but for a list the spec says never gains a value (a plan's
+// tier): that value is refused by its `enum` alone. A case's paths are the API answer's,
+// which my_entitlement answers under `entitlement`.
+const VOCABULARY_TOOLS = {
+    myEntitlement: { name: 'my_entitlement', under: ['entitlement'] },
+    listDatabases: { name: 'list_databases', under: [] },
+    listDownloads: { name: 'list_downloads', under: [] },
+};
+
+test('a value the API adds to a list comes back as served, and only a closed list refuses it', async () => {
+    const ajv = new Ajv({ strict: false, allErrors: true });
+    addFormats(ajv);
+    for (const c of data.vocabulary.cases) {
+        const { name, under } = VOCABULARY_TOOLS[c.call];
+        const def = toolsFor(serving(c.answer).fetch).get(name);
+        const out = await def.handler({});
+        assert.equal(out.isError, undefined, `${c.name}: ${out.content[0].text}`);
+
+        const refused = [];
+        for (const [path, want] of Object.entries(c.expect)) {
+            const segs = [...under, ...path.split('.')];
+            assert.equal(segs.reduce((v, seg) => v[seg], out.structuredContent), want, `${c.name}: ${path}`);
+            const schema = segs.reduce((n, seg) => (/^\d+$/.test(seg) ? n.items : n.properties[seg]),
+                def.tool.outputSchema);
+            if (Array.isArray(schema.enum) && !schema.enum.includes(want)) {
+                assert.match(schema.description, /never gains a value/, `${c.name}: ${path} is closed`);
+                refused.push(`/${segs.join('/')}`);
+            }
+        }
+
+        const validate = ajv.compile(def.tool.outputSchema);
+        const valid = validate(out.structuredContent);
+        assert.equal(valid, refused.length === 0, `${c.name}: ${ajv.errorsText(validate.errors)}`);
+        if (!valid) {
+            assert.deepEqual(validate.errors.map((e) => [e.keyword, e.instancePath]),
+                refused.map((p) => ['enum', p]), `${c.name}: refused for its closed list alone`);
+        }
     }
 });
 

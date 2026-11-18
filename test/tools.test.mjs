@@ -522,58 +522,6 @@ test("an answer's list stays closed only where the spec says it never grows", ()
     }
 });
 
-// Each answer serves a value no published list holds, at the paths named. Every tool
-// hands it back as served and its schema admits it, but for a list the spec says never
-// gains a value (a plan's tier), which its `enum` alone refuses. The shared corpus has
-// no such cases for this package, so they are written here.
-const UNKNOWN_VALUES = [
-    {
-        tool: 'list_databases',
-        body: {
-            databases: [{
-                ...CATALOG.databases[0], standing: 'suspended', license_type: 'oem',
-                versions: [{ ...CATALOG.databases[0].versions[0], formats: ['parquet'], sample_formats: ['parquet'] }],
-            }],
-        },
-        served: {
-            '/databases/0/standing': 'suspended',
-            '/databases/0/license_type': 'oem',
-            '/databases/0/versions/0/formats/0': 'parquet',
-            '/databases/0/versions/0/sample_formats/0': 'parquet',
-        },
-        refused: [],
-    },
-    {
-        tool: 'list_downloads',
-        body: { downloads: [{ ...NULL_DOWNLOADS.downloads[0], outcome: 'throttled' }] },
-        served: { '/downloads/0/outcome': 'throttled' },
-        refused: [],
-    },
-    {
-        tool: 'my_entitlement',
-        body: { ...ENTITLEMENT_BODY, plan: { ...ENTITLEMENT_BODY.plan, tier: 'data' } },
-        served: { '/entitlement/plan/tier': 'data' },
-        refused: ['/entitlement/plan/tier'],
-    },
-];
-
-test('a value the API adds to a list comes back as served, and only a closed list refuses it', async () => {
-    const ajv = validator();
-    for (const c of UNKNOWN_VALUES) {
-        const def = byName(serving(c.body).fetch).get(c.tool);
-        const out = await def.handler({});
-        assert.equal(out.isError, undefined, `${c.tool}: ${out.content[0].text}`);
-        for (const [path, want] of Object.entries(c.served)) {
-            const got = path.split('/').slice(1).reduce((v, seg) => v[seg], out.structuredContent);
-            assert.equal(got, want, `${c.tool}: ${path}`);
-        }
-        const validate = ajv.compile(def.tool.outputSchema);
-        validate(out.structuredContent);
-        assert.deepEqual((validate.errors ?? []).map((e) => [e.keyword, e.instancePath]),
-            c.refused.map((p) => ['enum', p]), `${c.tool}: ${ajv.errorsText(validate.errors)}`);
-    }
-});
-
 test('the downloads window is published and enforced', async () => {
     const tools = byName(serving({ downloads: [] }).fetch);
     const def = tools.get('list_downloads');
