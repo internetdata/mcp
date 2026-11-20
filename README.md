@@ -13,7 +13,7 @@ We host it at `https://mcp.internetdata.io/mcp`, and you sign in to it with your
 
 ### In Claude
 
-In claude.ai, the desktop app or Cowork, add `https://mcp.internetdata.io/mcp` as a custom connector and choose **Use Claude's published identity** when asked. In Claude Code, install our plugin, which adds the server with skills:
+In claude.ai, the desktop app or Cowork, add InternetData from [Claude's connectors directory](https://claude.ai/directory/internetdata), or add `https://mcp.internetdata.io/mcp` yourself as a custom connector and choose **Use Claude's published identity** when asked. In Claude Code, install our plugin, which adds the server with skills:
 
 ```console
 /plugin marketplace add internetdata/claude-plugin
@@ -101,7 +101,7 @@ Every tool is read-only. Answers come from our databases' latest builds: no look
 
 **There is deliberately no `my_ip` tool, although every client library has one.** Over a hosted transport the address our edge observes belongs to whatever proxied the call - Claude's infrastructure, not the person asking - so the tool would answer confidently and wrongly for the only reading anyone would put on it. `my_entitlement` has no such problem and is the same answer from any transport, because it describes the credential rather than the connection.
 
-A paid plan's usage counts against the anniversary of the subscription, not the calendar month and not the billing period, and the free plan's against the UTC day. `hard_limit` is where full answers stop, and a null one means they never do; it is not a limit of zero.
+A paid plan's usage counts against the anniversary of the subscription, not the calendar month and not the billing period, and the free plan's counts its trial, over the window the answer gives. `hard_limit` is where full answers stop, and a null one means they never do; it is not a limit of zero.
 
 ## Reading a result
 
