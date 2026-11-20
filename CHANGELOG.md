@@ -2,6 +2,13 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.6.2 - 2026-11-20
+
+### Fixes
+
+- Tool text and README: the free trial without a count ([`ff6ca10`](https://github.com/internetdata/mcp/commit/ff6ca107b1de600e1f9931f544b550d6e2c11027))
+- Take spec 2026.11.20: the trial without its count or period ([`9e4a858`](https://github.com/internetdata/mcp/commit/9e4a8583e66ba278bcb0ec2124a6296d5b9e8acd))
+
 ## 3.6.1 - 2026-11-18
 
 ### Fixes
