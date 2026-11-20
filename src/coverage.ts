@@ -85,8 +85,8 @@ export function coverageOf(body: Record<string, unknown>, kind: LookupKind = 'ip
         let lead = 'The fields in not_included were not returned, because this API key\'s plan does not '
             + 'include them.';
         if (body['trial_expired'] === true) {
-            lead = 'This key is on the free plan, and its organization\'s daily trial of every field is '
-                + 'spent for the UTC day, so this answer is Unlimited\'s and the fields in not_included were '
+            lead = 'This key is on the free plan, and its organization\'s trial of every field is '
+                + 'spent, so this answer is Unlimited\'s and the fields in not_included were '
                 + 'not returned.';
         } else if (body['cap_reached'] === true) {
             lead = 'This key\'s organization has reached the overage cap it set on its paid plan, so this '

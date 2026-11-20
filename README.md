@@ -50,7 +50,7 @@ Point it at `https://mcp.internetdata.io/mcp`. A client that supports MCP author
 
 ### On your own machine
 
-**No API key needed to look something up.** Unlimited, the free plan, answers with no daily or monthly cap, with a key or without one: an address's country-level location, the network that announces it, the company that uses it, its abuse email and reverse DNS name, and whether it is Tor, a relay, anycast, carrier or satellite space and which services answer on it; an AS's registration; and whether a domain is registered and which DNS record types it has. Every paid plan answers every field: VPN, proxy, hosting and CDN detection with the detail behind each flag, city-level location, Whois and RWHOIS, an AS's prefixes, RPKI status, neighbors and hosted domains, and a domain's records, IP ranges and whether it is disposable. A free account tries every field, 100 lookups a day.
+**No API key needed to look something up.** Unlimited, the free plan, answers with no daily or monthly cap, with a key or without one: an address's country-level location, the network that announces it, the company that uses it, its abuse email and reverse DNS name, and whether it is Tor, a relay, anycast, carrier or satellite space and which services answer on it; an AS's registration; and whether a domain is registered and which DNS record types it has. Every paid plan answers every field: VPN, proxy, hosting and CDN detection with the detail behind each flag, city-level location, Whois and RWHOIS, an AS's prefixes, RPKI status, neighbors and hosted domains, and a domain's records, IP ranges and whether it is disposable. A free account tries every field.
 
 Add this to your MCP client's config:
 
@@ -120,7 +120,7 @@ Each lookup comes back with a `coverage` block beside it:
 
 This matters more here than in a normal client library. A field missing from a result means your plan doesn't include it, never "we checked and found nothing" - and a model reading the result on its own will otherwise treat the absence as a negative answer. `coverage` states the difference explicitly so it can't. A paid field inside an object every plan gets, such as `location.city`, is named by its path.
 
-An answer to a key on the free plan also carries `trial_expired`: false while its organization's daily trial of every field lasts, and true once the answer is Unlimited's, which `coverage.note` then says.
+An answer to a key on the free plan also carries `trial_expired`: false while its organization's trial of every field lasts, and true once the answer is Unlimited's, which `coverage.note` then says.
 
 An answer to a key on a paid plan carries `cap_reached` instead: false while it has every field, and true once its organization's overage cap is reached and the answer has Unlimited's fields, unbilled, which `coverage.note` says too. Raising or removing the cap in Billing turns it false again. The API never answers a reached cap with an error, and in `lookup_ips` a cap reached part way through answers the rest of the list this way, so `coverage` then gives the narrowest answer's lists and says the answers differ.
 
