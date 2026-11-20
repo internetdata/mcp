@@ -9,7 +9,7 @@
       "url": "https://internetdata.io"
     },
     "termsOfService": "https://internetdata.io/terms",
-    "version": "2026.11.17"
+    "version": "2026.11.20"
   },
   "servers": [
     {
@@ -116,7 +116,7 @@
         ],
         "operationId": "downloadDatabaseV2",
         "summary": "Download",
-        "description": "Answers `302`; the bytes come straight from object storage rather than\nthrough this API. Follow the redirect.\n",
+        "description": "Downloads one file of a database: the answer is a `302` to time-limited\nobject storage, so follow the redirect.\n\nThe bytes come straight from object storage rather than through this API.\n",
         "security": [
           {
             "ApiKeyQueryAuth": []
@@ -321,7 +321,7 @@
         ],
         "operationId": "listDownloads",
         "summary": "History",
-        "description": "Refusals are listed too: a denial is what answers \"it stopped working\",\nand its absence answers nothing.\n",
+        "description": "Lists your organization's recent database downloads, newest first,\nrefused ones included, so a download that stopped working shows why.\n",
         "security": [
           {
             "ApiKeyQueryAuth": []
@@ -593,7 +593,7 @@
           "Organization"
         ],
         "summary": "Organization",
-        "description": "The organization this credential is scoped to.\n\nThere is no way to name a different one. A credential describes exactly\none organization, so an identifier in the path could only ever be your\nown or a refusal.\n",
+        "description": "Returns the organization the presented credential is scoped to. A\ncredential belongs to exactly one, so there is no ID to pass.\n\nAn identifier in the path could only ever be your own or a refusal.\n",
         "security": [
           {
             "BearerAuth": [
@@ -628,7 +628,7 @@
           "Organization"
         ],
         "summary": "Members",
-        "description": "Read-only. Adding or removing a member is an invitation flow with email\nin the middle rather than a POST, and modeling it as one here would\npromise something this API does not do.\n",
+        "description": "Lists the members of your organization. Adding or removing one is an\nemailed invitation in the console, not an API call.\n\nModeling it as one here would promise something this API does not do.\n",
         "security": [
           {
             "BearerAuth": [
@@ -663,7 +663,7 @@
           "API keys"
         ],
         "summary": "List",
-        "description": "Metadata only. A key's secret is never in a list - not here and not in\nthe console - because a list is the response that ends up in logs,\ncaches and support tickets.\n\n`retrievable` says whether the secret could still be read back at all.\nA key issued before this product stored secrets recoverably was never\nkept, so `reveal` will refuse it permanently; rotating produces one\nthat can be read.\n",
+        "description": "Lists your organization's API keys with their metadata, never a secret:\nonly Create, Rotate and Reveal return one.\n\nA secret is never in a list, here or in the console, because a list is\nthe response that ends up in logs, caches and support tickets.\n\n`retrievable` says whether the secret could still be read back at all.\nA key issued before this product stored secrets recoverably was never\nkept, so `reveal` will refuse it permanently; rotating produces one\nthat can be read.\n",
         "security": [
           {
             "BearerAuth": [
@@ -696,7 +696,7 @@
           "API keys"
         ],
         "summary": "Create",
-        "description": "Creates a key and returns its secret.\n\nThis is the only response that ever carries the secret, and only\nbecause this is the moment it comes into existence. Store it now.\n",
+        "description": "Creates an API key and returns its secret, which no list ever shows:\nkeep it, or reveal it again later.\n",
         "security": [
           {
             "BearerAuth": [
@@ -1246,7 +1246,9 @@
                         "name": "M247 Europe SRL",
                         "domain": "m247global.com",
                         "type": "hosting",
-                        "prefix": "146.70.116.0/24"
+                        "prefix": "146.70.116.0/24",
+                        "country": "RO",
+                        "rpki_status": "not_found"
                       },
                       "company": {
                         "name": "M247 LTD Vienna Infrastructure",
@@ -1259,7 +1261,7 @@
                     }
                   },
                   "trial": {
-                    "summary": "A free-plan key within its day's trial of every field",
+                    "summary": "A free-plan key within its trial of every field",
                     "value": {
                       "ip": "146.70.116.130",
                       "is_bogon": false,
@@ -1381,7 +1383,7 @@
                     }
                   },
                   "trialExpired": {
-                    "summary": "A free-plan key past its day's trial, with Unlimited's fields",
+                    "summary": "A free-plan key past its trial, with Unlimited's fields",
                     "value": {
                       "ip": "146.70.116.130",
                       "is_bogon": false,
@@ -1414,7 +1416,9 @@
                         "name": "M247 Europe SRL",
                         "domain": "m247global.com",
                         "type": "hosting",
-                        "prefix": "146.70.116.0/24"
+                        "prefix": "146.70.116.0/24",
+                        "country": "RO",
+                        "rpki_status": "not_found"
                       },
                       "company": {
                         "name": "M247 LTD Vienna Infrastructure",
@@ -1751,7 +1755,9 @@
                         "name": "M247 Europe SRL",
                         "domain": "m247global.com",
                         "type": "hosting",
-                        "prefix": "146.70.116.0/24"
+                        "prefix": "146.70.116.0/24",
+                        "country": "RO",
+                        "rpki_status": "not_found"
                       },
                       "company": {
                         "name": "M247 LTD Vienna Infrastructure",
@@ -1959,7 +1965,7 @@
             }
           },
           "429": {
-            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or Unlimited's\nper-minute limit. A paid plan's overage cap is never a `429`: it answers `200` with\nUnlimited's fields and `cap_reached` `true`.\n",
+            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or a burst of Unlimited\nlookups. A paid plan's overage cap is never a `429`: it answers `200` with Unlimited's\nfields and `cap_reached` `true`.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -1973,9 +1979,9 @@
                     }
                   },
                   "e2": {
-                    "summary": "per-minute limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
+                    "summary": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
                     "value": {
-                      "error": "per-minute limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
+                      "error": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
                     }
                   }
                 }
@@ -2080,7 +2086,9 @@
                         "name": "M247 Europe SRL",
                         "domain": "m247global.com",
                         "type": "hosting",
-                        "prefix": "146.70.116.0/24"
+                        "prefix": "146.70.116.0/24",
+                        "country": "RO",
+                        "rpki_status": "not_found"
                       },
                       "company": {
                         "name": "M247 LTD Vienna Infrastructure",
@@ -2157,7 +2165,7 @@
             }
           },
           "429": {
-            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or Unlimited's\nper-minute limit. A paid plan's overage cap is never a `429`: it answers `200` with\nUnlimited's fields and `cap_reached` `true`.\n",
+            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or a burst of Unlimited\nlookups. A paid plan's overage cap is never a `429`: it answers `200` with Unlimited's\nfields and `cap_reached` `true`.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -2171,9 +2179,9 @@
                     }
                   },
                   "e2": {
-                    "summary": "per-minute limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
+                    "summary": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
                     "value": {
-                      "error": "per-minute limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
+                      "error": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
                     }
                   }
                 }
@@ -2473,7 +2481,7 @@
             }
           },
           "429": {
-            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or Unlimited's\nper-minute limit. A paid plan's overage cap is never a `429`: it answers `200` with\nUnlimited's fields and `cap_reached` `true`.\n",
+            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or a burst of Unlimited\nlookups. A paid plan's overage cap is never a `429`: it answers `200` with Unlimited's\nfields and `cap_reached` `true`.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -2487,9 +2495,9 @@
                     }
                   },
                   "e2": {
-                    "summary": "per-minute limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
+                    "summary": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
                     "value": {
-                      "error": "per-minute limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
+                      "error": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
                     }
                   }
                 }
@@ -2744,7 +2752,7 @@
             }
           },
           "429": {
-            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or Unlimited's\nper-minute limit. A paid plan's overage cap is never a `429`: it answers `200` with\nUnlimited's fields and `cap_reached` `true`.\n",
+            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or a burst of Unlimited\nlookups. A paid plan's overage cap is never a `429`: it answers `200` with Unlimited's\nfields and `cap_reached` `true`.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -2758,9 +2766,9 @@
                     }
                   },
                   "e2": {
-                    "summary": "per-minute limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
+                    "summary": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
                     "value": {
-                      "error": "per-minute limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
+                      "error": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
                     }
                   }
                 }
@@ -3160,9 +3168,9 @@
                     }
                   },
                   "e2": {
-                    "summary": "per-minute limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
+                    "summary": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
                     "value": {
-                      "error": "per-minute limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
+                      "error": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
                     }
                   }
                 }
@@ -3231,7 +3239,7 @@
                     }
                   },
                   "free": {
-                    "summary": "A key of an organization on the free plan, Unlimited: its usage is the day's lookups answered with every field, out of the 100 a day its trial has. Nothing stops it past them, its lookups answering with Unlimited's fields, so there is no hard limit, and the window is the UTC day.",
+                    "summary": "A key of an organization on the free plan, Unlimited: its usage is its trial, the lookups answered with every field, out of the quota the trial has. Nothing stops it past them, its lookups answering with Unlimited's fields, so there is no hard limit.",
                     "value": {
                       "org_id": "f32191d0-ef02-450e-a505-eb5814c35cab",
                       "apikey": {
@@ -4725,7 +4733,7 @@
           },
           "trial_expired": {
             "type": "boolean",
-            "description": "On every answer to a key on the free plan, and on no other: `false` while the day's trial of every field lasts, `true` once the answer has Unlimited's fields."
+            "description": "On every answer to a key on the free plan, and on no other: `false` while its organization's trial of every field lasts, `true` once the answer has Unlimited's fields."
           },
           "cap_reached": {
             "type": "boolean",
@@ -5234,11 +5242,11 @@
           },
           "country": {
             "type": "string",
-            "description": "The country its registry assigned it to. Paid plans and the trial."
+            "description": "The country its registry assigned it to."
           },
           "rpki_status": {
             "type": "string",
-            "description": "The announcement's RPKI status. Paid plans and the trial."
+            "description": "The announcement's RPKI status."
           }
         },
         "required": [
@@ -5563,7 +5571,7 @@
           },
           "trial_expired": {
             "type": "boolean",
-            "description": "On every answer to a key on the free plan, and on no other: `false` while the day's trial of every field lasts, `true` once the answer has Unlimited's fields."
+            "description": "On every answer to a key on the free plan, and on no other: `false` while its organization's trial of every field lasts, `true` once the answer has Unlimited's fields."
           },
           "cap_reached": {
             "type": "boolean",
@@ -5676,7 +5684,7 @@
           },
           "trial_expired": {
             "type": "boolean",
-            "description": "On every answer to a key on the free plan, and on no other: `false` while the day's trial of every field lasts, `true` once the answer has Unlimited's fields."
+            "description": "On every answer to a key on the free plan, and on no other: `false` while its organization's trial of every field lasts, `true` once the answer has Unlimited's fields."
           },
           "cap_reached": {
             "type": "boolean",
@@ -6044,7 +6052,7 @@
         "properties": {
           "key": {
             "type": "string",
-            "description": "The plan the organization is on, as an identifier that is never\nrenamed or reused: `free` for the free plan, or a paid plan's key.\nCompare against it and show `name`. On `free`, usage counts the\nday's lookups answered with every field, its daily trial.\n",
+            "description": "The plan the organization is on, as an identifier that is never\nrenamed or reused: `free` for the free plan, or a paid plan's key.\nCompare against it and show `name`. On `free`, usage counts its\ntrial, the lookups answered with every field.\n",
             "example": "max"
           },
           "name": {
