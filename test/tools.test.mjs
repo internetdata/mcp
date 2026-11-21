@@ -865,11 +865,14 @@ test('every tool that answers with coverage says to read its note', () => {
 
 // Each lookup's description states what Unlimited answers and what a paid plan does,
 // which is the spec's plan tables in a model's words.
-test('every lookup states what Unlimited and a paid plan answer', () => {
-    for (const name of ['lookup_ip', 'lookup_asn', 'lookup_domain']) {
+// Which plan answers a field is its member's spec description, and what an answer left
+// out is its coverage note: a plan's fields listed in a tool's text are a copy to keep.
+test('no lookup states which plan answers which field', () => {
+    for (const name of ['lookup_ip', 'lookup_ips', 'lookup_asn', 'lookup_domain']) {
         const described = byName(serving({}).fetch).get(name).tool.description;
-        assert.match(described, /Unlimited, the free plan, answers/, `${name}: Unlimited's column`);
-        assert.match(described, /Every paid plan answers every field/, `${name}: the paid column`);
+        assert.doesNotMatch(described, /Unlimited/, `${name}: no plan's column`);
+        assert.doesNotMatch(described, /every field/i, `${name}: no paid column`);
+        assert.doesNotMatch(described, /\b(?:free|paid) plan,? answers/i, `${name}: no plan's fields`);
         assert.doesNotMatch(described, /keyless/i, `${name}: the plan is Unlimited, never "keyless"`);
     }
 });

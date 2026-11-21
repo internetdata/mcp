@@ -89,8 +89,8 @@ A key on a paid plan unlocks every field, and the database tools need a key carr
 |---|---|
 | `lookup_ip` | What every database says about one address. |
 | `lookup_ips` | The same for a whole list of addresses in one call, keyed by address. A long list is batched for you. Needs a key on a paid plan; with a key on the free plan, a list of up to 10 addresses is looked up one address at a time instead. |
-| `lookup_asn` | What we know about one AS, by its number: its registration, and on a paid plan its prefixes, RPKI status and Whois record, its rank and Tier 1 flag, its upstreams, peers and downstreams, and the domains it hosts. |
-| `lookup_domain` | What we know about one domain: whether it is registered and which DNS record types it has, and on a paid plan the records, its organization's IP ranges and whether it is disposable. |
+| `lookup_asn` | What we know about one AS, by its number: its registration, its prefixes, RPKI status and Whois record, its rank and Tier 1 flag, its upstreams, peers and downstreams, and the domains it hosts. |
+| `lookup_domain` | What we know about one domain: whether it is registered, which DNS record types it has, the records themselves, its organization's IP ranges and whether it is disposable. |
 | `my_entitlement` | What this key is entitled to and what it has spent: plan, field tier, requests so far, allowance, and when it resets. |
 | `list_databases` | Every database we publish, with its `standing` for your organization (`licensed`, `expired` or `unlicensed`) and the type and term of any license. |
 | `database_metadata` | A database's columns, sample rows, row count, build date and file sizes. |

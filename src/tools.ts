@@ -113,12 +113,6 @@ const TRUNCATED_SCHEMA = {
     required: ['note'],
 };
 
-// The paid column of the spec's plan tables, the same for every lookup. Each tool
-// names Unlimited's column itself, and the coverage note says answer by answer
-// which fields a plan left out.
-const PAID = 'Every paid plan answers every field up to any overage cap its organization sets, and so '
-    + 'does a key on the free plan while its organization\'s trial lasts.';
-
 const METADATA_INPUT = z.strictObject({
     dataset_id: z.string().describe(VERSIONED_ID),
 });
@@ -185,10 +179,7 @@ function lookupTools(ctx: ToolContext): ToolDef[] {
                     + 'carrier\'s or satellite operator\'s space; whether an SSH, mail, web, open DNS '
                     + 'resolver or BitTorrent service answered on it; whether it is a VPN, a residential, '
                     + 'datacenter, mobile or public proxy, a hosting provider or a CDN; and its Whois and '
-                    + 'RWHOIS records and how many domains it hosts. Unlimited, the free plan, answers with '
-                    + 'a key or without one: the location to its country, the network, the company, the '
-                    + 'abuse email, the reverse DNS name, and the Tor, relay, anycast, carrier, satellite '
-                    + `and service flags, with the Tor and relay detail. ${PAID} `
+                    + 'RWHOIS records and how many domains it hosts. '
                     + 'Private and reserved addresses are answered locally, without calling the API. '
                     + 'Always read `coverage.note` before concluding anything from a field that is not in '
                     + 'the result.',
@@ -251,9 +242,7 @@ function lookupTools(ctx: ToolContext): ToolDef[] {
                     + 'the prefixes it announces in global BGP with their RPKI status. The prefixes and each '
                     + `list of AS numbers hold their first ${ASN_LIST_SHOWN}, the AS numbers ascending, with `
                     + '`truncated` giving the total where there are more. An AS no database knows comes back as '
-                    + 'its number with empty values. Unlimited, the free plan, answers its operator, country, '
-                    + 'registry, allocation date and domain, with a key or without one. '
-                    + `${PAID} `
+                    + 'its number with empty values. '
                     + 'Always read `coverage.note` before concluding anything from a field that is not in '
                     + 'the result.',
                 inputSchema: jsonSchema(ASN_INPUT),
@@ -284,8 +273,7 @@ function lookupTools(ctx: ToolContext): ToolDef[] {
                 description: 'What InternetData knows about one domain, from its latest snapshots rather '
                     + 'than a live DNS query: whether it is registered, which DNS record types it has, the '
                     + 'records themselves, its organization\'s IP ranges, and whether it is a disposable '
-                    + 'email domain. Unlimited, the free plan, answers whether it is registered and which '
-                    + `record types it has, with a key or without one. ${PAID} `
+                    + 'email domain. '
                     + 'Always read `coverage.note` before concluding anything from a field that is not in '
                     + 'the result.',
                 inputSchema: jsonSchema(DOMAIN_INPUT),
