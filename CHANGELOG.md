@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.6.3 - 2026-11-21
+
+### Fixes
+
+- Drop the plan split from the lookup tools' text ([`fb0903c`](https://github.com/internetdata/mcp/commit/fb0903c193cae2ea9685016f4e1986c254044bb4))
+
 ## 3.6.2 - 2026-11-20
 
 ### Fixes
