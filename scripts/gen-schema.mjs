@@ -35,9 +35,9 @@ const domainLookup = schema('DomainLookupResponse');
 // of every coverage list. Checked against the spec, so a rename there fails this
 // script rather than quietly turning a marker into a dataset.
 const markers = ['trial_expired', 'cap_reached'];
-const ip = coverageMembers('LookupResponse', lookup);
-const asn = coverageMembers('AsnLookupResponse', asnLookup);
-const domain = coverageMembers('DomainLookupResponse', domainLookup);
+const ip = coverageMembers('LookupResponse', lookup, '/{ip}');
+const asn = coverageMembers('AsnLookupResponse', asnLookup, '/asn/{asn}');
+const domain = coverageMembers('DomainLookupResponse', domainLookup, '/domain/{domain}');
 
 const downloadsLimit = queryParam('/api/v2/database/downloads', 'limit');
 
@@ -104,14 +104,22 @@ console.log(`src/schema.gen.ts  (spec ${spec.info.version}, ${ip.all.length} add
 // `company.type`): its schema's own `required` list is what every plan gets, so the
 // rest are named by path. A detail object requires nothing, since `{}` is its answer
 // under a false flag, so none of its members is ever named here.
-function coverageMembers(name, answer) {
+// A member named for its lookup's own query parameter (`user_agent`) answers that
+// parameter, not the plan, and no tool sends one: it stays out, as a marker does.
+function coverageMembers(name, answer, path) {
     for (const m of markers) {
         if (!(m in answer.properties)) {
             throw new Error(`${m} is no longer a ${name} member: update the markers list`);
         }
     }
+    const operation = spec.paths[path]?.get;
+    if (operation === undefined) {
+        throw new Error(`spec has no GET ${path}, which answers ${name}`);
+    }
+    const params = (operation.parameters ?? []).filter((q) => q.in === 'query');
+    const skipped = [...markers, ...params.map((q) => q.name)];
     const required = answer.required ?? [];
-    const top = Object.keys(answer.properties).filter((m) => !markers.includes(m));
+    const top = Object.keys(answer.properties).filter((m) => !skipped.includes(m));
     const nested = required.flatMap((m) => {
         const member = answer.properties[m];
         if (member.type !== 'object' || member.properties === undefined || member.required === undefined) {
