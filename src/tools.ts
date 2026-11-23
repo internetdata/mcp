@@ -273,8 +273,10 @@ function lookupTools(ctx: ToolContext): ToolDef[] {
                 title: 'Look up a domain',
                 description: 'What InternetData knows about one domain, from its latest snapshots rather '
                     + 'than a live DNS query: whether it is registered, which DNS record types it has, the '
-                    + 'records themselves, its organization\'s IP ranges, and whether it is a disposable '
-                    + 'email domain. '
+                    + 'records themselves, the network announcing each address, the other domains on its '
+                    + 'first IPv4 address, its organization\'s IP ranges, whether it is a disposable email '
+                    + 'domain, what its home page says of itself and links to, and the domains whose home '
+                    + 'page redirects or links to it. '
                     + 'Always read `coverage.note` before concluding anything from a field that is not in '
                     + 'the result.',
                 inputSchema: jsonSchema(DOMAIN_INPUT),

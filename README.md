@@ -50,7 +50,7 @@ Point it at `https://mcp.internetdata.io/mcp`. A client that supports MCP author
 
 ### On your own machine
 
-**No API key needed to look something up.** Unlimited, the free plan, answers with no daily or monthly cap, with a key or without one: an address's country-level location, the network that announces it, the company that uses it, its abuse email and reverse DNS name, and whether it is Tor, a relay, a bot, anycast, carrier or satellite space and which services answer on it; an AS's registration; and whether a domain is registered and which DNS record types it has. Every paid plan answers every field: VPN, proxy, hosting and CDN detection with the detail behind each flag, whose bot uses an address, city-level location, Whois and RWHOIS, an AS's prefixes, RPKI status, neighbors and hosted domains, and a domain's records, IP ranges and whether it is disposable. A free account tries every field.
+**No API key needed to look something up.** Unlimited, the free plan, answers with no daily or monthly cap, with a key or without one: an address's country-level location, the network that announces it, the company that uses it, its abuse email and reverse DNS name, and whether it is Tor, a relay, a bot, anycast, carrier or satellite space and which services answer on it; an AS's registration; and whether a domain is registered and which DNS record types it has. Every paid plan answers every field: VPN, proxy, hosting and CDN detection with the detail behind each flag, whose bot uses an address, city-level location, Whois and RWHOIS and the domains an address hosts, an AS's prefixes, RPKI status, neighbors and hosted domains, and a domain's records, the network announcing each of its addresses, the domains sharing its first IPv4 address, IP ranges, whether it is disposable, its home page and the domains redirecting or linking to it. A free account tries every field.
 
 Add this to your MCP client's config:
 
@@ -90,7 +90,7 @@ A key on a paid plan unlocks every field, and the database tools need a key carr
 | `lookup_ip` | What every database says about one address. |
 | `lookup_ips` | The same for a whole list of addresses in one call, keyed by address. A long list is batched for you. Needs a key on a paid plan; with a key on the free plan, a list of up to 10 addresses is looked up one address at a time instead. |
 | `lookup_asn` | What we know about one AS, by its number: its registration, its prefixes, RPKI status and Whois record, its rank and Tier 1 flag, its upstreams, peers and downstreams, and the domains it hosts. |
-| `lookup_domain` | What we know about one domain: whether it is registered, which DNS record types it has, the records themselves, its organization's IP ranges and whether it is disposable. |
+| `lookup_domain` | What we know about one domain: whether it is registered, which DNS record types it has, the records themselves, the network announcing each address, the other domains on its first IPv4 address, its organization's IP ranges, whether it is disposable, what its home page says and links to, and the domains redirecting or linking to it. |
 | `my_entitlement` | What this key is entitled to and what it has spent: plan, field tier, requests so far, allowance, and when it resets. |
 | `list_databases` | Every database we publish, with its `standing` for your organization (`licensed`, `expired` or `unlicensed`) and the type and term of any license. |
 | `database_metadata` | A database's columns, sample rows, row count, build date and file sizes. |
