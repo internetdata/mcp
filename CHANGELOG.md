@@ -2,6 +2,17 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.7.0 - 2026-11-23
+
+### Features
+
+- Re-pin the spec to 2026.11.22: whether a crawler or other bot uses an address ([`9b71a6e`](https://github.com/internetdata/mcp/commit/9b71a6e12b429809cc86cdb0f56060285847c198))
+- Name what a paid domain answer adds in lookup_domain ([`cfe87be`](https://github.com/internetdata/mcp/commit/cfe87bef8f0c046ea022247ee074e7b2cdb27abc))
+
+### Fixes
+
+- Keep a request-answering lookup member out of coverage ([`77a0efe`](https://github.com/internetdata/mcp/commit/77a0efe7fcdd607289801b6af305710e0d3bd814))
+
 ## 3.6.3 - 2026-11-21
 
 ### Fixes
