@@ -823,6 +823,7 @@ const FLAG_WORDS = {
     is_pubproxy: 'public proxy',
     is_hosting: 'a hosting provider',
     is_cdn: 'a CDN',
+    is_bot: 'a crawler or other bot',
     is_anycast: 'anycast',
     is_carrier: 'carrier',
     is_satellite: 'satellite',
@@ -863,8 +864,6 @@ test('every tool that answers with coverage says to read its note', () => {
     }
 });
 
-// Each lookup's description states what Unlimited answers and what a paid plan does,
-// which is the spec's plan tables in a model's words.
 // Which plan answers a field is its member's spec description, and what an answer left
 // out is its coverage note: a plan's fields listed in a tool's text are a copy to keep.
 test('no lookup states which plan answers which field', () => {

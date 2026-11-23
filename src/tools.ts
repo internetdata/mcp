@@ -178,8 +178,9 @@ function lookupTools(ctx: ToolContext): ToolDef[] {
                     + 'reverse DNS name; whether it is a Tor node, a privacy relay, anycast, or a mobile '
                     + 'carrier\'s or satellite operator\'s space; whether an SSH, mail, web, open DNS '
                     + 'resolver or BitTorrent service answered on it; whether it is a VPN, a residential, '
-                    + 'datacenter, mobile or public proxy, a hosting provider or a CDN; and its Whois and '
-                    + 'RWHOIS records and how many domains it hosts. '
+                    + 'datacenter, mobile or public proxy, a hosting provider or a CDN; whether a crawler or '
+                    + 'other bot uses it, and whose; and its Whois and RWHOIS records and how many domains it '
+                    + 'hosts. '
                     + 'Private and reserved addresses are answered locally, without calling the API. '
                     + 'Always read `coverage.note` before concluding anything from a field that is not in '
                     + 'the result.',

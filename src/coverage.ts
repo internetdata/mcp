@@ -111,7 +111,7 @@ export function coverageOf(body: Record<string, unknown>, kind: LookupKind = 'ip
  * carry no shape at all. With neither available there is nothing honest to say,
  * which is what `NOTE_UNKNOWN` says. Served answers can differ: an overage cap
  * reached part way through a batch answers the rest with Unlimited's fields, and
- * a free-plan key's daily trial can run out between its single lookups. Reading
+ * a free-plan key's monthly trial can run out between its single lookups. Reading
  * the widest one would call every field checked, so the narrowest one speaks for
  * the batch and `NOTE_MIXED` says the answers differ.
  */

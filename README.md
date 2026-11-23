@@ -5,7 +5,7 @@
 
 The official [Model Context Protocol](https://modelcontextprotocol.io) server for the [InternetData](https://internetdata.io) API.
 
-It gives an AI agent nine read-only tools. Four look up an IP address, an AS or a domain in every database we publish: where an address is and who uses it, whether it is a VPN, a residential, datacenter, mobile or public proxy, a Tor node, a privacy relay, a hosting provider or a CDN, anycast, carrier, satellite or reserved space, and whether an SSH, mail, web, open DNS resolver or BitTorrent service answered on it. The rest cover your key's plan, the database catalog and your organization's license for each, what a database holds, its digests and your download history.
+It gives an AI agent nine read-only tools. Four look up an IP address, an AS or a domain in every database we publish: where an address is and who uses it, whether it is a VPN, a residential, datacenter, mobile or public proxy, a Tor node, a privacy relay, a hosting provider or a CDN, anycast, carrier, satellite or reserved space; whether a crawler or other bot uses it, and whose; and whether an SSH, mail, web, open DNS resolver or BitTorrent service answered on it. The rest cover your key's plan, the database catalog and your organization's license for each, what a database holds, its digests and your download history.
 
 ## Getting Started
 
@@ -50,7 +50,7 @@ Point it at `https://mcp.internetdata.io/mcp`. A client that supports MCP author
 
 ### On your own machine
 
-**No API key needed to look something up.** Unlimited, the free plan, answers with no daily or monthly cap, with a key or without one: an address's country-level location, the network that announces it, the company that uses it, its abuse email and reverse DNS name, and whether it is Tor, a relay, anycast, carrier or satellite space and which services answer on it; an AS's registration; and whether a domain is registered and which DNS record types it has. Every paid plan answers every field: VPN, proxy, hosting and CDN detection with the detail behind each flag, city-level location, Whois and RWHOIS, an AS's prefixes, RPKI status, neighbors and hosted domains, and a domain's records, IP ranges and whether it is disposable. A free account tries every field.
+**No API key needed to look something up.** Unlimited, the free plan, answers with no daily or monthly cap, with a key or without one: an address's country-level location, the network that announces it, the company that uses it, its abuse email and reverse DNS name, and whether it is Tor, a relay, a bot, anycast, carrier or satellite space and which services answer on it; an AS's registration; and whether a domain is registered and which DNS record types it has. Every paid plan answers every field: VPN, proxy, hosting and CDN detection with the detail behind each flag, whose bot uses an address, city-level location, Whois and RWHOIS, an AS's prefixes, RPKI status, neighbors and hosted domains, and a domain's records, IP ranges and whether it is disposable. A free account tries every field.
 
 Add this to your MCP client's config:
 

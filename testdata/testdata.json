@@ -181,12 +181,12 @@
         "Retry-After": "1"
       },
       "body": {
-        "error": "per-minute limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
+        "error": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
       },
       "expect": {
         "kind": "rate_limited",
         "retryable": true,
-        "message": "per-minute limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
+        "message": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
         "retryAfterSeconds": 1
       }
     },
@@ -256,6 +256,7 @@
       "is_pubproxy",
       "is_hosting",
       "is_cdn",
+      "is_bot",
       "is_anycast",
       "is_carrier",
       "is_satellite",
@@ -275,6 +276,7 @@
       "pubproxy",
       "hosting",
       "cdn",
+      "bot",
       "carrier",
       "satellite",
       "ssh",
@@ -367,6 +369,7 @@
       "is_pubproxy": false,
       "is_hosting": false,
       "is_cdn": false,
+      "is_bot": false,
       "is_anycast": false,
       "is_carrier": false,
       "is_satellite": false,
@@ -406,6 +409,7 @@
       "pubproxy": {},
       "hosting": {},
       "cdn": {},
+      "bot": {},
       "carrier": {},
       "satellite": {},
       "ssh": {},
@@ -1898,7 +1902,7 @@
   "lookup": [
     {
       "name": "unlimited-answer",
-      "why": "Unlimited, keyless or a key past its trial: the common set and InternetData's own flags. Every paid member is absent, which means not in this plan and must never read as false, and so is each paid member inside a shared object (location.city, asn.rpki_status, company.type, abuse.phone).",
+      "why": "Unlimited, keyless or a key past its trial: the common set and InternetData's own flags. Every paid member is absent, which means not in this plan and must never read as false, and so is each paid member inside a shared object (location.city, company.type, abuse.phone).",
       "call": "lookup",
       "target": "146.70.116.130",
       "status": 200,
@@ -1907,6 +1911,7 @@
         "is_bogon": false,
         "is_tor": false,
         "is_relay": false,
+        "is_bot": false,
         "is_anycast": false,
         "is_carrier": false,
         "is_satellite": false,
@@ -1934,7 +1939,9 @@
           "name": "M247 Europe SRL",
           "domain": "m247global.com",
           "type": "hosting",
-          "prefix": "146.70.116.0/24"
+          "prefix": "146.70.116.0/24",
+          "country": "RO",
+          "rpki_status": "not_found"
         },
         "company": {
           "name": "M247 LTD Vienna Infrastructure",
@@ -1951,6 +1958,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_anycast": false,
           "is_carrier": false,
           "is_satellite": false,
@@ -1962,9 +1970,9 @@
           "hostname": ""
         },
         "objects": [
+          "location",
           "tor",
           "relay",
-          "location",
           "asn",
           "company",
           "abuse"
@@ -1988,6 +1996,7 @@
           "pubproxy",
           "hosting",
           "cdn",
+          "bot",
           "carrier",
           "satellite",
           "ssh",
@@ -1998,8 +2007,8 @@
           "whois",
           "rwhois",
           "hosted_domains",
-          "trial_expired",
-          "cap_reached"
+          "cap_reached",
+          "trial_expired"
         ],
         "absentIn": {
           "location": [
@@ -2013,10 +2022,6 @@
             "geoname_id",
             "dma_code",
             "last_changed"
-          ],
-          "asn": [
-            "country",
-            "rpki_status"
           ],
           "company": [
             "type",
@@ -2052,6 +2057,7 @@
         "is_pubproxy": false,
         "is_hosting": true,
         "is_cdn": false,
+        "is_bot": false,
         "is_anycast": false,
         "is_carrier": false,
         "is_satellite": false,
@@ -2101,6 +2107,7 @@
           "last_seen": "2026-11-13"
         },
         "cdn": {},
+        "bot": {},
         "carrier": {},
         "satellite": {},
         "ssh": {},
@@ -2172,6 +2179,7 @@
           "is_pubproxy": false,
           "is_hosting": true,
           "is_cdn": false,
+          "is_bot": false,
           "is_anycast": false,
           "is_carrier": false,
           "is_satellite": false,
@@ -2184,6 +2192,7 @@
           "trial_expired": false
         },
         "objects": [
+          "location",
           "vpn",
           "tor",
           "relay",
@@ -2193,6 +2202,7 @@
           "pubproxy",
           "hosting",
           "cdn",
+          "bot",
           "carrier",
           "satellite",
           "ssh",
@@ -2200,7 +2210,6 @@
           "web",
           "dns_resolver",
           "bittorrent",
-          "location",
           "asn",
           "company",
           "abuse",
@@ -2216,6 +2225,7 @@
           "mobproxy",
           "pubproxy",
           "cdn",
+          "bot",
           "carrier",
           "satellite",
           "ssh",
@@ -2241,6 +2251,7 @@
         "is_bogon": false,
         "is_tor": false,
         "is_relay": false,
+        "is_bot": false,
         "is_anycast": false,
         "is_carrier": false,
         "is_satellite": false,
@@ -2268,7 +2279,9 @@
           "name": "M247 Europe SRL",
           "domain": "m247global.com",
           "type": "hosting",
-          "prefix": "146.70.116.0/24"
+          "prefix": "146.70.116.0/24",
+          "country": "RO",
+          "rpki_status": "not_found"
         },
         "company": {
           "name": "M247 LTD Vienna Infrastructure",
@@ -2286,6 +2299,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_anycast": false,
           "is_carrier": false,
           "is_satellite": false,
@@ -2298,9 +2312,9 @@
           "trial_expired": true
         },
         "objects": [
+          "location",
           "tor",
           "relay",
-          "location",
           "asn",
           "company",
           "abuse"
@@ -2324,6 +2338,7 @@
           "pubproxy",
           "hosting",
           "cdn",
+          "bot",
           "carrier",
           "satellite",
           "ssh",
@@ -2348,10 +2363,6 @@
             "geoname_id",
             "dma_code",
             "last_changed"
-          ],
-          "asn": [
-            "country",
-            "rpki_status"
           ],
           "company": [
             "type",
@@ -2380,6 +2391,7 @@
         "is_bogon": false,
         "is_tor": false,
         "is_relay": false,
+        "is_bot": false,
         "is_anycast": false,
         "is_carrier": false,
         "is_satellite": false,
@@ -2407,7 +2419,9 @@
           "name": "M247 Europe SRL",
           "domain": "m247global.com",
           "type": "hosting",
-          "prefix": "146.70.116.0/24"
+          "prefix": "146.70.116.0/24",
+          "country": "RO",
+          "rpki_status": "not_found"
         },
         "company": {
           "name": "M247 LTD Vienna Infrastructure",
@@ -2425,6 +2439,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_anycast": false,
           "is_carrier": false,
           "is_satellite": false,
@@ -2437,9 +2452,9 @@
           "cap_reached": true
         },
         "objects": [
+          "location",
           "tor",
           "relay",
-          "location",
           "asn",
           "company",
           "abuse"
@@ -2463,6 +2478,7 @@
           "pubproxy",
           "hosting",
           "cdn",
+          "bot",
           "carrier",
           "satellite",
           "ssh",
@@ -2487,10 +2503,6 @@
             "geoname_id",
             "dma_code",
             "last_changed"
-          ],
-          "asn": [
-            "country",
-            "rpki_status"
           ],
           "company": [
             "type",
@@ -2526,6 +2538,7 @@
         "is_pubproxy": false,
         "is_hosting": true,
         "is_cdn": false,
+        "is_bot": false,
         "is_anycast": false,
         "is_carrier": false,
         "is_satellite": false,
@@ -2574,14 +2587,57 @@
           "confidence": "high",
           "last_seen": "2026-11-13"
         },
-        "cdn": {},
+        "cdn": {
+          "provider": "cloudflare",
+          "provider_name": "Cloudflare",
+          "confidence": "high",
+          "last_seen": "2026-11-13"
+        },
+        "bot": {
+          "provider": "google",
+          "provider_name": "Google",
+          "agents": [
+            "Google-CloudVertexBot",
+            "GoogleOther",
+            "Googlebot"
+          ],
+          "categories": [
+            "ai_search",
+            "other",
+            "search_engine"
+          ],
+          "verified": true,
+          "identity": "verified",
+          "verified_by": "list",
+          "confidence": "high",
+          "first_seen": "2026-11-21",
+          "last_seen": "2026-11-21"
+        },
         "carrier": {},
         "satellite": {},
         "ssh": {},
         "smtp": {},
         "web": [],
-        "dns_resolver": {},
-        "bittorrent": {},
+        "dns_resolver": {
+          "port": 53,
+          "recursion_available": true,
+          "rcode": 0,
+          "answer_correct": true,
+          "first_seen": "2026-08-09",
+          "last_seen": "2026-11-07"
+        },
+        "bittorrent": {
+          "verified": true,
+          "id_matches_ip": false,
+          "first_seen": "2026-10-21",
+          "last_seen": "2026-11-12",
+          "last_reachable": "",
+          "days_seen": 19,
+          "num_ports": 84,
+          "peak_num_ports": 9,
+          "indexer": false,
+          "clients": []
+        },
         "asn": {
           "asn": 9009,
           "name": "M247 Europe SRL",
@@ -2646,6 +2702,7 @@
           "is_pubproxy": false,
           "is_hosting": true,
           "is_cdn": false,
+          "is_bot": false,
           "is_anycast": false,
           "is_carrier": false,
           "is_satellite": false,
@@ -2658,6 +2715,7 @@
           "cap_reached": false
         },
         "objects": [
+          "location",
           "vpn",
           "tor",
           "relay",
@@ -2667,6 +2725,7 @@
           "pubproxy",
           "hosting",
           "cdn",
+          "bot",
           "carrier",
           "satellite",
           "ssh",
@@ -2674,7 +2733,6 @@
           "web",
           "dns_resolver",
           "bittorrent",
-          "location",
           "asn",
           "company",
           "abuse",
@@ -2689,14 +2747,11 @@
           "dcproxy",
           "mobproxy",
           "pubproxy",
-          "cdn",
           "carrier",
           "satellite",
           "ssh",
           "smtp",
-          "web",
-          "dns_resolver",
-          "bittorrent"
+          "web"
         ],
         "absent": [
           "trial_expired"
@@ -2722,6 +2777,7 @@
         "is_pubproxy": false,
         "is_hosting": true,
         "is_cdn": true,
+        "is_bot": false,
         "is_anycast": true,
         "is_carrier": false,
         "is_satellite": false,
@@ -2771,6 +2827,7 @@
           "confidence": "high",
           "last_seen": "2026-11-13"
         },
+        "bot": {},
         "carrier": {},
         "satellite": {},
         "ssh": {},
@@ -2888,6 +2945,7 @@
           "is_pubproxy": false,
           "is_hosting": true,
           "is_cdn": true,
+          "is_bot": false,
           "is_anycast": true,
           "is_carrier": false,
           "is_satellite": false,
@@ -2900,6 +2958,7 @@
           "cap_reached": false
         },
         "objects": [
+          "location",
           "vpn",
           "tor",
           "relay",
@@ -2909,6 +2968,7 @@
           "pubproxy",
           "hosting",
           "cdn",
+          "bot",
           "carrier",
           "satellite",
           "ssh",
@@ -2916,7 +2976,6 @@
           "web",
           "dns_resolver",
           "bittorrent",
-          "location",
           "asn",
           "company",
           "abuse",
@@ -2932,10 +2991,226 @@
           "dcproxy",
           "mobproxy",
           "pubproxy",
+          "bot",
           "carrier",
           "satellite",
           "ssh",
           "smtp"
+        ],
+        "absent": [
+          "trial_expired"
+        ],
+        "absentIn": {}
+      }
+    },
+    {
+      "name": "paid-bot",
+      "why": "A paid answer for an address a bot uses: is_bot true, and bot naming the operator by ID and name, its bots as their user agents name them, what they do and whether the operator vouches for the address (verified, identity, verified_by), with the confidence and the first and last day. agents and categories are lists, kept in order.",
+      "call": "lookup",
+      "target": "66.249.66.1",
+      "status": 200,
+      "body": {
+        "ip": "66.249.66.1",
+        "is_bogon": false,
+        "is_vpn": false,
+        "is_tor": false,
+        "is_relay": false,
+        "is_resproxy": false,
+        "is_dcproxy": false,
+        "is_mobproxy": false,
+        "is_pubproxy": false,
+        "is_hosting": true,
+        "is_cdn": false,
+        "is_bot": true,
+        "is_anycast": false,
+        "is_carrier": false,
+        "is_satellite": false,
+        "is_ssh": false,
+        "is_smtp": false,
+        "is_web": false,
+        "is_dns_resolver": false,
+        "is_bittorrent": false,
+        "location": {
+          "continent": "NA",
+          "continent_name": "North America",
+          "country": "US",
+          "country_name": "United States",
+          "timezone": "America/Los_Angeles",
+          "currency_code": "USD",
+          "currency_name": "Dollar",
+          "currency_symbol": "$",
+          "flag_emoji": "🇺🇸",
+          "flag_unicode": "U+1F1FA U+1F1F8",
+          "region": "California",
+          "region_code": "US-CA",
+          "city": "Mountain View",
+          "postal_code": "94040",
+          "latitude": 37.38605,
+          "longitude": -122.08385,
+          "accuracy_radius": 2000,
+          "geoname_id": "5375480",
+          "dma_code": "807",
+          "last_changed": "2026-10-02"
+        },
+        "vpn": {},
+        "tor": {},
+        "relay": {},
+        "resproxy": {},
+        "dcproxy": {},
+        "mobproxy": {},
+        "pubproxy": {},
+        "hosting": {
+          "provider": "google",
+          "provider_name": "Google",
+          "confidence": "high",
+          "last_seen": "2026-11-20"
+        },
+        "cdn": {},
+        "bot": {
+          "provider": "google",
+          "provider_name": "Google",
+          "agents": [
+            "Google-CloudVertexBot",
+            "GoogleOther",
+            "Googlebot"
+          ],
+          "categories": [
+            "ai_search",
+            "other",
+            "search_engine"
+          ],
+          "verified": true,
+          "identity": "verified",
+          "verified_by": "list",
+          "confidence": "high",
+          "first_seen": "2026-11-21",
+          "last_seen": "2026-11-21"
+        },
+        "carrier": {},
+        "satellite": {},
+        "ssh": {},
+        "smtp": {},
+        "web": [],
+        "dns_resolver": {},
+        "bittorrent": {},
+        "asn": {
+          "asn": 15169,
+          "name": "Google LLC",
+          "domain": "google.com",
+          "type": "hosting",
+          "prefix": "66.249.64.0/20",
+          "country": "US",
+          "rpki_status": "valid"
+        },
+        "company": {
+          "name": "Google LLC",
+          "domain": "google.com",
+          "type": "hosting",
+          "country": "US"
+        },
+        "hostname": "crawl-66-249-66-1.googlebot.com",
+        "abuse": {
+          "email": "network-abuse@google.com",
+          "name": "Abuse",
+          "phone": "+1-650-253-0000",
+          "address": "1600 Amphitheatre Parkway, Mountain View, CA, 94043",
+          "country": "US",
+          "network": "66.249.64.0-66.249.95.255",
+          "validated": true,
+          "unvalidated_since": ""
+        },
+        "whois": {
+          "id": "GOOGLE",
+          "name": "Google LLC",
+          "org": "GOGL",
+          "country": "",
+          "status": "allocation",
+          "source": "arin",
+          "domain": "google.com",
+          "abuse_email": "network-abuse@google.com",
+          "asn": 15169
+        },
+        "rwhois": {
+          "id": "",
+          "name": "",
+          "country": "",
+          "source": "",
+          "domain": "",
+          "abuse_email": ""
+        },
+        "hosted_domains": {
+          "total": 0,
+          "domains": []
+        },
+        "cap_reached": false
+      },
+      "expect": {
+        "present": {
+          "ip": "66.249.66.1",
+          "is_bogon": false,
+          "is_vpn": false,
+          "is_tor": false,
+          "is_relay": false,
+          "is_resproxy": false,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "is_pubproxy": false,
+          "is_hosting": true,
+          "is_cdn": false,
+          "is_bot": true,
+          "is_anycast": false,
+          "is_carrier": false,
+          "is_satellite": false,
+          "is_ssh": false,
+          "is_smtp": false,
+          "is_web": false,
+          "is_dns_resolver": false,
+          "is_bittorrent": false,
+          "hostname": "crawl-66-249-66-1.googlebot.com",
+          "cap_reached": false
+        },
+        "objects": [
+          "location",
+          "vpn",
+          "tor",
+          "relay",
+          "resproxy",
+          "dcproxy",
+          "mobproxy",
+          "pubproxy",
+          "hosting",
+          "cdn",
+          "bot",
+          "carrier",
+          "satellite",
+          "ssh",
+          "smtp",
+          "web",
+          "dns_resolver",
+          "bittorrent",
+          "asn",
+          "company",
+          "abuse",
+          "whois",
+          "rwhois",
+          "hosted_domains"
+        ],
+        "empty": [
+          "vpn",
+          "tor",
+          "relay",
+          "resproxy",
+          "dcproxy",
+          "mobproxy",
+          "pubproxy",
+          "cdn",
+          "carrier",
+          "satellite",
+          "ssh",
+          "smtp",
+          "web",
+          "dns_resolver",
+          "bittorrent"
         ],
         "absent": [
           "trial_expired"
@@ -3184,7 +3459,7 @@
     },
     {
       "name": "domain-unlimited-answer",
-      "why": "A domain on Unlimited: whether it is registered and which record types it has; the records themselves, its IP ranges and Disposable Domain are absent.",
+      "why": "A domain on Unlimited: whether it is registered and which record types it has; the records themselves, the network on each address, its co-hosted domains, its IP ranges, Disposable Domain, its home page, redirects and backlinks are absent.",
       "call": "lookupDomain",
       "target": "example.com",
       "status": 200,
@@ -3212,15 +3487,20 @@
         "absent": [
           "is_disposable",
           "dns",
+          "hosting",
+          "cohosted_domains",
           "ip_ranges",
           "disposable",
+          "web",
+          "redirects",
+          "backlinks",
           "cap_reached"
         ]
       }
     },
     {
       "name": "domain-paid-answer",
-      "why": "A domain on a paid plan: the records, its organization's IP ranges and is_disposable.",
+      "why": "A domain on a paid plan: the records, the network announcing each address, the other domains on its first IPv4 address, its organization's IP ranges, is_disposable, its home page, and the domains whose home page redirects or links to it.",
       "call": "lookupDomain",
       "target": "example.com",
       "status": 200,
@@ -3265,6 +3545,41 @@
           ],
           "cname": []
         },
+        "hosting": [
+          {
+            "ip": "192.0.2.10",
+            "asn": {
+              "asn": 64496,
+              "name": "EXAMPLE-AS",
+              "domain": "example.net",
+              "type": "hosting",
+              "prefix": "192.0.2.0/24",
+              "country": "US",
+              "rpki_status": "valid"
+            }
+          },
+          {
+            "ip": "2001:db8::10",
+            "asn": {
+              "asn": 64496,
+              "name": "EXAMPLE-AS",
+              "domain": "example.net",
+              "type": "hosting",
+              "prefix": "2001:db8::/32",
+              "country": "US",
+              "rpki_status": "valid"
+            }
+          }
+        ],
+        "cohosted_domains": {
+          "ip": "192.0.2.10",
+          "total": 3,
+          "domains": [
+            "example.net",
+            "example.org",
+            "shop.example"
+          ]
+        },
         "ip_ranges": {
           "domain": "example.com",
           "redirects_to": "",
@@ -3279,6 +3594,33 @@
           ]
         },
         "disposable": {},
+        "web": {
+          "url": "https://example.com/",
+          "title": "Example Domain",
+          "description": "",
+          "last_seen": "2026-11-18",
+          "links": {
+            "total": 1,
+            "hosts": [
+              "www.iana.org"
+            ]
+          }
+        },
+        "redirects": {
+          "total": 2,
+          "domains": [
+            "example.net",
+            "example.org"
+          ]
+        },
+        "backlinks": {
+          "total": 3,
+          "domains": [
+            "docs.example",
+            "news.example",
+            "wiki.example"
+          ]
+        },
         "cap_reached": false
       },
       "expect": {
@@ -3295,8 +3637,13 @@
         },
         "objects": [
           "dns",
+          "hosting",
+          "cohosted_domains",
           "ip_ranges",
-          "disposable"
+          "disposable",
+          "web",
+          "redirects",
+          "backlinks"
         ],
         "empty": [
           "disposable"
@@ -3336,8 +3683,13 @@
         "absent": [
           "is_disposable",
           "dns",
+          "hosting",
+          "cohosted_domains",
           "ip_ranges",
           "disposable",
+          "web",
+          "redirects",
+          "backlinks",
           "trial_expired"
         ]
       }
@@ -6961,6 +7313,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -7012,6 +7365,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -7107,6 +7461,7 @@
           "is_vpn": false,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": false,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -7140,6 +7495,7 @@
             "confidence": "high",
             "last_seen": "2026-11-13"
           },
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -7269,6 +7625,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_anycast": false,
           "is_carrier": false,
           "is_satellite": false,
@@ -7277,8 +7634,6 @@
           "is_web": false,
           "is_dns_resolver": false,
           "is_bittorrent": false,
-          "tor": {},
-          "relay": {},
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -7291,12 +7646,16 @@
             "flag_emoji": "🇦🇹",
             "flag_unicode": "U+1F1E6 U+1F1F9"
           },
+          "tor": {},
+          "relay": {},
           "asn": {
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
             "type": "hosting",
-            "prefix": "146.70.116.0/24"
+            "prefix": "146.70.116.0/24",
+            "country": "RO",
+            "rpki_status": "not_found"
           },
           "company": {
             "name": "M247 LTD Vienna Infrastructure",
@@ -7325,6 +7684,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_anycast": false,
           "is_carrier": false,
           "is_satellite": false,
@@ -7333,8 +7693,6 @@
           "is_web": false,
           "is_dns_resolver": false,
           "is_bittorrent": false,
-          "tor": {},
-          "relay": {},
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -7347,12 +7705,16 @@
             "flag_emoji": "🇦🇹",
             "flag_unicode": "U+1F1E6 U+1F1F9"
           },
+          "tor": {},
+          "relay": {},
           "asn": {
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
             "type": "hosting",
-            "prefix": "146.70.116.0/24"
+            "prefix": "146.70.116.0/24",
+            "country": "RO",
+            "rpki_status": "not_found"
           },
           "company": {
             "name": "M247 LTD Vienna Infrastructure",
@@ -7380,6 +7742,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -7431,6 +7794,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -7529,6 +7893,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -7580,6 +7945,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -7677,6 +8043,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -7728,6 +8095,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -7825,6 +8193,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -7876,6 +8245,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -7972,6 +8342,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -8023,6 +8394,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -8119,6 +8491,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -8170,6 +8543,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -8272,6 +8646,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -8323,6 +8698,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -8425,6 +8801,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -8476,6 +8853,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -8576,6 +8954,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -8627,6 +9006,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -8726,6 +9106,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -8777,6 +9158,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -8876,6 +9258,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -8927,6 +9310,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -9026,6 +9410,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -9077,6 +9462,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -9177,6 +9563,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -9228,6 +9615,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -9327,6 +9715,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -9378,6 +9767,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -9477,6 +9867,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -9528,6 +9919,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -9627,6 +10019,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -9678,6 +10071,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -9777,6 +10171,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -9828,6 +10223,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -9927,6 +10323,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -9978,6 +10375,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -10077,6 +10475,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_anycast": false,
           "is_carrier": false,
           "is_satellite": false,
@@ -10085,8 +10484,6 @@
           "is_web": false,
           "is_dns_resolver": false,
           "is_bittorrent": false,
-          "tor": {},
-          "relay": {},
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -10099,12 +10496,16 @@
             "flag_emoji": "🇦🇹",
             "flag_unicode": "U+1F1E6 U+1F1F9"
           },
+          "tor": {},
+          "relay": {},
           "asn": {
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
             "type": "hosting",
-            "prefix": "146.70.116.0/24"
+            "prefix": "146.70.116.0/24",
+            "country": "RO",
+            "rpki_status": "not_found"
           },
           "company": {
             "name": "M247 LTD Vienna Infrastructure",
@@ -10138,6 +10539,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -10189,6 +10591,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -10285,6 +10688,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -10336,6 +10740,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -10432,6 +10837,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -10483,6 +10889,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -10592,6 +10999,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -10643,6 +11051,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -10741,6 +11150,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -10792,6 +11202,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -10888,6 +11299,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_anycast": false,
           "is_carrier": false,
           "is_satellite": false,
@@ -10896,8 +11308,6 @@
           "is_web": false,
           "is_dns_resolver": false,
           "is_bittorrent": false,
-          "tor": {},
-          "relay": {},
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -10910,12 +11320,16 @@
             "flag_emoji": "🇦🇹",
             "flag_unicode": "U+1F1E6 U+1F1F9"
           },
+          "tor": {},
+          "relay": {},
           "asn": {
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
             "type": "hosting",
-            "prefix": "146.70.116.0/24"
+            "prefix": "146.70.116.0/24",
+            "country": "RO",
+            "rpki_status": "not_found"
           },
           "company": {
             "name": "M247 LTD Vienna Infrastructure",
@@ -10944,6 +11358,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_anycast": false,
           "is_carrier": false,
           "is_satellite": false,
@@ -10952,8 +11367,6 @@
           "is_web": false,
           "is_dns_resolver": false,
           "is_bittorrent": false,
-          "tor": {},
-          "relay": {},
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -10966,12 +11379,16 @@
             "flag_emoji": "🇦🇹",
             "flag_unicode": "U+1F1E6 U+1F1F9"
           },
+          "tor": {},
+          "relay": {},
           "asn": {
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
             "type": "hosting",
-            "prefix": "146.70.116.0/24"
+            "prefix": "146.70.116.0/24",
+            "country": "RO",
+            "rpki_status": "not_found"
           },
           "company": {
             "name": "M247 LTD Vienna Infrastructure",
@@ -11003,6 +11420,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_anycast": false,
           "is_carrier": false,
           "is_satellite": false,
@@ -11011,8 +11429,6 @@
           "is_web": false,
           "is_dns_resolver": false,
           "is_bittorrent": false,
-          "tor": {},
-          "relay": {},
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -11025,12 +11441,16 @@
             "flag_emoji": "🇦🇹",
             "flag_unicode": "U+1F1E6 U+1F1F9"
           },
+          "tor": {},
+          "relay": {},
           "asn": {
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
             "type": "hosting",
-            "prefix": "146.70.116.0/24"
+            "prefix": "146.70.116.0/24",
+            "country": "RO",
+            "rpki_status": "not_found"
           },
           "company": {
             "name": "M247 LTD Vienna Infrastructure",
@@ -11059,6 +11479,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_anycast": false,
           "is_carrier": false,
           "is_satellite": false,
@@ -11067,8 +11488,6 @@
           "is_web": false,
           "is_dns_resolver": false,
           "is_bittorrent": false,
-          "tor": {},
-          "relay": {},
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -11081,12 +11500,16 @@
             "flag_emoji": "🇦🇹",
             "flag_unicode": "U+1F1E6 U+1F1F9"
           },
+          "tor": {},
+          "relay": {},
           "asn": {
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
             "type": "hosting",
-            "prefix": "146.70.116.0/24"
+            "prefix": "146.70.116.0/24",
+            "country": "RO",
+            "rpki_status": "not_found"
           },
           "company": {
             "name": "M247 LTD Vienna Infrastructure",
@@ -11118,6 +11541,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -11169,6 +11593,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -11265,6 +11690,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_anycast": false,
           "is_carrier": false,
           "is_satellite": false,
@@ -11273,8 +11699,6 @@
           "is_web": false,
           "is_dns_resolver": false,
           "is_bittorrent": false,
-          "tor": {},
-          "relay": {},
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -11287,12 +11711,16 @@
             "flag_emoji": "🇦🇹",
             "flag_unicode": "U+1F1E6 U+1F1F9"
           },
+          "tor": {},
+          "relay": {},
           "asn": {
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
             "type": "hosting",
-            "prefix": "146.70.116.0/24"
+            "prefix": "146.70.116.0/24",
+            "country": "RO",
+            "rpki_status": "not_found"
           },
           "company": {
             "name": "M247 LTD Vienna Infrastructure",
@@ -11310,27 +11738,28 @@
             }
           },
           {
-            "asn": {
-              "rpki_status": "valid"
+            "company": {
+              "type": "hosting"
             }
           }
         ],
         "expect": {
           "blocked": false,
           "missing": [
-            "asn.rpki_status",
+            "company.type",
             "location.region"
           ]
         }
       },
       {
-        "name": "asn-type-matches",
-        "why": "The network's type, on every plan.",
+        "name": "asn-rpki-status-on-every-plan",
+        "why": "Unlimited serves the AS's RPKI status and country since 2026-11-20, so a condition on either is evaluated, never reported missing.",
         "body": {
           "ip": "146.70.116.130",
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_anycast": false,
           "is_carrier": false,
           "is_satellite": false,
@@ -11339,8 +11768,6 @@
           "is_web": false,
           "is_dns_resolver": false,
           "is_bittorrent": false,
-          "tor": {},
-          "relay": {},
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -11353,12 +11780,75 @@
             "flag_emoji": "🇦🇹",
             "flag_unicode": "U+1F1E6 U+1F1F9"
           },
+          "tor": {},
+          "relay": {},
           "asn": {
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
             "type": "hosting",
-            "prefix": "146.70.116.0/24"
+            "prefix": "146.70.116.0/24",
+            "country": "RO",
+            "rpki_status": "not_found"
+          },
+          "company": {
+            "name": "M247 LTD Vienna Infrastructure",
+            "domain": "m247.ro"
+          },
+          "hostname": "",
+          "abuse": {
+            "email": "abuse@m247.ro"
+          }
+        },
+        "condition": {
+          "asn": {
+            "rpki_status": "not_found"
+          }
+        },
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "asn-type-matches",
+        "why": "The network's type, on every plan.",
+        "body": {
+          "ip": "146.70.116.130",
+          "is_bogon": false,
+          "is_tor": false,
+          "is_relay": false,
+          "is_bot": false,
+          "is_anycast": false,
+          "is_carrier": false,
+          "is_satellite": false,
+          "is_ssh": false,
+          "is_smtp": false,
+          "is_web": false,
+          "is_dns_resolver": false,
+          "is_bittorrent": false,
+          "location": {
+            "continent": "EU",
+            "continent_name": "Europe",
+            "country": "AT",
+            "country_name": "Austria",
+            "timezone": "Europe/Vienna",
+            "currency_code": "EUR",
+            "currency_name": "Euro",
+            "currency_symbol": "€",
+            "flag_emoji": "🇦🇹",
+            "flag_unicode": "U+1F1E6 U+1F1F9"
+          },
+          "tor": {},
+          "relay": {},
+          "asn": {
+            "asn": 9009,
+            "name": "M247 Europe SRL",
+            "domain": "m247global.com",
+            "type": "hosting",
+            "prefix": "146.70.116.0/24",
+            "country": "RO",
+            "rpki_status": "not_found"
           },
           "company": {
             "name": "M247 LTD Vienna Infrastructure",
@@ -11387,6 +11877,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_anycast": false,
           "is_carrier": false,
           "is_satellite": false,
@@ -11395,8 +11886,6 @@
           "is_web": false,
           "is_dns_resolver": false,
           "is_bittorrent": false,
-          "tor": {},
-          "relay": {},
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -11409,12 +11898,16 @@
             "flag_emoji": "🇦🇹",
             "flag_unicode": "U+1F1E6 U+1F1F9"
           },
+          "tor": {},
+          "relay": {},
           "asn": {
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
             "type": "hosting",
-            "prefix": "146.70.116.0/24"
+            "prefix": "146.70.116.0/24",
+            "country": "RO",
+            "rpki_status": "not_found"
           },
           "company": {
             "name": "M247 LTD Vienna Infrastructure",
@@ -11444,6 +11937,7 @@
           "is_vpn": true,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": true,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -11495,6 +11989,7 @@
             "last_seen": "2026-11-13"
           },
           "cdn": {},
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -11591,6 +12086,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_anycast": false,
           "is_carrier": false,
           "is_satellite": false,
@@ -11599,8 +12095,6 @@
           "is_web": false,
           "is_dns_resolver": false,
           "is_bittorrent": false,
-          "tor": {},
-          "relay": {},
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -11613,12 +12107,16 @@
             "flag_emoji": "🇦🇹",
             "flag_unicode": "U+1F1E6 U+1F1F9"
           },
+          "tor": {},
+          "relay": {},
           "asn": {
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
             "type": "hosting",
-            "prefix": "146.70.116.0/24"
+            "prefix": "146.70.116.0/24",
+            "country": "RO",
+            "rpki_status": "not_found"
           },
           "company": {
             "name": "M247 LTD Vienna Infrastructure",
@@ -11650,6 +12148,7 @@
           "is_vpn": false,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": false,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -11683,6 +12182,7 @@
             "confidence": "high",
             "last_seen": "2026-11-13"
           },
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -11821,6 +12321,7 @@
           "is_vpn": false,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_resproxy": false,
           "is_dcproxy": false,
           "is_mobproxy": false,
@@ -11854,6 +12355,7 @@
             "confidence": "high",
             "last_seen": "2026-11-13"
           },
+          "bot": {},
           "carrier": {},
           "satellite": {},
           "ssh": {},
@@ -11986,6 +12488,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
+          "is_bot": false,
           "is_anycast": false,
           "is_carrier": false,
           "is_satellite": false,
@@ -11994,8 +12497,6 @@
           "is_web": false,
           "is_dns_resolver": false,
           "is_bittorrent": false,
-          "tor": {},
-          "relay": {},
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -12008,12 +12509,16 @@
             "flag_emoji": "🇦🇹",
             "flag_unicode": "U+1F1E6 U+1F1F9"
           },
+          "tor": {},
+          "relay": {},
           "asn": {
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
             "type": "hosting",
-            "prefix": "146.70.116.0/24"
+            "prefix": "146.70.116.0/24",
+            "country": "RO",
+            "rpki_status": "not_found"
           },
           "company": {
             "name": "M247 LTD Vienna Infrastructure",

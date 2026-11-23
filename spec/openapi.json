@@ -9,7 +9,7 @@
       "url": "https://internetdata.io"
     },
     "termsOfService": "https://internetdata.io/terms",
-    "version": "2026.11.20"
+    "version": "2026.11.22"
   },
   "servers": [
     {
@@ -538,12 +538,10 @@
           "Account"
         ],
         "summary": "Identity",
-        "description": "The identity behind this credential: what it is, the organization it is\nscoped to, and the scopes it currently holds.\n\n`user` is present for an OAuth token and absent for an API key, which\nhas an organization but no person behind it. `credential.kind` says\nwhich you are holding, so a client can branch without guessing from a\nmissing field.\n\nNarrower than what the console shows its own user on purpose: an\nintegration needs a name to display and an organization to address, not\na profile. The `scopes` array is what the credential may do right now,\nso a client can render its own capabilities rather than discovering\nthem from a 403.\n",
+        "description": "The identity behind this credential: what it is, the organization it is\nscoped to, and the scopes it currently holds.\n\n`user` is present for an OAuth token and absent for an API key, which\nhas an organization but no person behind it. `credential.kind` says\nwhich you are holding, so a client can branch without guessing from a\nmissing field.\n\nNarrower than what the console shows its own user on purpose: an\nintegration needs a name to display and an organization to address, not\na profile. The `scopes` array is what the credential may do right now,\nso a client can render its own capabilities rather than discovering\nthem from a 403.\n\nNeeds the `account.read` scope.\n",
         "security": [
           {
-            "BearerAuth": [
-              "account.read"
-            ]
+            "BearerAuth": []
           }
         ],
         "responses": {
@@ -593,12 +591,10 @@
           "Organization"
         ],
         "summary": "Organization",
-        "description": "Returns the organization the presented credential is scoped to. A\ncredential belongs to exactly one, so there is no ID to pass.\n\nAn identifier in the path could only ever be your own or a refusal.\n",
+        "description": "Returns the organization the presented credential is scoped to. A\ncredential belongs to exactly one, so there is no ID to pass.\n\nAn identifier in the path could only ever be your own or a refusal.\n\nNeeds the `org.read` scope.\n",
         "security": [
           {
-            "BearerAuth": [
-              "org.read"
-            ]
+            "BearerAuth": []
           }
         ],
         "responses": {
@@ -628,12 +624,10 @@
           "Organization"
         ],
         "summary": "Members",
-        "description": "Lists the members of your organization. Adding or removing one is an\nemailed invitation in the console, not an API call.\n\nModeling it as one here would promise something this API does not do.\n",
+        "description": "Lists the members of your organization. Adding or removing one is an\nemailed invitation in the console, not an API call.\n\nModeling it as one here would promise something this API does not do.\n\nNeeds the `org.read` scope.\n",
         "security": [
           {
-            "BearerAuth": [
-              "org.read"
-            ]
+            "BearerAuth": []
           }
         ],
         "responses": {
@@ -663,12 +657,10 @@
           "API keys"
         ],
         "summary": "List",
-        "description": "Lists your organization's API keys with their metadata, never a secret:\nonly Create, Rotate and Reveal return one.\n\nA secret is never in a list, here or in the console, because a list is\nthe response that ends up in logs, caches and support tickets.\n\n`retrievable` says whether the secret could still be read back at all.\nA key issued before this product stored secrets recoverably was never\nkept, so `reveal` will refuse it permanently; rotating produces one\nthat can be read.\n",
+        "description": "Lists your organization's API keys with their metadata, never a secret:\nonly Create, Rotate and Reveal return one.\n\nA secret is never in a list, here or in the console, because a list is\nthe response that ends up in logs, caches and support tickets.\n\n`retrievable` says whether the secret could still be read back at all.\nA key issued before this product stored secrets recoverably was never\nkept, so `reveal` will refuse it permanently; rotating produces one\nthat can be read.\n\nNeeds the `apikeys.read` scope.\n",
         "security": [
           {
-            "BearerAuth": [
-              "apikeys.read"
-            ]
+            "BearerAuth": []
           }
         ],
         "responses": {
@@ -696,12 +688,10 @@
           "API keys"
         ],
         "summary": "Create",
-        "description": "Creates an API key and returns its secret, which no list ever shows:\nkeep it, or reveal it again later.\n",
+        "description": "Creates an API key and returns its secret, which no list ever shows:\nkeep it, or reveal it again later.\n\nNeeds the `apikeys.manage` scope.\n",
         "security": [
           {
-            "BearerAuth": [
-              "apikeys.manage"
-            ]
+            "BearerAuth": []
           }
         ],
         "requestBody": {
@@ -747,10 +737,7 @@
         "description": "Replaces the secret behind a key, keeping its ID, name and settings.\nThe previous secret stops working immediately. The new secret comes\nback in the answer, so this needs `apikeys.reveal` as well as\n`apikeys.manage`.\n",
         "security": [
           {
-            "BearerAuth": [
-              "apikeys.manage",
-              "apikeys.reveal"
-            ]
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -788,12 +775,10 @@
           "API keys"
         ],
         "summary": "Revoke",
-        "description": "Stops the key working. Revocation is soft: the key stays listed with a\n`revoked_at`, because the organization still owns whatever it did while\nit was alive.\n",
+        "description": "Stops the key working. Revocation is soft: the key stays listed with a\n`revoked_at`, because the organization still owns whatever it did while\nit was alive.\n\nNeeds the `apikeys.manage` scope.\n",
         "security": [
           {
-            "BearerAuth": [
-              "apikeys.manage"
-            ]
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -831,12 +816,10 @@
           "API keys"
         ],
         "summary": "Reveal",
-        "description": "Returns an existing key's secret.\n\nIts own scope rather than part of `apikeys.manage`, because the two are\ndifferent acts: rotating replaces a secret you never see, while this\nhands one over.\n\nRefused with `NOT_RETRIEVABLE` for a key issued before this product\nstored secrets recoverably - that secret was never kept, so no retry\nwill ever produce it. Rotate the key instead.\n",
+        "description": "Returns an existing key's secret.\n\nIts own scope rather than part of `apikeys.manage`, because the two are\ndifferent acts: rotating replaces a secret you never see, while this\nhands one over.\n\nRefused with `NOT_RETRIEVABLE` for a key issued before this product\nstored secrets recoverably - that secret was never kept, so no retry\nwill ever produce it. Rotate the key instead.\n\nNeeds the `apikeys.reveal` scope.\n",
         "security": [
           {
-            "BearerAuth": [
-              "apikeys.reveal"
-            ]
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -1201,6 +1184,17 @@
                 "value": "2606:4700:4700::1111"
               }
             }
+          },
+          {
+            "in": "query",
+            "name": "user_agent",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 1024
+            },
+            "description": "The `User-Agent` header of the request you are deciding on. With every field, on a paid plan or the trial, the answer then carries `user_agent`, the agent it names and whether this address bears that out. Never kept, and nothing sent with a lookup feeds our data.",
+            "example": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
           }
         ],
         "responses": {
@@ -1219,6 +1213,7 @@
                       "is_bogon": false,
                       "is_tor": false,
                       "is_relay": false,
+                      "is_bot": false,
                       "is_anycast": false,
                       "is_carrier": false,
                       "is_satellite": false,
@@ -1274,6 +1269,7 @@
                       "is_pubproxy": false,
                       "is_hosting": true,
                       "is_cdn": false,
+                      "is_bot": false,
                       "is_anycast": false,
                       "is_carrier": false,
                       "is_satellite": false,
@@ -1323,6 +1319,7 @@
                         "last_seen": "2026-11-13"
                       },
                       "cdn": {},
+                      "bot": {},
                       "carrier": {},
                       "satellite": {},
                       "ssh": {},
@@ -1389,6 +1386,7 @@
                       "is_bogon": false,
                       "is_tor": false,
                       "is_relay": false,
+                      "is_bot": false,
                       "is_anycast": false,
                       "is_carrier": false,
                       "is_satellite": false,
@@ -1445,6 +1443,7 @@
                       "is_pubproxy": false,
                       "is_hosting": true,
                       "is_cdn": false,
+                      "is_bot": false,
                       "is_anycast": false,
                       "is_carrier": false,
                       "is_satellite": false,
@@ -1494,6 +1493,7 @@
                         "last_seen": "2026-11-13"
                       },
                       "cdn": {},
+                      "bot": {},
                       "carrier": {},
                       "satellite": {},
                       "ssh": {},
@@ -1567,6 +1567,7 @@
                       "is_pubproxy": false,
                       "is_hosting": true,
                       "is_cdn": true,
+                      "is_bot": false,
                       "is_anycast": true,
                       "is_carrier": false,
                       "is_satellite": false,
@@ -1616,6 +1617,7 @@
                         "confidence": "high",
                         "last_seen": "2026-11-13"
                       },
+                      "bot": {},
                       "carrier": {},
                       "satellite": {},
                       "ssh": {},
@@ -1721,6 +1723,144 @@
                       "cap_reached": false
                     }
                   },
+                  "paidBot": {
+                    "summary": "A paid key, looking up a verified crawler's address (Googlebot)",
+                    "value": {
+                      "ip": "66.249.66.1",
+                      "is_bogon": false,
+                      "is_vpn": false,
+                      "is_tor": false,
+                      "is_relay": false,
+                      "is_resproxy": false,
+                      "is_dcproxy": false,
+                      "is_mobproxy": false,
+                      "is_pubproxy": false,
+                      "is_hosting": true,
+                      "is_cdn": false,
+                      "is_bot": true,
+                      "is_anycast": false,
+                      "is_carrier": false,
+                      "is_satellite": false,
+                      "is_ssh": false,
+                      "is_smtp": false,
+                      "is_web": false,
+                      "is_dns_resolver": false,
+                      "is_bittorrent": false,
+                      "location": {
+                        "continent": "NA",
+                        "continent_name": "North America",
+                        "country": "US",
+                        "country_name": "United States",
+                        "timezone": "America/Los_Angeles",
+                        "currency_code": "USD",
+                        "currency_name": "Dollar",
+                        "currency_symbol": "$",
+                        "flag_emoji": "🇺🇸",
+                        "flag_unicode": "U+1F1FA U+1F1F8",
+                        "region": "California",
+                        "region_code": "US-CA",
+                        "city": "Mountain View",
+                        "postal_code": "94040",
+                        "latitude": 37.38605,
+                        "longitude": -122.08385,
+                        "accuracy_radius": 2000,
+                        "geoname_id": "5375480",
+                        "dma_code": "807",
+                        "last_changed": "2026-10-02"
+                      },
+                      "vpn": {},
+                      "tor": {},
+                      "relay": {},
+                      "resproxy": {},
+                      "dcproxy": {},
+                      "mobproxy": {},
+                      "pubproxy": {},
+                      "hosting": {
+                        "provider": "google",
+                        "provider_name": "Google",
+                        "confidence": "high",
+                        "last_seen": "2026-11-20"
+                      },
+                      "cdn": {},
+                      "bot": {
+                        "provider": "google",
+                        "provider_name": "Google",
+                        "agents": [
+                          "Google-CloudVertexBot",
+                          "GoogleOther",
+                          "Googlebot"
+                        ],
+                        "categories": [
+                          "ai_search",
+                          "other",
+                          "search_engine"
+                        ],
+                        "verified": true,
+                        "identity": "verified",
+                        "verified_by": "list",
+                        "confidence": "high",
+                        "first_seen": "2026-11-21",
+                        "last_seen": "2026-11-21"
+                      },
+                      "carrier": {},
+                      "satellite": {},
+                      "ssh": {},
+                      "smtp": {},
+                      "web": [],
+                      "dns_resolver": {},
+                      "bittorrent": {},
+                      "asn": {
+                        "asn": 15169,
+                        "name": "Google LLC",
+                        "domain": "google.com",
+                        "type": "hosting",
+                        "prefix": "66.249.64.0/20",
+                        "country": "US",
+                        "rpki_status": "valid"
+                      },
+                      "company": {
+                        "name": "Google LLC",
+                        "domain": "google.com",
+                        "type": "hosting",
+                        "country": "US"
+                      },
+                      "hostname": "crawl-66-249-66-1.googlebot.com",
+                      "abuse": {
+                        "email": "network-abuse@google.com",
+                        "name": "Abuse",
+                        "phone": "+1-650-253-0000",
+                        "address": "1600 Amphitheatre Parkway, Mountain View, CA, 94043",
+                        "country": "US",
+                        "network": "66.249.64.0-66.249.95.255",
+                        "validated": true,
+                        "unvalidated_since": ""
+                      },
+                      "whois": {
+                        "id": "GOOGLE",
+                        "name": "Google LLC",
+                        "org": "GOGL",
+                        "country": "",
+                        "status": "allocation",
+                        "source": "arin",
+                        "domain": "google.com",
+                        "abuse_email": "network-abuse@google.com",
+                        "asn": 15169
+                      },
+                      "rwhois": {
+                        "id": "",
+                        "name": "",
+                        "country": "",
+                        "source": "",
+                        "domain": "",
+                        "abuse_email": ""
+                      },
+                      "hosted_domains": {
+                        "total": 0,
+                        "domains": []
+                      },
+                      "cap_reached": false
+                    }
+                  },
                   "capReached": {
                     "summary": "A key on a paid plan past its organization's overage cap, with Unlimited's fields",
                     "value": {
@@ -1728,6 +1868,7 @@
                       "is_bogon": false,
                       "is_tor": false,
                       "is_relay": false,
+                      "is_bot": false,
                       "is_anycast": false,
                       "is_carrier": false,
                       "is_satellite": false,
@@ -1784,6 +1925,7 @@
                       "is_pubproxy": false,
                       "is_hosting": false,
                       "is_cdn": false,
+                      "is_bot": false,
                       "is_anycast": false,
                       "is_carrier": false,
                       "is_satellite": false,
@@ -1823,6 +1965,7 @@
                       "pubproxy": {},
                       "hosting": {},
                       "cdn": {},
+                      "bot": {},
                       "carrier": {},
                       "satellite": {},
                       "ssh": {},
@@ -1965,7 +2108,7 @@
             }
           },
           "429": {
-            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or a burst of Unlimited\nlookups. A paid plan's overage cap is never a `429`: it answers `200` with Unlimited's\nfields and `cap_reached` `true`.\n",
+            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or a burst of Unlimited\nlookups. A paid plan's overage cap is never a `429` by itself: it answers `200` with\nUnlimited's fields and `cap_reached` `true`, and a burst past it pays Unlimited's rate limit.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -1982,6 +2125,12 @@
                     "summary": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
                     "value": {
                       "error": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
+                    }
+                  },
+                  "e3": {
+                    "summary": "rate limit for lookups past your overage cap exceeded; retry shortly, or raise the cap in Billing",
+                    "value": {
+                      "error": "rate limit for lookups past your overage cap exceeded; retry shortly, or raise the cap in Billing"
                     }
                   }
                 }
@@ -2043,6 +2192,19 @@
         ],
         "summary": "My IP",
         "description": "The address you are calling from, answered as `GET /{ip}` would answer it, and charged as\nthat lookup is.\n",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "user_agent",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 1024
+            },
+            "description": "The `User-Agent` header of the request you are deciding on. With every field, on a paid plan or the trial, the answer then carries `user_agent`, the agent it names and whether this address bears that out. Never kept, and nothing sent with a lookup feeds our data.",
+            "example": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+          }
+        ],
         "responses": {
           "200": {
             "description": "The lookup of your own address.",
@@ -2059,6 +2221,7 @@
                       "is_bogon": false,
                       "is_tor": false,
                       "is_relay": false,
+                      "is_bot": false,
                       "is_anycast": false,
                       "is_carrier": false,
                       "is_satellite": false,
@@ -2165,7 +2328,7 @@
             }
           },
           "429": {
-            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or a burst of Unlimited\nlookups. A paid plan's overage cap is never a `429`: it answers `200` with Unlimited's\nfields and `cap_reached` `true`.\n",
+            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or a burst of Unlimited\nlookups. A paid plan's overage cap is never a `429` by itself: it answers `200` with\nUnlimited's fields and `cap_reached` `true`, and a burst past it pays Unlimited's rate limit.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -2182,6 +2345,12 @@
                     "summary": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
                     "value": {
                       "error": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
+                    }
+                  },
+                  "e3": {
+                    "summary": "rate limit for lookups past your overage cap exceeded; retry shortly, or raise the cap in Billing",
+                    "value": {
+                      "error": "rate limit for lookups past your overage cap exceeded; retry shortly, or raise the cap in Billing"
                     }
                   }
                 }
@@ -2481,7 +2650,7 @@
             }
           },
           "429": {
-            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or a burst of Unlimited\nlookups. A paid plan's overage cap is never a `429`: it answers `200` with Unlimited's\nfields and `cap_reached` `true`.\n",
+            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or a burst of Unlimited\nlookups. A paid plan's overage cap is never a `429` by itself: it answers `200` with\nUnlimited's fields and `cap_reached` `true`, and a burst past it pays Unlimited's rate limit.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -2498,6 +2667,12 @@
                     "summary": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
                     "value": {
                       "error": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
+                    }
+                  },
+                  "e3": {
+                    "summary": "rate limit for lookups past your overage cap exceeded; retry shortly, or raise the cap in Billing",
+                    "value": {
+                      "error": "rate limit for lookups past your overage cap exceeded; retry shortly, or raise the cap in Billing"
                     }
                   }
                 }
@@ -2558,7 +2733,7 @@
           "Lookup"
         ],
         "summary": "Domain lookup",
-        "description": "Answers what InternetData knows about one domain from its latest snapshots: on every plan\nwhether it is registered and which DNS record types it has; on a paid one the records themselves, up to\n100 a type, the organization's IP ranges and whether it is a disposable email domain. An internationalized\nname is answered under its punycode spelling.\n",
+        "description": "Answers what InternetData knows about one domain from its latest snapshots: on every plan\nwhether it is registered and which DNS record types it has; on a paid one the records themselves, up to\n100 a type, the network announcing each address, the other domains on its first IPv4 address, the\norganization's IP ranges, whether it is a disposable email domain, what its home page says of itself and\nlinks to, and the domains whose home page redirects or links to it. An internationalized name is answered\nunder its punycode spelling.\n",
         "parameters": [
           {
             "in": "path",
@@ -2639,6 +2814,41 @@
                         ],
                         "cname": []
                       },
+                      "hosting": [
+                        {
+                          "ip": "192.0.2.10",
+                          "asn": {
+                            "asn": 64496,
+                            "name": "EXAMPLE-AS",
+                            "domain": "example.net",
+                            "type": "hosting",
+                            "prefix": "192.0.2.0/24",
+                            "country": "US",
+                            "rpki_status": "valid"
+                          }
+                        },
+                        {
+                          "ip": "2001:db8::10",
+                          "asn": {
+                            "asn": 64496,
+                            "name": "EXAMPLE-AS",
+                            "domain": "example.net",
+                            "type": "hosting",
+                            "prefix": "2001:db8::/32",
+                            "country": "US",
+                            "rpki_status": "valid"
+                          }
+                        }
+                      ],
+                      "cohosted_domains": {
+                        "ip": "192.0.2.10",
+                        "total": 3,
+                        "domains": [
+                          "example.net",
+                          "example.org",
+                          "shop.example"
+                        ]
+                      },
                       "ip_ranges": {
                         "domain": "example.com",
                         "redirects_to": "",
@@ -2653,6 +2863,33 @@
                         ]
                       },
                       "disposable": {},
+                      "web": {
+                        "url": "https://example.com/",
+                        "title": "Example Domain",
+                        "description": "",
+                        "last_seen": "2026-11-18",
+                        "links": {
+                          "total": 1,
+                          "hosts": [
+                            "www.iana.org"
+                          ]
+                        }
+                      },
+                      "redirects": {
+                        "total": 2,
+                        "domains": [
+                          "example.net",
+                          "example.org"
+                        ]
+                      },
+                      "backlinks": {
+                        "total": 3,
+                        "domains": [
+                          "docs.example",
+                          "news.example",
+                          "wiki.example"
+                        ]
+                      },
                       "cap_reached": false
                     }
                   },
@@ -2752,7 +2989,7 @@
             }
           },
           "429": {
-            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or a burst of Unlimited\nlookups. A paid plan's overage cap is never a `429`: it answers `200` with Unlimited's\nfields and `cap_reached` `true`.\n",
+            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or a burst of Unlimited\nlookups. A paid plan's overage cap is never a `429` by itself: it answers `200` with\nUnlimited's fields and `cap_reached` `true`, and a burst past it pays Unlimited's rate limit.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -2769,6 +3006,12 @@
                     "summary": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
                     "value": {
                       "error": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
+                    }
+                  },
+                  "e3": {
+                    "summary": "rate limit for lookups past your overage cap exceeded; retry shortly, or raise the cap in Billing",
+                    "value": {
+                      "error": "rate limit for lookups past your overage cap exceeded; retry shortly, or raise the cap in Billing"
                     }
                   }
                 }
@@ -2877,6 +3120,7 @@
                           "is_pubproxy": false,
                           "is_hosting": true,
                           "is_cdn": false,
+                          "is_bot": false,
                           "is_anycast": false,
                           "is_carrier": false,
                           "is_satellite": false,
@@ -2926,6 +3170,7 @@
                             "last_seen": "2026-11-13"
                           },
                           "cdn": {},
+                          "bot": {},
                           "carrier": {},
                           "satellite": {},
                           "ssh": {},
@@ -3171,6 +3416,12 @@
                     "summary": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
                     "value": {
                       "error": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
+                    }
+                  },
+                  "e3": {
+                    "summary": "rate limit for lookups past your overage cap exceeded; retry shortly, or raise the cap in Billing",
+                    "value": {
+                      "error": "rate limit for lookups past your overage cap exceeded; retry shortly, or raise the cap in Billing"
                     }
                   }
                 }
@@ -4547,6 +4798,10 @@
             "type": "boolean",
             "description": "In CDN IP: a content delivery network. Paid plans and the trial."
           },
+          "is_bot": {
+            "type": "boolean",
+            "description": "In Bot IP: an automated client's address, such as a search engine's or an AI company's crawler, an uptime monitor, an internet scanner or a webhook sender. `bot` says whose, what it does and whether its operator vouches for the address."
+          },
           "is_anycast": {
             "type": "boolean",
             "description": "In Anycast IP: announced from many places at once."
@@ -4651,6 +4906,14 @@
             ],
             "description": "`{}` when `is_cdn` is false. Paid plans and the trial."
           },
+          "bot": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BotDetail"
+              }
+            ],
+            "description": "`{}` when `is_bot` is false. Paid plans and the trial."
+          },
           "carrier": {
             "allOf": [
               {
@@ -4731,6 +4994,14 @@
           "hosted_domains": {
             "$ref": "#/components/schemas/HostedDomains"
           },
+          "user_agent": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserAgentVerdict"
+              }
+            ],
+            "description": "When the request sent `user_agent`, with every field, the agent it names and whether this address bears it out. Absent otherwise."
+          },
           "trial_expired": {
             "type": "boolean",
             "description": "On every answer to a key on the free plan, and on no other: `false` while its organization's trial of every field lasts, `true` once the answer has Unlimited's fields."
@@ -4745,6 +5016,7 @@
           "is_bogon",
           "is_tor",
           "is_relay",
+          "is_bot",
           "is_anycast",
           "is_carrier",
           "is_satellite",
@@ -4903,11 +5175,91 @@
           },
           "asn": {
             "type": "integer",
+            "format": "int64",
             "description": "The AS the operator announces it from."
           },
           "confidence": {
             "type": "string",
             "description": "`high`, `medium` or `low`."
+          }
+        }
+      },
+      "UserAgentVerdict": {
+        "type": "object",
+        "properties": {
+          "agent": {
+            "type": "string",
+            "description": "The agent the user agent names, such as `Googlebot` or `Chrome`; `Unknown` where it names none."
+          },
+          "kind": {
+            "type": "string",
+            "description": "`browser`, `inapp`, `automation`, `bot`, `ai-bot`, `http-client` or `unknown`: what kind of client the user agent says it is."
+          },
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "verified",
+              "spoofed",
+              "unverifiable",
+              "not_bot"
+            ],
+            "description": "`verified`: the agent's operator vouches for this address as it. `spoofed`: the operator of a bot that publishes its addresses, or whose registered space it uses, does not vouch for this one, or this address posed as the bot before. `unverifiable`: a bot no published list or registered space can confirm. `not_bot`: a browser, an app or a script."
+          }
+        },
+        "required": [
+          "agent",
+          "kind",
+          "verdict"
+        ]
+      },
+      "BotDetail": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "description": "The bot operator's ID in Bot Provider; for an address that is not verified, the operator its claim named. Empty where no operator is known."
+          },
+          "provider_name": {
+            "type": "string",
+            "description": "The operator's name, the one its claim named for an address that is not verified; empty where no operator is known."
+          },
+          "agents": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The bots the address serves, as their user agents name them (`Googlebot`, `GPTBot`); for an address that is not verified, the bots it claimed to be. One address can serve several, and `[]` means none is named."
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "What those bots do: `search_engine`, `ai_training`, `ai_search`, `ai_assistant`, `ai_agent`, `seo`, `ads`, `preview`, `feed`, `monitoring`, `archiver`, `scanner`, `link_security`, `webhook` or `other`; `[]` where unknown."
+          },
+          "verified": {
+            "type": "boolean",
+            "description": "Whether the operator vouches for the address, so the bots in `agents` really are its."
+          },
+          "identity": {
+            "type": "string",
+            "description": "`verified` (the operator vouches for the address), `declared` (it names itself a bot that cannot be verified), `spoofed` (it claimed a bot whose operator vouches for other addresses) or `undeclared` (it hides as a browser and behaves as automation)."
+          },
+          "verified_by": {
+            "type": "string",
+            "description": "How a verified address verified: `list` (the operator publishes it), `rdns` (its reverse DNS name ends in a suffix the operator documents and resolves back) or `owner` (the operator's own space, seen claiming its bot); empty when not verified."
+          },
+          "confidence": {
+            "type": "string",
+            "description": "`high`, `medium` or `low`: how sure we are the address is what the row says."
+          },
+          "first_seen": {
+            "type": "string",
+            "description": "The first day the address was seen as such."
+          },
+          "last_seen": {
+            "type": "string",
+            "description": "The last day it was."
           }
         }
       },
@@ -5222,6 +5574,7 @@
         "properties": {
           "asn": {
             "type": "integer",
+            "format": "int64",
             "description": "The AS announcing the address, 0 where none does."
           },
           "name": {
@@ -5254,7 +5607,9 @@
           "name",
           "domain",
           "type",
-          "prefix"
+          "prefix",
+          "country",
+          "rpki_status"
         ],
         "description": "The network announcing the address, from IP ASN."
       },
@@ -5362,6 +5717,7 @@
           },
           "asn": {
             "type": "integer",
+            "format": "int64",
             "description": "The AS announcing the record's start address."
           }
         },
@@ -5461,6 +5817,7 @@
         "properties": {
           "asn": {
             "type": "integer",
+            "format": "int64",
             "description": "The AS number."
           },
           "name": {
@@ -5671,6 +6028,16 @@
           "dns": {
             "$ref": "#/components/schemas/DomainDns"
           },
+          "hosting": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DomainHost"
+            },
+            "description": "The network announcing each address in `dns.a` and then `dns.aaaa`, from IP ASN; `[]` where it resolves to none. Paid plans and the trial."
+          },
+          "cohosted_domains": {
+            "$ref": "#/components/schemas/CohostedDomains"
+          },
           "ip_ranges": {
             "$ref": "#/components/schemas/DomainIpRanges"
           },
@@ -5681,6 +6048,15 @@
               }
             ],
             "description": "`{}` when `is_disposable` is false. Paid plans and the trial."
+          },
+          "web": {
+            "$ref": "#/components/schemas/DomainWeb"
+          },
+          "redirects": {
+            "$ref": "#/components/schemas/DomainRedirects"
+          },
+          "backlinks": {
+            "$ref": "#/components/schemas/DomainBacklinks"
           },
           "trial_expired": {
             "type": "boolean",
@@ -5701,6 +6077,149 @@
           "has_cname"
         ],
         "description": "What every database says about one domain."
+      },
+      "DomainHost": {
+        "type": "object",
+        "properties": {
+          "ip": {
+            "type": "string",
+            "description": "One address the domain resolves to."
+          },
+          "asn": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Asn"
+              }
+            ],
+            "description": "The network announcing it, as an address lookup's `asn`; every member empty where IP ASN holds none."
+          }
+        },
+        "required": [
+          "ip",
+          "asn"
+        ],
+        "description": "An address the domain resolves to and the network announcing it."
+      },
+      "CohostedDomains": {
+        "type": "object",
+        "properties": {
+          "ip": {
+            "type": "string",
+            "description": "The domain's first IPv4 address, `''` where it has none."
+          },
+          "total": {
+            "type": "integer",
+            "description": "How many other registered domains resolve to it."
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Up to 10 of them, the most popular first, the domain itself left out; `[]` when none does."
+          }
+        },
+        "required": [
+          "ip",
+          "total",
+          "domains"
+        ],
+        "description": "From IP Hosted Domains: the other registered domains on the domain's first IPv4 address, how many and the 10 most popular. Paid plans and the trial."
+      },
+      "DomainWeb": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "The URL of the home page read."
+          },
+          "title": {
+            "type": "string",
+            "description": "An English page's title."
+          },
+          "description": {
+            "type": "string",
+            "description": "An English page's description."
+          },
+          "last_seen": {
+            "type": "string",
+            "description": "The day it was last read."
+          },
+          "links": {
+            "$ref": "#/components/schemas/DomainWebLinks"
+          }
+        },
+        "required": [
+          "url",
+          "title",
+          "description",
+          "last_seen",
+          "links"
+        ],
+        "description": "What our crawl last read of the domain's own home page, every member empty where it holds none. Paid plans and the trial."
+      },
+      "DomainWebLinks": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "How many external hosts the home page links to."
+          },
+          "hosts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Up to 10 of them; `[]` when it links to none."
+          }
+        },
+        "required": [
+          "total",
+          "hosts"
+        ],
+        "description": "The external hosts the home page links to."
+      },
+      "DomainRedirects": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "How many registered domains have a home page that redirects to this domain."
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Up to 10 of them, the most popular first; `[]` when none does."
+          }
+        },
+        "required": [
+          "total",
+          "domains"
+        ],
+        "description": "The registered domains whose home page redirects to this one, how many and the 10 most popular. Paid plans and the trial."
+      },
+      "DomainBacklinks": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "How many registered domains have a home page that links to this domain."
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Up to 10 of them, the most popular first; `[]` when none does."
+          }
+        },
+        "required": [
+          "total",
+          "domains"
+        ],
+        "description": "The registered domains whose home page links to this one, how many and the 10 most popular. Paid plans and the trial."
       },
       "DomainDns": {
         "type": "object",
@@ -5923,6 +6442,14 @@
               "type": "string"
             },
             "description": "Domains."
+          },
+          "user_agents": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "maxLength": 1024
+            },
+            "description": "Each address's `User-Agent`, keyed by the string it is sent as in `ips`. With every field, that address's answer then carries `user_agent`, as a single lookup's does. Never kept."
           }
         },
         "description": "Up to 1000 items across the three arrays, each optional."
