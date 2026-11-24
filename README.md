@@ -155,7 +155,7 @@ There are official InternetData client libraries available for many languages in
 
 Geolocation, anonymity, ownership, network, service and domain data for any IP address, AS or domain, by API or as databases you download.
 
-[<img src="https://s3.internetdata.io/internetdata-public/brand/mark.svg" alt="InternetData" height="64"/>](https://internetdata.io/)
+[<picture><source media="(prefers-color-scheme: dark)" srcset="https://s3.internetdata.io/internetdata-public/brand/logo-dark.svg"><img src="https://s3.internetdata.io/internetdata-public/brand/logo.svg" alt="InternetData" height="40"/></picture>](https://internetdata.io/)
 
 ## License
 
