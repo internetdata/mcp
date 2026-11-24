@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.7.1 - 2026-11-24
+
+### Fixes
+
+- Re-pin the spec to 2026.11.23: each first and last seen day is a date ([`2e2fd37`](https://github.com/internetdata/mcp/commit/2e2fd37e20b8fcb76cf3486bc8d3ee6650f12661))
+
 ## 3.7.0 - 2026-11-23
 
 ### Features
