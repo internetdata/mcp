@@ -9,7 +9,7 @@
       "url": "https://internetdata.io"
     },
     "termsOfService": "https://internetdata.io/terms",
-    "version": "2026.11.22"
+    "version": "2026.11.23"
   },
   "servers": [
     {
@@ -5052,6 +5052,7 @@
           },
           "last_seen": {
             "type": "string",
+            "format": "date",
             "description": "The last day the range was seen as such."
           }
         }
@@ -5069,10 +5070,12 @@
           },
           "first_seen": {
             "type": "string",
+            "format": "date",
             "description": "The first day of the window the address was seen as an exit."
           },
           "last_seen": {
             "type": "string",
+            "format": "date",
             "description": "The last day it was."
           },
           "hits": {
@@ -5117,6 +5120,7 @@
           },
           "last_seen": {
             "type": "string",
+            "format": "date",
             "description": "The last day one was seen."
           },
           "last_usable": {
@@ -5255,10 +5259,12 @@
           },
           "first_seen": {
             "type": "string",
+            "format": "date",
             "description": "The first day the address was seen as such."
           },
           "last_seen": {
             "type": "string",
+            "format": "date",
             "description": "The last day it was."
           }
         }
@@ -5284,10 +5290,12 @@
           },
           "first_seen": {
             "type": "string",
+            "format": "date",
             "description": "The first day it answered."
           },
           "last_seen": {
             "type": "string",
+            "format": "date",
             "description": "The last day it did."
           }
         }
@@ -5309,10 +5317,12 @@
           },
           "first_seen": {
             "type": "string",
+            "format": "date",
             "description": "The first day it answered."
           },
           "last_seen": {
             "type": "string",
+            "format": "date",
             "description": "The last day it did."
           }
         }
@@ -5370,10 +5380,12 @@
           },
           "first_seen": {
             "type": "string",
+            "format": "date",
             "description": "The first day the port was open."
           },
           "last_seen": {
             "type": "string",
+            "format": "date",
             "description": "The last day it was."
           }
         },
@@ -5415,10 +5427,12 @@
           },
           "first_seen": {
             "type": "string",
+            "format": "date",
             "description": "The first day it answered."
           },
           "last_seen": {
             "type": "string",
+            "format": "date",
             "description": "The last day it did."
           }
         }
@@ -5436,10 +5450,12 @@
           },
           "first_seen": {
             "type": "string",
+            "format": "date",
             "description": "The first day a client was seen here."
           },
           "last_seen": {
             "type": "string",
+            "format": "date",
             "description": "The last day."
           },
           "last_reachable": {
@@ -5962,6 +5978,7 @@
           },
           "first_seen": {
             "type": "string",
+            "format": "date",
             "description": "The first day BGP Route saw it."
           },
           "country": {
@@ -6143,7 +6160,7 @@
           },
           "last_seen": {
             "type": "string",
-            "description": "The day it was last read."
+            "description": "The day it was last read, empty when the crawl holds no page."
           },
           "links": {
             "$ref": "#/components/schemas/DomainWebLinks"
@@ -6273,6 +6290,7 @@
           },
           "last_seen": {
             "type": "string",
+            "format": "date",
             "description": "The last day the snapshot saw it."
           }
         },
@@ -6294,6 +6312,7 @@
           },
           "last_seen": {
             "type": "string",
+            "format": "date",
             "description": "The last day seen."
           }
         },
@@ -6312,6 +6331,7 @@
           },
           "last_seen": {
             "type": "string",
+            "format": "date",
             "description": "The last day seen."
           }
         },
@@ -6329,6 +6349,7 @@
           },
           "last_seen": {
             "type": "string",
+            "format": "date",
             "description": "The last day seen."
           }
         },
@@ -6411,10 +6432,12 @@
           },
           "first_seen": {
             "type": "string",
+            "format": "date",
             "description": "The first day seen in use."
           },
           "last_seen": {
             "type": "string",
+            "format": "date",
             "description": "The last day."
           }
         }
