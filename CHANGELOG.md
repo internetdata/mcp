@@ -2,6 +2,16 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.8.0 - 2026-11-25
+
+### Features
+
+- Take a visitor's User-Agent in lookup_ip and lookup_ips ([`ac78a06`](https://github.com/internetdata/mcp/commit/ac78a06c8cba6b46618993fdfbdccfd3874b6478))
+
+### Fixes
+
+- Re-pin the spec to 2026.11.25: a paid plan or the trial, in each field's words ([`ca64577`](https://github.com/internetdata/mcp/commit/ca645775b5161b058cb5319bcf0cba0d0bfad68e))
+
 ## 3.7.1 - 2026-11-24
 
 ### Fixes
