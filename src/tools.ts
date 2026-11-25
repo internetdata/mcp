@@ -50,16 +50,40 @@ const VERSIONED_ID = 'A VERSIONED database ID, from `versions[].id` in `list_dat
 // the call answered as if it had never been passed.
 const NO_INPUT = z.strictObject({});
 
+// An agent sent can still come back without a verdict, and a model must not read that
+// absence as one either way. No length cap: the API cuts a long agent rather than refusing it.
+const AGENT_VERDICT = 'The answer\'s `user_agent` then names the agent and says whether this '
+    + 'address bears it out, so a crawler forging its agent reads `spoofed`. An answer without '
+    + '`user_agent` did not check the agent, which is no verdict either way.';
+
 const LOOKUP_INPUT = z.strictObject({
     ip: z.string().describe('The IPv4 or IPv6 address to look up.'),
+    user_agent: z.string().optional().describe(
+        `The \`User-Agent\` a client at this address sent. ${AGENT_VERDICT}`),
 });
 
 // Uncapped: a caller passes every address it has. The SDK sends them to POST
 // /batch in chunks of that endpoint's 1000, so the spec's `maxItems: 1000` bounds
 // a REQUEST, not this tool - never derive a cap from it. One call is bounded by
 // its transport instead: the hosted server takes a request body of at most 1 MB.
+// An agent keyed by an address the list lacks would be dropped unremarked, as a
+// misspelled argument would, so it is refused by name instead.
 const LOOKUP_BATCH_INPUT = z.strictObject({
     ips: z.array(z.string()).min(1).describe('The IPv4 or IPv6 addresses to look up.'),
+    user_agents: z.record(z.string(), z.string()).optional().describe(
+        'Each address\'s `User-Agent`, keyed by the address as `ips` spells it. An address left '
+        + `out sends none. ${AGENT_VERDICT}`),
+}).superRefine(({ ips, user_agents }, ctx) => {
+    const listed = new Set(ips);
+    for (const addr of Object.keys(user_agents ?? {})) {
+        if (!listed.has(addr)) {
+            ctx.addIssue({
+                code: 'custom',
+                path: ['user_agents', addr],
+                message: `"${addr}" is not in ips, so its agent would not be sent`,
+            });
+        }
+    }
 });
 
 // An AS number is 32 bits (RFC 6793), which is what the API reads one as. The spec
@@ -181,6 +205,9 @@ function lookupTools(ctx: ToolContext): ToolDef[] {
                     + 'datacenter, mobile or public proxy, a hosting provider or a CDN; whether a crawler or '
                     + 'other bot uses it, and whose; and its Whois and RWHOIS records and how many domains it '
                     + 'hosts. '
+                    + 'Pass the `User-Agent` a client at this address sent as `user_agent` to learn '
+                    + 'whether the address bears it out, which tells a real crawler from one forging '
+                    + 'its agent. '
                     + 'Private and reserved addresses are answered locally, without calling the API. '
                     + 'Always read `coverage.note` before concluding anything from a field that is not in '
                     + 'the result.',
@@ -206,7 +233,9 @@ function lookupTools(ctx: ToolContext): ToolDef[] {
                     + 'duplicates collapse and the order you passed them stops mattering. Each answer is '
                     + 'what `lookup_ip` gives for that address. Pass the whole list rather than splitting it '
                     + 'yourself: a long one is batched for you. Prefer this over repeated `lookup_ip` calls '
-                    + 'when you already have the list, for example when triaging a log file. A batch needs '
+                    + 'when you already have the list, for example when triaging a log file. To check the '
+                    + 'agents such a log claims, pass `user_agents`, one `User-Agent` per address, and each '
+                    + 'answer says whether its address bears its agent out. A batch needs '
                     + 'a key on a paid plan: with a key on the free plan, a list of up to '
                     + `${TRIAL_SINGLE_LOOKUPS} addresses is looked up one address at a time instead, `
                     + 'and a longer one comes back refused. An address that fails carries its error in '
@@ -301,20 +330,21 @@ function lookupTools(ctx: ToolContext): ToolDef[] {
 }
 
 async function lookupIp(ctx: ToolContext, args: Record<string, unknown>): Promise<CallToolResult> {
-    const { ip } = LOOKUP_INPUT.parse(args);
-    const body = wireBody(await ctx.client.lookup(ip));
+    const { ip, user_agent } = LOOKUP_INPUT.parse(args);
+    const body = wireBody(await ctx.client.lookup(ip, { userAgent: user_agent }));
     return ok({ result: body, coverage: coverageOf(body) });
 }
 
 async function lookupIps(ctx: ToolContext, args: Record<string, unknown>): Promise<CallToolResult> {
-    const { ips } = LOOKUP_BATCH_INPUT.parse(args);
+    const { ips, user_agents } = LOOKUP_BATCH_INPUT.parse(args);
+    const agents = new Map(Object.entries(user_agents ?? {}));
 
-    const answers: Map<string, unknown> = await ctx.client.lookupBatch(ips);
+    const answers: Map<string, unknown> = await ctx.client.lookupBatch(ips, { userAgents: agents });
     const refused = [...answers.keys()].filter((addr) => asClientError(answers.get(addr))?.status === 402);
     const single = refused.length <= TRIAL_SINGLE_LOOKUPS;
     if (single) {
         for (const addr of refused) {
-            answers.set(addr, await lookupOne(ctx, addr));
+            answers.set(addr, await lookupOne(ctx, addr, agents.get(addr)));
         }
     }
     // Each address is the caller's own string, and assigning one to a plain object
@@ -341,9 +371,9 @@ async function lookupIps(ctx: ToolContext, args: Record<string, unknown>): Promi
 }
 
 /** One address looked up on its own, its failure kept as that address's answer. */
-async function lookupOne(ctx: ToolContext, addr: string): Promise<unknown> {
+async function lookupOne(ctx: ToolContext, addr: string, agent: string | undefined): Promise<unknown> {
     try {
-        return await ctx.client.lookup(addr);
+        return await ctx.client.lookup(addr, { userAgent: agent });
     } catch (err) {
         if (asClientError(err) === undefined) {
             throw err;

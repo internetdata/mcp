@@ -247,8 +247,8 @@ test('a bogon answer also validates, and declares every member it carries', asyn
 // and a single lookup answered.
 function trialServer(calls) {
     return async (input) => {
-        const path = new URL(input.url).pathname;
-        calls.push(`${input.method} ${path}`);
+        const { pathname: path, search } = new URL(input.url);
+        calls.push(`${input.method} ${path}${search}`);
         if (path === '/batch') {
             return new Response('{"error":"POST /batch needs a paid plan"}', {
                 status: 402, headers: { 'content-type': 'application/json' },
@@ -292,6 +292,86 @@ test("a free-plan key's long list keeps the refusal, and says what to pass inste
         assert.match(results[ip].error.message, /at most 10 addresses/, ip);
     }
     assert.deepEqual(calls, ['POST /batch'], 'no address is looked up on its own');
+});
+
+const GOOGLEBOT = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)';
+const VERIFIED = { agent: 'Googlebot', kind: 'bot', verdict: 'verified' };
+
+// A served answer that echoes the verdict when, and only when, the request sent an agent.
+function agentServer(sent) {
+    return async (input) => {
+        const url = new URL(input.url);
+        if (url.pathname === '/batch') {
+            const { ips, user_agents: agents } = JSON.parse(await input.text());
+            sent.push(agents);
+            const results = Object.fromEntries(ips.map((ip) => [
+                ip, answerFor(ip, agents?.[ip] === undefined ? {} : { user_agent: VERIFIED }),
+            ]));
+            return new Response(JSON.stringify({ results: results, errors: {} }), {
+                status: 200, headers: { 'content-type': 'application/json' },
+            });
+        }
+        const agent = url.searchParams.get('user_agent');
+        sent.push(agent);
+        const body = answerFor(url.pathname.slice(1), agent === null ? {} : { user_agent: VERIFIED });
+        return new Response(JSON.stringify(body), {
+            status: 200, headers: { 'content-type': 'application/json' },
+        });
+    };
+}
+
+test("lookup_ip sends a visitor's agent, and passes on the verdict it brings back", async () => {
+    const ajv = validator();
+    const sent = [];
+    const lookup = toolsFor(agentServer(sent)).find((d) => d.tool.name === 'lookup_ip');
+    const validate = ajv.compile(lookup.tool.outputSchema);
+
+    const out = await lookup.handler({ ip: '66.249.66.1', user_agent: GOOGLEBOT });
+    const plain = await lookup.handler({ ip: '66.249.66.2' });
+
+    assert.deepEqual(sent, [GOOGLEBOT, null], 'the agent is sent as given, and none without one');
+    assert.deepEqual(out.structuredContent.result.user_agent, VERIFIED);
+    assert.ok(validate(out.structuredContent), ajv.errorsText(validate.errors));
+    const { coverage } = out.structuredContent;
+    assert.ok(![...coverage.included, ...coverage.not_included].includes('user_agent'),
+        'the verdict answers the request, not the plan');
+    assert.equal('user_agent' in plain.structuredContent.result, false);
+});
+
+test("lookup_ips sends each address's agent with the batch", async () => {
+    const sent = [];
+    const batch = toolsFor(agentServer(sent)).find((d) => d.tool.name === 'lookup_ips');
+
+    const out = await batch.handler({
+        ips: ['66.249.66.1', '9.9.9.9'], user_agents: { '66.249.66.1': GOOGLEBOT },
+    });
+
+    assert.deepEqual(sent, [{ '66.249.66.1': GOOGLEBOT }]);
+    const { results } = out.structuredContent;
+    assert.deepEqual(results['66.249.66.1'].user_agent, VERIFIED);
+    assert.equal('user_agent' in results['9.9.9.9'], false);
+});
+
+test("a free-plan key's single lookups carry each address's agent", async () => {
+    const calls = [];
+    const batch = toolsFor(trialServer(calls)).find((d) => d.tool.name === 'lookup_ips');
+
+    await batch.handler({ ips: ['9.9.9.1', '9.9.9.2'], user_agents: { '9.9.9.1': 'curl/8.14.1' } });
+
+    assert.deepEqual(calls, ['POST /batch', 'GET /9.9.9.1?user_agent=curl%2F8.14.1', 'GET /9.9.9.2']);
+});
+
+test('an agent for an address not in ips is refused by name, before any request', async () => {
+    const calls = [];
+    const batch = toolsFor(trialServer(calls)).find((d) => d.tool.name === 'lookup_ips');
+
+    const out = await batch.handler({ ips: ['9.9.9.1'], user_agents: { '9.9.9.1 ': 'curl/8.14.1' } });
+
+    assert.equal(out.isError, true);
+    const error = JSON.parse(out.content[0].text).error;
+    assert.equal(error.kind, 'invalid_argument');
+    assert.match(error.message, /"9\.9\.9\.1 " is not in ips/);
+    assert.deepEqual(calls, []);
 });
 
 // A batch answer holds results AND the package's own entry errors side by side,
