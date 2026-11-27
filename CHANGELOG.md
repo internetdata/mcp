@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.8.1 - 2026-11-27
+
+### Fixes
+
+- Re-pin the spec to 2026.11.26: bot, carrier, satellite and service flags are a paid answer's ([`3e3b6f2`](https://github.com/internetdata/mcp/commit/3e3b6f2b1b0934a2d58ae46a91bc87d9d4ce0f36))
+
 ## 3.8.0 - 2026-11-25
 
 ### Features
