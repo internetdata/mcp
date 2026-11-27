@@ -1902,7 +1902,7 @@
   "lookup": [
     {
       "name": "unlimited-answer",
-      "why": "Unlimited, keyless or a key past its trial: the common set and InternetData's own flags. Every paid member is absent, which means not in this plan and must never read as false, and so is each paid member inside a shared object (location.city, company.type, abuse.phone).",
+      "why": "Unlimited, keyless or a key past its trial: the common set and InternetData's own points: anycast, the company, the abuse email and the hostname. Every paid member is absent, which means not in this plan and must never read as false, and so is each paid member inside a shared object (location.city, company.type, abuse.phone).",
       "call": "lookup",
       "target": "146.70.116.130",
       "status": 200,
@@ -1911,15 +1911,7 @@
         "is_bogon": false,
         "is_tor": false,
         "is_relay": false,
-        "is_bot": false,
         "is_anycast": false,
-        "is_carrier": false,
-        "is_satellite": false,
-        "is_ssh": false,
-        "is_smtp": false,
-        "is_web": false,
-        "is_dns_resolver": false,
-        "is_bittorrent": false,
         "location": {
           "continent": "EU",
           "continent_name": "Europe",
@@ -1938,7 +1930,6 @@
           "asn": 9009,
           "name": "M247 Europe SRL",
           "domain": "m247global.com",
-          "type": "hosting",
           "prefix": "146.70.116.0/24",
           "country": "RO",
           "rpki_status": "not_found"
@@ -1958,15 +1949,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
-          "is_bot": false,
           "is_anycast": false,
-          "is_carrier": false,
-          "is_satellite": false,
-          "is_ssh": false,
-          "is_smtp": false,
-          "is_web": false,
-          "is_dns_resolver": false,
-          "is_bittorrent": false,
           "hostname": ""
         },
         "objects": [
@@ -1989,6 +1972,14 @@
           "is_pubproxy",
           "is_hosting",
           "is_cdn",
+          "is_bot",
+          "is_carrier",
+          "is_satellite",
+          "is_ssh",
+          "is_smtp",
+          "is_web",
+          "is_dns_resolver",
+          "is_bittorrent",
           "vpn",
           "resproxy",
           "dcproxy",
@@ -2035,6 +2026,9 @@
             "network",
             "validated",
             "unvalidated_since"
+          ],
+          "asn": [
+            "type"
           ]
         }
       }
@@ -2251,15 +2245,7 @@
         "is_bogon": false,
         "is_tor": false,
         "is_relay": false,
-        "is_bot": false,
         "is_anycast": false,
-        "is_carrier": false,
-        "is_satellite": false,
-        "is_ssh": false,
-        "is_smtp": false,
-        "is_web": false,
-        "is_dns_resolver": false,
-        "is_bittorrent": false,
         "location": {
           "continent": "EU",
           "continent_name": "Europe",
@@ -2278,7 +2264,6 @@
           "asn": 9009,
           "name": "M247 Europe SRL",
           "domain": "m247global.com",
-          "type": "hosting",
           "prefix": "146.70.116.0/24",
           "country": "RO",
           "rpki_status": "not_found"
@@ -2299,15 +2284,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
-          "is_bot": false,
           "is_anycast": false,
-          "is_carrier": false,
-          "is_satellite": false,
-          "is_ssh": false,
-          "is_smtp": false,
-          "is_web": false,
-          "is_dns_resolver": false,
-          "is_bittorrent": false,
           "hostname": "",
           "trial_expired": true
         },
@@ -2331,6 +2308,14 @@
           "is_pubproxy",
           "is_hosting",
           "is_cdn",
+          "is_bot",
+          "is_carrier",
+          "is_satellite",
+          "is_ssh",
+          "is_smtp",
+          "is_web",
+          "is_dns_resolver",
+          "is_bittorrent",
           "vpn",
           "resproxy",
           "dcproxy",
@@ -2376,6 +2361,9 @@
             "network",
             "validated",
             "unvalidated_since"
+          ],
+          "asn": [
+            "type"
           ]
         }
       }
@@ -2391,15 +2379,7 @@
         "is_bogon": false,
         "is_tor": false,
         "is_relay": false,
-        "is_bot": false,
         "is_anycast": false,
-        "is_carrier": false,
-        "is_satellite": false,
-        "is_ssh": false,
-        "is_smtp": false,
-        "is_web": false,
-        "is_dns_resolver": false,
-        "is_bittorrent": false,
         "location": {
           "continent": "EU",
           "continent_name": "Europe",
@@ -2418,7 +2398,6 @@
           "asn": 9009,
           "name": "M247 Europe SRL",
           "domain": "m247global.com",
-          "type": "hosting",
           "prefix": "146.70.116.0/24",
           "country": "RO",
           "rpki_status": "not_found"
@@ -2439,15 +2418,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
-          "is_bot": false,
           "is_anycast": false,
-          "is_carrier": false,
-          "is_satellite": false,
-          "is_ssh": false,
-          "is_smtp": false,
-          "is_web": false,
-          "is_dns_resolver": false,
-          "is_bittorrent": false,
           "hostname": "",
           "cap_reached": true
         },
@@ -2471,6 +2442,14 @@
           "is_pubproxy",
           "is_hosting",
           "is_cdn",
+          "is_bot",
+          "is_carrier",
+          "is_satellite",
+          "is_ssh",
+          "is_smtp",
+          "is_web",
+          "is_dns_resolver",
+          "is_bittorrent",
           "vpn",
           "resproxy",
           "dcproxy",
@@ -2516,6 +2495,9 @@
             "network",
             "validated",
             "unvalidated_since"
+          ],
+          "asn": [
+            "type"
           ]
         }
       }
@@ -7625,15 +7607,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
-          "is_bot": false,
           "is_anycast": false,
-          "is_carrier": false,
-          "is_satellite": false,
-          "is_ssh": false,
-          "is_smtp": false,
-          "is_web": false,
-          "is_dns_resolver": false,
-          "is_bittorrent": false,
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -7652,7 +7626,6 @@
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
-            "type": "hosting",
             "prefix": "146.70.116.0/24",
             "country": "RO",
             "rpki_status": "not_found"
@@ -7677,22 +7650,14 @@
         }
       },
       {
-        "name": "flag-on-every-plan-is-not-a-gap",
-        "why": "Unlimited serves is_anycast, so a false one is a real answer and nothing is reported.",
+        "name": "bot-flag-is-a-paid-member",
+        "why": "Unlimited does not serve is_bot, so a term on it can never match and is reported: a bot is a paid answer's.",
         "body": {
           "ip": "146.70.116.130",
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
-          "is_bot": false,
           "is_anycast": false,
-          "is_carrier": false,
-          "is_satellite": false,
-          "is_ssh": false,
-          "is_smtp": false,
-          "is_web": false,
-          "is_dns_resolver": false,
-          "is_bittorrent": false,
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -7711,7 +7676,56 @@
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
-            "type": "hosting",
+            "prefix": "146.70.116.0/24",
+            "country": "RO",
+            "rpki_status": "not_found"
+          },
+          "company": {
+            "name": "M247 LTD Vienna Infrastructure",
+            "domain": "m247.ro"
+          },
+          "hostname": "",
+          "abuse": {
+            "email": "abuse@m247.ro"
+          }
+        },
+        "condition": {
+          "is_bot": true
+        },
+        "expect": {
+          "blocked": false,
+          "missing": [
+            "is_bot"
+          ]
+        }
+      },
+      {
+        "name": "flag-on-every-plan-is-not-a-gap",
+        "why": "Unlimited serves is_anycast, so a false one is a real answer and nothing is reported.",
+        "body": {
+          "ip": "146.70.116.130",
+          "is_bogon": false,
+          "is_tor": false,
+          "is_relay": false,
+          "is_anycast": false,
+          "location": {
+            "continent": "EU",
+            "continent_name": "Europe",
+            "country": "AT",
+            "country_name": "Austria",
+            "timezone": "Europe/Vienna",
+            "currency_code": "EUR",
+            "currency_name": "Euro",
+            "currency_symbol": "€",
+            "flag_emoji": "🇦🇹",
+            "flag_unicode": "U+1F1E6 U+1F1F9"
+          },
+          "tor": {},
+          "relay": {},
+          "asn": {
+            "asn": 9009,
+            "name": "M247 Europe SRL",
+            "domain": "m247global.com",
             "prefix": "146.70.116.0/24",
             "country": "RO",
             "rpki_status": "not_found"
@@ -10475,15 +10489,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
-          "is_bot": false,
           "is_anycast": false,
-          "is_carrier": false,
-          "is_satellite": false,
-          "is_ssh": false,
-          "is_smtp": false,
-          "is_web": false,
-          "is_dns_resolver": false,
-          "is_bittorrent": false,
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -10502,7 +10508,6 @@
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
-            "type": "hosting",
             "prefix": "146.70.116.0/24",
             "country": "RO",
             "rpki_status": "not_found"
@@ -10538,15 +10543,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
-          "is_bot": false,
           "is_anycast": false,
-          "is_carrier": false,
-          "is_satellite": false,
-          "is_ssh": false,
-          "is_smtp": false,
-          "is_web": false,
-          "is_dns_resolver": false,
-          "is_bittorrent": false,
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -10565,7 +10562,6 @@
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
-            "type": "hosting",
             "prefix": "146.70.116.0/24",
             "country": "RO",
             "rpki_status": "not_found"
@@ -10601,15 +10597,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
-          "is_bot": false,
           "is_anycast": false,
-          "is_carrier": false,
-          "is_satellite": false,
-          "is_ssh": false,
-          "is_smtp": false,
-          "is_web": false,
-          "is_dns_resolver": false,
-          "is_bittorrent": false,
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -10628,7 +10616,6 @@
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
-            "type": "hosting",
             "prefix": "146.70.116.0/24",
             "country": "RO",
             "rpki_status": "not_found"
@@ -12920,15 +12907,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
-          "is_bot": false,
           "is_anycast": false,
-          "is_carrier": false,
-          "is_satellite": false,
-          "is_ssh": false,
-          "is_smtp": false,
-          "is_web": false,
-          "is_dns_resolver": false,
-          "is_bittorrent": false,
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -12947,7 +12926,6 @@
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
-            "type": "hosting",
             "prefix": "146.70.116.0/24",
             "country": "RO",
             "rpki_status": "not_found"
@@ -12979,15 +12957,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
-          "is_bot": false,
           "is_anycast": false,
-          "is_carrier": false,
-          "is_satellite": false,
-          "is_ssh": false,
-          "is_smtp": false,
-          "is_web": false,
-          "is_dns_resolver": false,
-          "is_bittorrent": false,
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -13006,7 +12976,6 @@
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
-            "type": "hosting",
             "prefix": "146.70.116.0/24",
             "country": "RO",
             "rpki_status": "not_found"
@@ -13041,15 +13010,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
-          "is_bot": false,
           "is_anycast": false,
-          "is_carrier": false,
-          "is_satellite": false,
-          "is_ssh": false,
-          "is_smtp": false,
-          "is_web": false,
-          "is_dns_resolver": false,
-          "is_bittorrent": false,
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -13068,7 +13029,6 @@
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
-            "type": "hosting",
             "prefix": "146.70.116.0/24",
             "country": "RO",
             "rpki_status": "not_found"
@@ -13100,15 +13060,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
-          "is_bot": false,
           "is_anycast": false,
-          "is_carrier": false,
-          "is_satellite": false,
-          "is_ssh": false,
-          "is_smtp": false,
-          "is_web": false,
-          "is_dns_resolver": false,
-          "is_bittorrent": false,
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -13127,7 +13079,6 @@
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
-            "type": "hosting",
             "prefix": "146.70.116.0/24",
             "country": "RO",
             "rpki_status": "not_found"
@@ -13311,15 +13262,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
-          "is_bot": false,
           "is_anycast": false,
-          "is_carrier": false,
-          "is_satellite": false,
-          "is_ssh": false,
-          "is_smtp": false,
-          "is_web": false,
-          "is_dns_resolver": false,
-          "is_bittorrent": false,
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -13338,7 +13281,6 @@
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
-            "type": "hosting",
             "prefix": "146.70.116.0/24",
             "country": "RO",
             "rpki_status": "not_found"
@@ -13380,15 +13322,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
-          "is_bot": false,
           "is_anycast": false,
-          "is_carrier": false,
-          "is_satellite": false,
-          "is_ssh": false,
-          "is_smtp": false,
-          "is_web": false,
-          "is_dns_resolver": false,
-          "is_bittorrent": false,
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -13407,7 +13341,6 @@
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
-            "type": "hosting",
             "prefix": "146.70.116.0/24",
             "country": "RO",
             "rpki_status": "not_found"
@@ -13433,21 +13366,13 @@
       },
       {
         "name": "asn-type-matches",
-        "why": "The network's type, on every plan.",
+        "why": "The network's type is a paid plan's: Unlimited does not serve it, so the term can never match and is reported by its path.",
         "body": {
           "ip": "146.70.116.130",
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
-          "is_bot": false,
           "is_anycast": false,
-          "is_carrier": false,
-          "is_satellite": false,
-          "is_ssh": false,
-          "is_smtp": false,
-          "is_web": false,
-          "is_dns_resolver": false,
-          "is_bittorrent": false,
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -13466,7 +13391,6 @@
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
-            "type": "hosting",
             "prefix": "146.70.116.0/24",
             "country": "RO",
             "rpki_status": "not_found"
@@ -13486,8 +13410,10 @@
           }
         },
         "expect": {
-          "blocked": true,
-          "missing": []
+          "blocked": false,
+          "missing": [
+            "asn.type"
+          ]
         }
       },
       {
@@ -13498,15 +13424,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
-          "is_bot": false,
           "is_anycast": false,
-          "is_carrier": false,
-          "is_satellite": false,
-          "is_ssh": false,
-          "is_smtp": false,
-          "is_web": false,
-          "is_dns_resolver": false,
-          "is_bittorrent": false,
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -13525,7 +13443,6 @@
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
-            "type": "hosting",
             "prefix": "146.70.116.0/24",
             "country": "RO",
             "rpki_status": "not_found"
@@ -13707,15 +13624,7 @@
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
-          "is_bot": false,
           "is_anycast": false,
-          "is_carrier": false,
-          "is_satellite": false,
-          "is_ssh": false,
-          "is_smtp": false,
-          "is_web": false,
-          "is_dns_resolver": false,
-          "is_bittorrent": false,
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -13734,7 +13643,6 @@
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
-            "type": "hosting",
             "prefix": "146.70.116.0/24",
             "country": "RO",
             "rpki_status": "not_found"
@@ -14103,21 +14011,13 @@
       },
       {
         "name": "carrier-detail-is-a-paid-member",
-        "why": "Unlimited serves is_carrier but not the carrier behind it: the flag is a real false and the detail is reported.",
+        "why": "Unlimited serves neither is_carrier nor the carrier behind it, so each term can never match and both are reported.",
         "body": {
           "ip": "146.70.116.130",
           "is_bogon": false,
           "is_tor": false,
           "is_relay": false,
-          "is_bot": false,
           "is_anycast": false,
-          "is_carrier": false,
-          "is_satellite": false,
-          "is_ssh": false,
-          "is_smtp": false,
-          "is_web": false,
-          "is_dns_resolver": false,
-          "is_bittorrent": false,
           "location": {
             "continent": "EU",
             "continent_name": "Europe",
@@ -14136,7 +14036,6 @@
             "asn": 9009,
             "name": "M247 Europe SRL",
             "domain": "m247global.com",
-            "type": "hosting",
             "prefix": "146.70.116.0/24",
             "country": "RO",
             "rpki_status": "not_found"
@@ -14159,6 +14058,7 @@
         "expect": {
           "blocked": false,
           "missing": [
+            "is_carrier",
             "carrier"
           ]
         }

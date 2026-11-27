@@ -9,7 +9,7 @@
       "url": "https://internetdata.io"
     },
     "termsOfService": "https://internetdata.io/terms",
-    "version": "2026.11.25"
+    "version": "2026.11.26"
   },
   "servers": [
     {
@@ -1213,15 +1213,7 @@
                       "is_bogon": false,
                       "is_tor": false,
                       "is_relay": false,
-                      "is_bot": false,
                       "is_anycast": false,
-                      "is_carrier": false,
-                      "is_satellite": false,
-                      "is_ssh": false,
-                      "is_smtp": false,
-                      "is_web": false,
-                      "is_dns_resolver": false,
-                      "is_bittorrent": false,
                       "location": {
                         "continent": "EU",
                         "continent_name": "Europe",
@@ -1240,7 +1232,6 @@
                         "asn": 9009,
                         "name": "M247 Europe SRL",
                         "domain": "m247global.com",
-                        "type": "hosting",
                         "prefix": "146.70.116.0/24",
                         "country": "RO",
                         "rpki_status": "not_found"
@@ -1386,15 +1377,7 @@
                       "is_bogon": false,
                       "is_tor": false,
                       "is_relay": false,
-                      "is_bot": false,
                       "is_anycast": false,
-                      "is_carrier": false,
-                      "is_satellite": false,
-                      "is_ssh": false,
-                      "is_smtp": false,
-                      "is_web": false,
-                      "is_dns_resolver": false,
-                      "is_bittorrent": false,
                       "location": {
                         "continent": "EU",
                         "continent_name": "Europe",
@@ -1413,7 +1396,6 @@
                         "asn": 9009,
                         "name": "M247 Europe SRL",
                         "domain": "m247global.com",
-                        "type": "hosting",
                         "prefix": "146.70.116.0/24",
                         "country": "RO",
                         "rpki_status": "not_found"
@@ -1868,15 +1850,7 @@
                       "is_bogon": false,
                       "is_tor": false,
                       "is_relay": false,
-                      "is_bot": false,
                       "is_anycast": false,
-                      "is_carrier": false,
-                      "is_satellite": false,
-                      "is_ssh": false,
-                      "is_smtp": false,
-                      "is_web": false,
-                      "is_dns_resolver": false,
-                      "is_bittorrent": false,
                       "location": {
                         "continent": "EU",
                         "continent_name": "Europe",
@@ -1895,7 +1869,6 @@
                         "asn": 9009,
                         "name": "M247 Europe SRL",
                         "domain": "m247global.com",
-                        "type": "hosting",
                         "prefix": "146.70.116.0/24",
                         "country": "RO",
                         "rpki_status": "not_found"
@@ -2221,15 +2194,7 @@
                       "is_bogon": false,
                       "is_tor": false,
                       "is_relay": false,
-                      "is_bot": false,
                       "is_anycast": false,
-                      "is_carrier": false,
-                      "is_satellite": false,
-                      "is_ssh": false,
-                      "is_smtp": false,
-                      "is_web": false,
-                      "is_dns_resolver": false,
-                      "is_bittorrent": false,
                       "location": {
                         "continent": "EU",
                         "continent_name": "Europe",
@@ -2248,7 +2213,6 @@
                         "asn": 9009,
                         "name": "M247 Europe SRL",
                         "domain": "m247global.com",
-                        "type": "hosting",
                         "prefix": "146.70.116.0/24",
                         "country": "RO",
                         "rpki_status": "not_found"
@@ -4800,7 +4764,7 @@
           },
           "is_bot": {
             "type": "boolean",
-            "description": "In Bot IP: an automated client's address, such as a search engine's or an AI company's crawler, an uptime monitor, an internet scanner or a webhook sender. `bot` says whose, what it does and whether its operator vouches for the address."
+            "description": "In Bot IP: an automated client's address, such as a search engine's or an AI company's crawler, an uptime monitor, an internet scanner or a webhook sender. `bot` says whose, what it does and whether its operator vouches for the address. On a paid plan or the trial."
           },
           "is_anycast": {
             "type": "boolean",
@@ -4808,31 +4772,31 @@
           },
           "is_carrier": {
             "type": "boolean",
-            "description": "In Carrier IP: a mobile carrier's address space."
+            "description": "In Carrier IP: a mobile carrier's address space. On a paid plan or the trial."
           },
           "is_satellite": {
             "type": "boolean",
-            "description": "In Satellite IP: a satellite operator's address space."
+            "description": "In Satellite IP: a satellite operator's address space. On a paid plan or the trial."
           },
           "is_ssh": {
             "type": "boolean",
-            "description": "In SSH IP: an SSH server answered here."
+            "description": "In SSH IP: an SSH server answered here. On a paid plan or the trial."
           },
           "is_smtp": {
             "type": "boolean",
-            "description": "In SMTP IP: a mail server answered here."
+            "description": "In SMTP IP: a mail server answered here. On a paid plan or the trial."
           },
           "is_web": {
             "type": "boolean",
-            "description": "In Web IP: a web server answered here on port 80 or 443."
+            "description": "In Web IP: a web server answered here on port 80 or 443. On a paid plan or the trial."
           },
           "is_dns_resolver": {
             "type": "boolean",
-            "description": "In DNS Resolver IP: an open DNS resolver answered here."
+            "description": "In DNS Resolver IP: an open DNS resolver answered here. On a paid plan or the trial."
           },
           "is_bittorrent": {
             "type": "boolean",
-            "description": "In BitTorrent IP: a BitTorrent client was seen here in the last 90 days."
+            "description": "In BitTorrent IP: a BitTorrent client was seen here in the last 90 days. On a paid plan or the trial."
           },
           "vpn": {
             "allOf": [
@@ -5016,15 +4980,7 @@
           "is_bogon",
           "is_tor",
           "is_relay",
-          "is_bot",
           "is_anycast",
-          "is_carrier",
-          "is_satellite",
-          "is_ssh",
-          "is_smtp",
-          "is_web",
-          "is_dns_resolver",
-          "is_bittorrent",
           "tor",
           "relay",
           "location",
@@ -5603,7 +5559,7 @@
           },
           "type": {
             "type": "string",
-            "description": "The kind of network it runs."
+            "description": "The kind of network it runs. On a paid plan or the trial."
           },
           "prefix": {
             "type": "string",
@@ -5622,7 +5578,6 @@
           "asn",
           "name",
           "domain",
-          "type",
           "prefix",
           "country",
           "rpki_status"

@@ -167,8 +167,8 @@ importers:
   .:
     dependencies:
       '@internetdata/internetdata':
-        specifier: ^2.18.0
-        version: 2.18.0
+        specifier: ^2.19.0
+        version: 2.19.0
       '@modelcontextprotocol/server':
         specifier: ^2.2.0
         version: 2.4.0
@@ -256,8 +256,8 @@ packages:
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
 
-  '@internetdata/internetdata@2.18.0':
-    resolution: {integrity: sha512-QzLTMrb27OgTXrb6WVanE7NND3m0e650M39lUmaQp0U/Wq1cjj5AqVgOcObt+kf+muCfacIZm4EFIKbZ3/+IwA==}
+  '@internetdata/internetdata@2.19.0':
+    resolution: {integrity: sha512-9vc4IY4Zfczg7XPgkqMxcQvIURdJ3p5+kwZ679Ln3VzuIq1m6ISO7/KETwgveEXxflrxzZKbElaKURZUEV26FA==}
     engines: {node: '>=22'}
 
   '@keyv/bigmap@1.3.1':
@@ -751,7 +751,7 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@internetdata/internetdata@2.18.0':
+  '@internetdata/internetdata@2.19.0':
     dependencies:
       lru-cache: 11.5.3
       p-limit: 6.2.0
