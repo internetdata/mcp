@@ -133,14 +133,16 @@ test("a free-plan key's full answer reports full coverage and keeps trial_expire
     assert.match(coverage.note, /real negative result/);
 });
 
-test("a free-plan key's spent trial says so beside what was not covered", async () => {
+test("a free-plan key's spent full answers say so beside what was not covered", async () => {
     const { structuredContent: { result, coverage } } = await lookedUp(lookupCase('trial-expired-answer'));
 
     assert.equal(result.trial_expired, true);
     assert.ok(!coverage.included.includes('trial_expired'));
     assert.ok(!coverage.not_included.includes('trial_expired'));
     assert.ok(coverage.not_included.includes('is_hosting'));
-    assert.match(coverage.note, /trial/);
+    assert.match(coverage.note, /every field are spent for today/);
+    assert.match(coverage.note, /A new UTC day brings them back/);
+    assert.doesNotMatch(coverage.note, /Unlimited|trial/);
     assert.match(coverage.note, /not a negative result/);
 });
 

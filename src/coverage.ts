@@ -64,7 +64,7 @@ const NOTE_UNKNOWN = 'No served answer was available to derive coverage from, so
     + 'nothing about which datasets the plan covers.';
 
 const NOTE_MIXED = 'The answers in this batch do not all carry the same fields, and these lists are the '
-    + 'narrowest answer\'s: one marked `cap_reached: true` or `trial_expired: true` has only Unlimited\'s '
+    + 'narrowest answer\'s: one marked `cap_reached: true` or `trial_expired: true` has only the core '
     + 'fields, while the others have every field.';
 
 /**
@@ -85,12 +85,12 @@ export function coverageOf(body: Record<string, unknown>, kind: LookupKind = 'ip
         let lead = 'The fields in not_included were not returned, because this API key\'s plan does not '
             + 'include them.';
         if (body['trial_expired'] === true) {
-            lead = 'This key is on the free plan, and its organization\'s trial of every field is '
-                + 'spent, so this answer is Unlimited\'s and the fields in not_included were '
-                + 'not returned.';
+            lead = 'This key is on the free plan, and its organization\'s answers with every field are '
+                + 'spent for today, so this answer has the core fields and the fields in not_included '
+                + 'were not returned. A new UTC day brings them back.';
         } else if (body['cap_reached'] === true) {
             lead = 'This key\'s organization has reached the overage cap it set on its paid plan, so this '
-                + 'answer is Unlimited\'s, unbilled, and the fields in not_included were not returned. '
+                + 'answer has the core fields, unbilled, and the fields in not_included were not returned. '
                 + 'Raising or removing the cap in Billing brings them back.';
         }
         note = `${lead} Their absence is not a negative result: ${subject} was never checked against those `
@@ -110,8 +110,8 @@ export function coverageOf(body: Record<string, unknown>, kind: LookupKind = 'ip
  * would report every dataset as covered whatever the plan actually buys. Errors
  * carry no shape at all. With neither available there is nothing honest to say,
  * which is what `NOTE_UNKNOWN` says. Served answers can differ: an overage cap
- * reached part way through a batch answers the rest with Unlimited's fields, and
- * a free-plan key's trial can run out between its single lookups. Reading
+ * reached part way through a batch answers the rest with the core fields, and
+ * a free-plan key's full answers for the day can run out between its single lookups. Reading
  * the widest one would call every field checked, so the narrowest one speaks for
  * the batch and `NOTE_MIXED` says the answers differ.
  */

@@ -9,7 +9,7 @@
       "url": "https://internetdata.io"
     },
     "termsOfService": "https://internetdata.io/terms",
-    "version": "2026.11.27"
+    "version": "2026.11.28"
   },
   "servers": [
     {
@@ -1166,7 +1166,7 @@
           "Lookup"
         ],
         "summary": "IP lookup",
-        "description": "Answers what every database says about one IPv4 or IPv6 address. Which fields come back is\ndecided by the presented key; with no key, on Unlimited, the free plan, the answer carries the fields in\nthe address table's unlimited column. The path also takes `AS15169` or a domain, as internetdata.io's\npages do, and then answers as `GET /asn/{asn}` or `GET /domain/{domain}` would.\n",
+        "description": "Answers what every database says about one IPv4 or IPv6 address. Which fields come back is\ndecided by the presented key; with no key, on the free plan, the answer carries the fields in the\naddress table's free column. The path also takes `AS15169` or a domain, as internetdata.io's pages do,\nand then answers as `GET /asn/{asn}` or `GET /domain/{domain}` would.\n",
         "parameters": [
           {
             "in": "path",
@@ -1193,7 +1193,7 @@
               "type": "string",
               "maxLength": 1024
             },
-            "description": "The `User-Agent` header of the request you are deciding on. With every field, on a paid plan or the trial, the answer then carries `user_agent`, the agent it names and whether this address bears that out. Never kept, and nothing sent with a lookup feeds our data.",
+            "description": "The `User-Agent` header of the request you are deciding on. With every field, on a paid plan or a free key's full answers, the answer then carries `user_agent`, the agent it names and whether this address bears that out. Never kept, and nothing sent with a lookup feeds our data.",
             "example": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
           }
         ],
@@ -1206,8 +1206,8 @@
                   "$ref": "#/components/schemas/LookupResponse"
                 },
                 "examples": {
-                  "unlimited": {
-                    "summary": "Unlimited, with no API key",
+                  "free": {
+                    "summary": "The free plan, with no API key",
                     "value": {
                       "ip": "146.70.116.130",
                       "is_bogon": false,
@@ -1246,8 +1246,8 @@
                       }
                     }
                   },
-                  "trial": {
-                    "summary": "A free-plan key within its trial of every field",
+                  "freeKey": {
+                    "summary": "A free-plan key within its organization's full answers for the day",
                     "value": {
                       "ip": "146.70.116.130",
                       "is_bogon": false,
@@ -1370,8 +1370,8 @@
                       "trial_expired": false
                     }
                   },
-                  "trialExpired": {
-                    "summary": "A free-plan key past its trial, with Unlimited's fields",
+                  "freeKeyCore": {
+                    "summary": "A free-plan key past its organization's full answers for the day, with the core fields",
                     "value": {
                       "ip": "146.70.116.130",
                       "is_bogon": false,
@@ -1844,7 +1844,7 @@
                     }
                   },
                   "capReached": {
-                    "summary": "A key on a paid plan past its organization's overage cap, with Unlimited's fields",
+                    "summary": "A key on a paid plan past its organization's overage cap, with the core fields",
                     "value": {
                       "ip": "146.70.116.130",
                       "is_bogon": false,
@@ -2081,7 +2081,7 @@
             }
           },
           "429": {
-            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or a burst of Unlimited\nlookups. A paid plan's overage cap is never a `429` by itself: it answers `200` with\nUnlimited's fields and `cap_reached` `true`, and a burst past it pays Unlimited's rate limit.\n",
+            "description": "A rate limit with `Retry-After`: this API protecting itself, or a burst of free lookups. Without\nit, a lookup with no key past its address's daily allowance, which a free API key answers past.\nA paid plan's overage cap is never a `429` by itself: it answers `200` with the core fields and\n`cap_reached` `true`, and a burst past it pays the free plan's rate limit.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -2095,9 +2095,9 @@
                     }
                   },
                   "e2": {
-                    "summary": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
+                    "summary": "rate limit for free lookups exceeded; retry shortly, or use a paid plan",
                     "value": {
-                      "error": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
+                      "error": "rate limit for free lookups exceeded; retry shortly, or use a paid plan"
                     }
                   },
                   "e3": {
@@ -2105,13 +2105,20 @@
                     "value": {
                       "error": "rate limit for lookups past your overage cap exceeded; retry shortly, or raise the cap in Billing"
                     }
+                  },
+                  "e4": {
+                    "summary": "lookups without an API key are used up for today",
+                    "value": {
+                      "error": "lookups without an API key are used up for today; a free key answers on: https://app.internetdata.io/auth/signup"
+                    }
                   }
                 }
               }
             },
             "headers": {
               "Retry-After": {
-                "description": "Seconds until a rate limit lets the request through.",
+                "description": "Seconds until a rate limit lets the request through; absent on a spent allowance.",
+                "required": false,
                 "schema": {
                   "type": "integer"
                 }
@@ -2174,7 +2181,7 @@
               "type": "string",
               "maxLength": 1024
             },
-            "description": "The `User-Agent` header of the request you are deciding on. With every field, on a paid plan or the trial, the answer then carries `user_agent`, the agent it names and whether this address bears that out. Never kept, and nothing sent with a lookup feeds our data.",
+            "description": "The `User-Agent` header of the request you are deciding on. With every field, on a paid plan or a free key's full answers, the answer then carries `user_agent`, the agent it names and whether this address bears that out. Never kept, and nothing sent with a lookup feeds our data.",
             "example": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
           }
         ],
@@ -2187,8 +2194,8 @@
                   "$ref": "#/components/schemas/LookupResponse"
                 },
                 "examples": {
-                  "unlimited": {
-                    "summary": "Unlimited, with no API key",
+                  "free": {
+                    "summary": "The free plan, with no API key",
                     "value": {
                       "ip": "146.70.116.130",
                       "is_bogon": false,
@@ -2292,7 +2299,7 @@
             }
           },
           "429": {
-            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or a burst of Unlimited\nlookups. A paid plan's overage cap is never a `429` by itself: it answers `200` with\nUnlimited's fields and `cap_reached` `true`, and a burst past it pays Unlimited's rate limit.\n",
+            "description": "A rate limit with `Retry-After`: this API protecting itself, or a burst of free lookups. Without\nit, a lookup with no key past its address's daily allowance, which a free API key answers past.\nA paid plan's overage cap is never a `429` by itself: it answers `200` with the core fields and\n`cap_reached` `true`, and a burst past it pays the free plan's rate limit.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -2306,9 +2313,9 @@
                     }
                   },
                   "e2": {
-                    "summary": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
+                    "summary": "rate limit for free lookups exceeded; retry shortly, or use a paid plan",
                     "value": {
-                      "error": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
+                      "error": "rate limit for free lookups exceeded; retry shortly, or use a paid plan"
                     }
                   },
                   "e3": {
@@ -2316,13 +2323,20 @@
                     "value": {
                       "error": "rate limit for lookups past your overage cap exceeded; retry shortly, or raise the cap in Billing"
                     }
+                  },
+                  "e4": {
+                    "summary": "lookups without an API key are used up for today",
+                    "value": {
+                      "error": "lookups without an API key are used up for today; a free key answers on: https://app.internetdata.io/auth/signup"
+                    }
                   }
                 }
               }
             },
             "headers": {
               "Retry-After": {
-                "description": "Seconds until a rate limit lets the request through.",
+                "description": "Seconds until a rate limit lets the request through; absent on a spent allowance.",
+                "required": false,
                 "schema": {
                   "type": "integer"
                 }
@@ -2404,8 +2418,8 @@
                   "$ref": "#/components/schemas/AsnLookupResponse"
                 },
                 "examples": {
-                  "unlimited": {
-                    "summary": "Unlimited, with no API key",
+                  "free": {
+                    "summary": "The free plan, with no API key",
                     "value": {
                       "asn": 9009,
                       "name": "M247 Europe SRL",
@@ -2520,7 +2534,7 @@
                     }
                   },
                   "capReached": {
-                    "summary": "A key on a paid plan past its organization's overage cap, with Unlimited's fields",
+                    "summary": "A key on a paid plan past its organization's overage cap, with the core fields",
                     "value": {
                       "asn": 9009,
                       "name": "M247 Europe SRL",
@@ -2614,7 +2628,7 @@
             }
           },
           "429": {
-            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or a burst of Unlimited\nlookups. A paid plan's overage cap is never a `429` by itself: it answers `200` with\nUnlimited's fields and `cap_reached` `true`, and a burst past it pays Unlimited's rate limit.\n",
+            "description": "A rate limit with `Retry-After`: this API protecting itself, or a burst of free lookups. Without\nit, a lookup with no key past its address's daily allowance, which a free API key answers past.\nA paid plan's overage cap is never a `429` by itself: it answers `200` with the core fields and\n`cap_reached` `true`, and a burst past it pays the free plan's rate limit.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -2628,9 +2642,9 @@
                     }
                   },
                   "e2": {
-                    "summary": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
+                    "summary": "rate limit for free lookups exceeded; retry shortly, or use a paid plan",
                     "value": {
-                      "error": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
+                      "error": "rate limit for free lookups exceeded; retry shortly, or use a paid plan"
                     }
                   },
                   "e3": {
@@ -2638,13 +2652,20 @@
                     "value": {
                       "error": "rate limit for lookups past your overage cap exceeded; retry shortly, or raise the cap in Billing"
                     }
+                  },
+                  "e4": {
+                    "summary": "lookups without an API key are used up for today",
+                    "value": {
+                      "error": "lookups without an API key are used up for today; a free key answers on: https://app.internetdata.io/auth/signup"
+                    }
                   }
                 }
               }
             },
             "headers": {
               "Retry-After": {
-                "description": "Seconds until a rate limit lets the request through.",
+                "description": "Seconds until a rate limit lets the request through; absent on a spent allowance.",
+                "required": false,
                 "schema": {
                   "type": "integer"
                 }
@@ -2723,8 +2744,8 @@
                   "$ref": "#/components/schemas/DomainLookupResponse"
                 },
                 "examples": {
-                  "unlimited": {
-                    "summary": "Unlimited, with no API key",
+                  "free": {
+                    "summary": "The free plan, with no API key",
                     "value": {
                       "domain": "example.com",
                       "is_registered": true,
@@ -2858,7 +2879,7 @@
                     }
                   },
                   "capReached": {
-                    "summary": "A key on a paid plan past its organization's overage cap, with Unlimited's fields",
+                    "summary": "A key on a paid plan past its organization's overage cap, with the core fields",
                     "value": {
                       "domain": "example.com",
                       "is_registered": true,
@@ -2953,7 +2974,7 @@
             }
           },
           "429": {
-            "description": "A rate limit, always with `Retry-After`: this API protecting itself, or a burst of Unlimited\nlookups. A paid plan's overage cap is never a `429` by itself: it answers `200` with\nUnlimited's fields and `cap_reached` `true`, and a burst past it pays Unlimited's rate limit.\n",
+            "description": "A rate limit with `Retry-After`: this API protecting itself, or a burst of free lookups. Without\nit, a lookup with no key past its address's daily allowance, which a free API key answers past.\nA paid plan's overage cap is never a `429` by itself: it answers `200` with the core fields and\n`cap_reached` `true`, and a burst past it pays the free plan's rate limit.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -2967,9 +2988,9 @@
                     }
                   },
                   "e2": {
-                    "summary": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
+                    "summary": "rate limit for free lookups exceeded; retry shortly, or use a paid plan",
                     "value": {
-                      "error": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
+                      "error": "rate limit for free lookups exceeded; retry shortly, or use a paid plan"
                     }
                   },
                   "e3": {
@@ -2977,13 +2998,20 @@
                     "value": {
                       "error": "rate limit for lookups past your overage cap exceeded; retry shortly, or raise the cap in Billing"
                     }
+                  },
+                  "e4": {
+                    "summary": "lookups without an API key are used up for today",
+                    "value": {
+                      "error": "lookups without an API key are used up for today; a free key answers on: https://app.internetdata.io/auth/signup"
+                    }
                   }
                 }
               }
             },
             "headers": {
               "Retry-After": {
-                "description": "Seconds until a rate limit lets the request through.",
+                "description": "Seconds until a rate limit lets the request through; absent on a spent allowance.",
+                "required": false,
                 "schema": {
                   "type": "integer"
                 }
@@ -3036,7 +3064,7 @@
           "Lookup"
         ],
         "summary": "Batch",
-        "description": "Up to 1000 addresses, AS numbers and domains in one call, each answered exactly as its own\nlookup would be and each counted as one lookup. Answers and failures are keyed by the string you sent, in\nthe order you sent them; duplicates collapse. Needs a paid plan: a batch of one item is answered as the\nlookup it is on any plan. An overage cap reached part way through answers the remaining items with\nUnlimited's fields and `cap_reached` `true`, in `results`.\n",
+        "description": "Up to 1000 addresses, AS numbers and domains in one call, each answered exactly as its own\nlookup would be and each counted as one lookup. Answers and failures are keyed by the string you sent, in\nthe order you sent them; duplicates collapse. Needs a paid plan: a batch of one item is answered as the\nlookup it is on any plan, and charged as that lookup is. An overage cap reached part way through answers\nthe remaining items with the core fields and `cap_reached` `true`, in `results`.\n",
         "requestBody": {
           "required": true,
           "content": {
@@ -3203,7 +3231,7 @@
                     }
                   },
                   "failures": {
-                    "summary": "An AS answered past the overage cap with Unlimited's fields, and a domain our data could not answer",
+                    "summary": "An AS answered past the overage cap with the core fields, and a domain our data could not answer",
                     "value": {
                       "results": {
                         "AS9009": {
@@ -3355,10 +3383,11 @@
             }
           },
           "429": {
-            "description": "A rate limit; retry after `Retry-After`.",
+            "description": "A rate limit refused the whole call; retry after `Retry-After`. Without it, a batch of one item\nwith no key is past its address's daily allowance, which a free API key answers past.\n",
             "headers": {
               "Retry-After": {
-                "description": "Seconds until a rate limit lets the request through.",
+                "description": "Seconds until a rate limit lets the request through; absent on a spent allowance.",
+                "required": false,
                 "schema": {
                   "type": "integer"
                 }
@@ -3377,15 +3406,21 @@
                     }
                   },
                   "e2": {
-                    "summary": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan",
+                    "summary": "rate limit for free lookups exceeded; retry shortly, or use a paid plan",
                     "value": {
-                      "error": "rate limit for Unlimited lookups exceeded; retry shortly, or use a paid plan"
+                      "error": "rate limit for free lookups exceeded; retry shortly, or use a paid plan"
                     }
                   },
                   "e3": {
                     "summary": "rate limit for lookups past your overage cap exceeded; retry shortly, or raise the cap in Billing",
                     "value": {
                       "error": "rate limit for lookups past your overage cap exceeded; retry shortly, or raise the cap in Billing"
+                    }
+                  },
+                  "e4": {
+                    "summary": "lookups without an API key are used up for today",
+                    "value": {
+                      "error": "lookups without an API key are used up for today; a free key answers on: https://app.internetdata.io/auth/signup"
                     }
                   }
                 }
@@ -3423,7 +3458,7 @@
         "description": "Answers what the presented key is, what plan is behind it, and what has\nbeen spent against that plan's allowance in the current window.\n",
         "responses": {
           "200": {
-            "description": "The key's entitlements and consumption. On the free plan, Unlimited,\nusage is its trial: the lookups answered with every field while it\nlasts, against its limit, and no hard limit, since nothing stops a\nlookup past it. The trial's length and limit are on the pricing\npage, never fixed here.\n",
+            "description": "The key's entitlements and consumption. On the free plan, Free,\nusage is the UTC day's lookups answered with every field, against\nits daily limit, and no hard limit, since nothing stops a lookup past\nit: its core fields have no cap. The daily limit is on the pricing\npage, never fixed here.\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -4705,7 +4740,7 @@
           },
           "is_vpn": {
             "type": "boolean",
-            "description": "In VPN IP: a VPN service's server. On a paid plan or the trial."
+            "description": "In VPN IP: a VPN service's server. On a paid plan or a free key's full answers."
           },
           "is_tor": {
             "type": "boolean",
@@ -4717,31 +4752,31 @@
           },
           "is_resproxy": {
             "type": "boolean",
-            "description": "In Residential Proxy IP's 90-day window: a residential proxy exit. On a paid plan or the trial."
+            "description": "In Residential Proxy IP's 90-day window: a residential proxy exit. On a paid plan or a free key's full answers."
           },
           "is_dcproxy": {
             "type": "boolean",
-            "description": "In Datacenter Proxy IP's 90-day window. On a paid plan or the trial."
+            "description": "In Datacenter Proxy IP's 90-day window. On a paid plan or a free key's full answers."
           },
           "is_mobproxy": {
             "type": "boolean",
-            "description": "In Mobile Proxy IP's 90-day window. On a paid plan or the trial."
+            "description": "In Mobile Proxy IP's 90-day window. On a paid plan or a free key's full answers."
           },
           "is_pubproxy": {
             "type": "boolean",
-            "description": "In Public Proxy IP: a public proxy listens here, or its traffic left from here. On a paid plan or the trial."
+            "description": "In Public Proxy IP: a public proxy listens here, or its traffic left from here. On a paid plan or a free key's full answers."
           },
           "is_hosting": {
             "type": "boolean",
-            "description": "In Hosting IP: a hosting or cloud network. On a paid plan or the trial."
+            "description": "In Hosting IP: a hosting or cloud network. On a paid plan or a free key's full answers."
           },
           "is_cdn": {
             "type": "boolean",
-            "description": "In CDN IP: a content delivery network. On a paid plan or the trial."
+            "description": "In CDN IP: a content delivery network. On a paid plan or a free key's full answers."
           },
           "is_bot": {
             "type": "boolean",
-            "description": "In Bot IP: an automated client's address, such as a search engine's or an AI company's crawler, an uptime monitor, an internet scanner or a webhook sender. `bot` says whose, what it does and whether its operator vouches for the address. On a paid plan or the trial."
+            "description": "In Bot IP: an automated client's address, such as a search engine's or an AI company's crawler, an uptime monitor, an internet scanner or a webhook sender. `bot` says whose, what it does and whether its operator vouches for the address. On a paid plan or a free key's full answers."
           },
           "is_anycast": {
             "type": "boolean",
@@ -4749,31 +4784,31 @@
           },
           "is_carrier": {
             "type": "boolean",
-            "description": "In Carrier IP: a mobile carrier's address space. On a paid plan or the trial."
+            "description": "In Carrier IP: a mobile carrier's address space. On a paid plan or a free key's full answers."
           },
           "is_satellite": {
             "type": "boolean",
-            "description": "In Satellite IP: a satellite operator's address space. On a paid plan or the trial."
+            "description": "In Satellite IP: a satellite operator's address space. On a paid plan or a free key's full answers."
           },
           "is_ssh": {
             "type": "boolean",
-            "description": "In SSH IP: an SSH server answered here. On a paid plan or the trial."
+            "description": "In SSH IP: an SSH server answered here. On a paid plan or a free key's full answers."
           },
           "is_smtp": {
             "type": "boolean",
-            "description": "In SMTP IP: a mail server answered here. On a paid plan or the trial."
+            "description": "In SMTP IP: a mail server answered here. On a paid plan or a free key's full answers."
           },
           "is_web": {
             "type": "boolean",
-            "description": "In Web IP: a web server answered here on port 80 or 443. On a paid plan or the trial."
+            "description": "In Web IP: a web server answered here on port 80 or 443. On a paid plan or a free key's full answers."
           },
           "is_dns_resolver": {
             "type": "boolean",
-            "description": "In DNS Resolver IP: an open DNS resolver answered here. On a paid plan or the trial."
+            "description": "In DNS Resolver IP: an open DNS resolver answered here. On a paid plan or a free key's full answers."
           },
           "is_bittorrent": {
             "type": "boolean",
-            "description": "In BitTorrent IP: a BitTorrent client was seen here in the last 90 days. On a paid plan or the trial."
+            "description": "In BitTorrent IP: a BitTorrent client was seen here in the last 90 days. On a paid plan or a free key's full answers."
           },
           "vpn": {
             "allOf": [
@@ -4781,7 +4816,7 @@
                 "$ref": "#/components/schemas/ClassDetail"
               }
             ],
-            "description": "VPN IP's row, `{}` when `is_vpn` is false. On a paid plan or the trial."
+            "description": "VPN IP's row, `{}` when `is_vpn` is false. On a paid plan or a free key's full answers."
           },
           "tor": {
             "allOf": [
@@ -4805,7 +4840,7 @@
                 "$ref": "#/components/schemas/ProxyDetail"
               }
             ],
-            "description": "`{}` when `is_resproxy` is false. On a paid plan or the trial."
+            "description": "`{}` when `is_resproxy` is false. On a paid plan or a free key's full answers."
           },
           "dcproxy": {
             "allOf": [
@@ -4813,7 +4848,7 @@
                 "$ref": "#/components/schemas/ProxyDetail"
               }
             ],
-            "description": "`{}` when `is_dcproxy` is false. On a paid plan or the trial."
+            "description": "`{}` when `is_dcproxy` is false. On a paid plan or a free key's full answers."
           },
           "mobproxy": {
             "allOf": [
@@ -4821,7 +4856,7 @@
                 "$ref": "#/components/schemas/ProxyDetail"
               }
             ],
-            "description": "`{}` when `is_mobproxy` is false. On a paid plan or the trial."
+            "description": "`{}` when `is_mobproxy` is false. On a paid plan or a free key's full answers."
           },
           "pubproxy": {
             "allOf": [
@@ -4829,7 +4864,7 @@
                 "$ref": "#/components/schemas/PubproxyDetail"
               }
             ],
-            "description": "`{}` when `is_pubproxy` is false. On a paid plan or the trial."
+            "description": "`{}` when `is_pubproxy` is false. On a paid plan or a free key's full answers."
           },
           "hosting": {
             "allOf": [
@@ -4837,7 +4872,7 @@
                 "$ref": "#/components/schemas/ClassDetail"
               }
             ],
-            "description": "`{}` when `is_hosting` is false. On a paid plan or the trial."
+            "description": "`{}` when `is_hosting` is false. On a paid plan or a free key's full answers."
           },
           "cdn": {
             "allOf": [
@@ -4845,7 +4880,7 @@
                 "$ref": "#/components/schemas/ClassDetail"
               }
             ],
-            "description": "`{}` when `is_cdn` is false. On a paid plan or the trial."
+            "description": "`{}` when `is_cdn` is false. On a paid plan or a free key's full answers."
           },
           "bot": {
             "allOf": [
@@ -4853,7 +4888,7 @@
                 "$ref": "#/components/schemas/BotDetail"
               }
             ],
-            "description": "`{}` when `is_bot` is false. On a paid plan or the trial."
+            "description": "`{}` when `is_bot` is false. On a paid plan or a free key's full answers."
           },
           "carrier": {
             "allOf": [
@@ -4861,7 +4896,7 @@
                 "$ref": "#/components/schemas/CarrierDetail"
               }
             ],
-            "description": "`{}` when `is_carrier` is false. On a paid plan or the trial."
+            "description": "`{}` when `is_carrier` is false. On a paid plan or a free key's full answers."
           },
           "satellite": {
             "allOf": [
@@ -4869,7 +4904,7 @@
                 "$ref": "#/components/schemas/SatelliteDetail"
               }
             ],
-            "description": "`{}` when `is_satellite` is false. On a paid plan or the trial."
+            "description": "`{}` when `is_satellite` is false. On a paid plan or a free key's full answers."
           },
           "ssh": {
             "allOf": [
@@ -4877,7 +4912,7 @@
                 "$ref": "#/components/schemas/SshDetail"
               }
             ],
-            "description": "`{}` when `is_ssh` is false. On a paid plan or the trial."
+            "description": "`{}` when `is_ssh` is false. On a paid plan or a free key's full answers."
           },
           "smtp": {
             "allOf": [
@@ -4885,14 +4920,14 @@
                 "$ref": "#/components/schemas/SmtpDetail"
               }
             ],
-            "description": "`{}` when `is_smtp` is false. On a paid plan or the trial."
+            "description": "`{}` when `is_smtp` is false. On a paid plan or a free key's full answers."
           },
           "web": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/WebDetail"
             },
-            "description": "A row per port that answered, lowest first; `[]` when `is_web` is false. On a paid plan or the trial."
+            "description": "A row per port that answered, lowest first; `[]` when `is_web` is false. On a paid plan or a free key's full answers."
           },
           "dns_resolver": {
             "allOf": [
@@ -4900,7 +4935,7 @@
                 "$ref": "#/components/schemas/DnsResolverDetail"
               }
             ],
-            "description": "`{}` when `is_dns_resolver` is false. On a paid plan or the trial."
+            "description": "`{}` when `is_dns_resolver` is false. On a paid plan or a free key's full answers."
           },
           "bittorrent": {
             "allOf": [
@@ -4908,7 +4943,7 @@
                 "$ref": "#/components/schemas/BitTorrentDetail"
               }
             ],
-            "description": "`{}` when `is_bittorrent` is false. On a paid plan or the trial."
+            "description": "`{}` when `is_bittorrent` is false. On a paid plan or a free key's full answers."
           },
           "location": {
             "$ref": "#/components/schemas/Location"
@@ -4945,11 +4980,11 @@
           },
           "trial_expired": {
             "type": "boolean",
-            "description": "On every answer to a key on the free plan, and on no other: `false` while its organization's trial of every field lasts, `true` once the answer has Unlimited's fields."
+            "description": "On every answer to a key on the free plan, and on no other: `false` while its organization's lookups of the UTC day answer every field, `true` once those are used up and the answer has the core fields."
           },
           "cap_reached": {
             "type": "boolean",
-            "description": "On every answer to a key on a paid plan, and on no other: `false` while the answer has every field, `true` once its organization's overage cap is reached and the answer has Unlimited's. Lookups answered past the cap are not billed; raising or removing the cap in Billing turns it `false` again."
+            "description": "On every answer to a key on a paid plan, and on no other: `false` while the answer has every field, `true` once its organization's overage cap is reached and the answer has the core fields. Lookups answered past the cap are not billed; raising or removing the cap in Billing turns it `false` again."
           }
         },
         "required": [
@@ -5465,43 +5500,43 @@
           },
           "region": {
             "type": "string",
-            "description": "Region (state or province). On a paid plan or the trial."
+            "description": "Region (state or province). On a paid plan or a free key's full answers."
           },
           "region_code": {
             "type": "string",
-            "description": "ISO 3166-2 region code. On a paid plan or the trial."
+            "description": "ISO 3166-2 region code. On a paid plan or a free key's full answers."
           },
           "city": {
             "type": "string",
-            "description": "City. On a paid plan or the trial."
+            "description": "City. On a paid plan or a free key's full answers."
           },
           "postal_code": {
             "type": "string",
-            "description": "Postal code. On a paid plan or the trial."
+            "description": "Postal code. On a paid plan or a free key's full answers."
           },
           "latitude": {
             "type": "number",
-            "description": "Latitude of the city. On a paid plan or the trial."
+            "description": "Latitude of the city. On a paid plan or a free key's full answers."
           },
           "longitude": {
             "type": "number",
-            "description": "Longitude of the city. On a paid plan or the trial."
+            "description": "Longitude of the city. On a paid plan or a free key's full answers."
           },
           "accuracy_radius": {
             "type": "integer",
-            "description": "Radius in km holding the true location with 67% confidence. On a paid plan or the trial."
+            "description": "Radius in km holding the true location with 67% confidence. On a paid plan or a free key's full answers."
           },
           "geoname_id": {
             "type": "string",
-            "description": "GeoNames ID of the city. On a paid plan or the trial."
+            "description": "GeoNames ID of the city. On a paid plan or a free key's full answers."
           },
           "dma_code": {
             "type": "string",
-            "description": "US TV market (DMA) code. On a paid plan or the trial."
+            "description": "US TV market (DMA) code. On a paid plan or a free key's full answers."
           },
           "last_changed": {
             "type": "string",
-            "description": "The day the range's location last changed. On a paid plan or the trial."
+            "description": "The day the range's location last changed. On a paid plan or a free key's full answers."
           }
         },
         "required": [
@@ -5536,7 +5571,7 @@
           },
           "type": {
             "type": "string",
-            "description": "The kind of network it runs. On a paid plan or the trial."
+            "description": "The kind of network it runs. On a paid plan or a free key's full answers."
           },
           "prefix": {
             "type": "string",
@@ -5574,11 +5609,11 @@
           },
           "type": {
             "type": "string",
-            "description": "What kind of organization: hosting, isp, business, education, government. On a paid plan or the trial."
+            "description": "What kind of organization: hosting, isp, business, education, government. On a paid plan or a free key's full answers."
           },
           "country": {
             "type": "string",
-            "description": "ISO 3166 country code. On a paid plan or the trial."
+            "description": "ISO 3166 country code. On a paid plan or a free key's full answers."
           }
         },
         "required": [
@@ -5596,31 +5631,31 @@
           },
           "name": {
             "type": "string",
-            "description": "The contact. On a paid plan or the trial."
+            "description": "The contact. On a paid plan or a free key's full answers."
           },
           "phone": {
             "type": "string",
-            "description": "Its phone number. On a paid plan or the trial."
+            "description": "Its phone number. On a paid plan or a free key's full answers."
           },
           "address": {
             "type": "string",
-            "description": "Its postal address. On a paid plan or the trial."
+            "description": "Its postal address. On a paid plan or a free key's full answers."
           },
           "country": {
             "type": "string",
-            "description": "ISO 3166 country code. On a paid plan or the trial."
+            "description": "ISO 3166 country code. On a paid plan or a free key's full answers."
           },
           "network": {
             "type": "string",
-            "description": "The registry block it was derived from. On a paid plan or the trial."
+            "description": "The registry block it was derived from. On a paid plan or a free key's full answers."
           },
           "validated": {
             "type": "boolean",
-            "description": "ARIN reports the contact answered its yearly validation. On a paid plan or the trial."
+            "description": "ARIN reports the contact answered its yearly validation. On a paid plan or a free key's full answers."
           },
           "unvalidated_since": {
             "type": "string",
-            "description": "Since when it has not. On a paid plan or the trial."
+            "description": "Since when it has not. On a paid plan or a free key's full answers."
           }
         },
         "required": [
@@ -5680,7 +5715,7 @@
           "abuse_email",
           "asn"
         ],
-        "description": "IP Whois's most specific record covering the address. On a paid plan or the trial."
+        "description": "IP Whois's most specific record covering the address. On a paid plan or a free key's full answers."
       },
       "Rwhois": {
         "type": "object",
@@ -5718,7 +5753,7 @@
           "domain",
           "abuse_email"
         ],
-        "description": "IP RWHOIS's most specific network covering the address. On a paid plan or the trial."
+        "description": "IP RWHOIS's most specific network covering the address. On a paid plan or a free key's full answers."
       },
       "HostedDomains": {
         "type": "object",
@@ -5738,7 +5773,7 @@
         "required": [
           "total"
         ],
-        "description": "From IP Hosted Domains: how many registered domains resolve to the address, and the 10 most popular. Its database lists up to 1,000 an address. On a paid plan or the trial."
+        "description": "From IP Hosted Domains: how many registered domains resolve to the address, and the 10 most popular. Its database lists up to 1,000 an address. On a paid plan or a free key's full answers."
       },
       "AsnHostedDomains": {
         "type": "object",
@@ -5758,7 +5793,7 @@
         "required": [
           "total"
         ],
-        "description": "From ASN Hosted Domains: how many registered domains the AS hosts, and the 10 most popular. Its database lists up to 1,000 an AS. On a paid plan or the trial."
+        "description": "From ASN Hosted Domains: how many registered domains the AS hosts, and the 10 most popular. Its database lists up to 1,000 an AS. On a paid plan or a free key's full answers."
       },
       "AsnLookupResponse": {
         "type": "object",
@@ -5790,97 +5825,97 @@
           },
           "type": {
             "type": "string",
-            "description": "The kind of network it runs. On a paid plan or the trial."
+            "description": "The kind of network it runs. On a paid plan or a free key's full answers."
           },
           "num_ips": {
             "type": "integer",
-            "description": "IPv4 addresses it announces. On a paid plan or the trial."
+            "description": "IPv4 addresses it announces. On a paid plan or a free key's full answers."
           },
           "num_prefixes4": {
             "type": "integer",
-            "description": "IPv4 prefixes it announces. On a paid plan or the trial."
+            "description": "IPv4 prefixes it announces. On a paid plan or a free key's full answers."
           },
           "num_prefixes6": {
             "type": "integer",
-            "description": "IPv6 prefixes it announces. On a paid plan or the trial."
+            "description": "IPv6 prefixes it announces. On a paid plan or a free key's full answers."
           },
           "rpki_valid": {
             "type": "integer",
-            "description": "Its announcements RPKI calls valid. On a paid plan or the trial."
+            "description": "Its announcements RPKI calls valid. On a paid plan or a free key's full answers."
           },
           "rpki_invalid": {
             "type": "integer",
-            "description": "Invalid. On a paid plan or the trial."
+            "description": "Invalid. On a paid plan or a free key's full answers."
           },
           "rpki_not_found": {
             "type": "integer",
-            "description": "With no RPKI record. On a paid plan or the trial."
+            "description": "With no RPKI record. On a paid plan or a free key's full answers."
           },
           "whois": {
             "type": "object",
             "additionalProperties": {
               "type": "string"
             },
-            "description": "Its ASN Whois record, every column, empty where the registry states nothing. On a paid plan or the trial."
+            "description": "Its ASN Whois record, every column, empty where the registry states nothing. On a paid plan or a free key's full answers."
           },
           "prefixes": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/AsnPrefix"
             },
-            "description": "What it announces, IPv4 then IPv6, up to 20000 a family. On a paid plan or the trial."
+            "description": "What it announces, IPv4 then IPv6, up to 20000 a family. On a paid plan or a free key's full answers."
           },
           "rank": {
             "type": "integer",
-            "description": "Its rank in ASN Extended, by customer cone, 1 the largest; `0` for an AS seen in no AS path. On a paid plan or the trial."
+            "description": "Its rank in ASN Extended, by customer cone, 1 the largest; `0` for an AS seen in no AS path. On a paid plan or a free key's full answers."
           },
           "tier1": {
             "type": "boolean",
-            "description": "Whether it is one of the transit-free networks at the top of the hierarchy, which get transit from no one and peer with each other. On a paid plan or the trial."
+            "description": "Whether it is one of the transit-free networks at the top of the hierarchy, which get transit from no one and peer with each other. On a paid plan or a free key's full answers."
           },
           "num_upstreams": {
             "type": "integer",
-            "description": "How many AS numbers it gets transit from. On a paid plan or the trial."
+            "description": "How many AS numbers it gets transit from. On a paid plan or a free key's full answers."
           },
           "upstreams": {
             "type": "array",
             "items": {
               "type": "integer"
             },
-            "description": "Those AS numbers, ascending, up to 20000. On a paid plan or the trial."
+            "description": "Those AS numbers, ascending, up to 20000. On a paid plan or a free key's full answers."
           },
           "num_peers": {
             "type": "integer",
-            "description": "How many AS numbers it exchanges its own and its customers' routes with. On a paid plan or the trial."
+            "description": "How many AS numbers it exchanges its own and its customers' routes with. On a paid plan or a free key's full answers."
           },
           "peers": {
             "type": "array",
             "items": {
               "type": "integer"
             },
-            "description": "Those AS numbers, ascending, up to 20000. On a paid plan or the trial."
+            "description": "Those AS numbers, ascending, up to 20000. On a paid plan or a free key's full answers."
           },
           "num_downstreams": {
             "type": "integer",
-            "description": "How many AS numbers it provides transit to. On a paid plan or the trial."
+            "description": "How many AS numbers it provides transit to. On a paid plan or a free key's full answers."
           },
           "downstreams": {
             "type": "array",
             "items": {
               "type": "integer"
             },
-            "description": "Those AS numbers, ascending, up to 20000. On a paid plan or the trial."
+            "description": "Those AS numbers, ascending, up to 20000. On a paid plan or a free key's full answers."
           },
           "hosted_domains": {
             "$ref": "#/components/schemas/AsnHostedDomains"
           },
           "trial_expired": {
             "type": "boolean",
-            "description": "On every answer to a key on the free plan, and on no other: `false` while its organization's trial of every field lasts, `true` once the answer has Unlimited's fields."
+            "description": "On every answer to a key on the free plan, and on no other: `false` while its organization's lookups of the UTC day answer every field, `true` once those are used up and the answer has the core fields."
           },
           "cap_reached": {
             "type": "boolean",
-            "description": "On every answer to a key on a paid plan, and on no other: `false` while the answer has every field, `true` once its organization's overage cap is reached and the answer has Unlimited's. Lookups answered past the cap are not billed; raising or removing the cap in Billing turns it `false` again."
+            "description": "On every answer to a key on a paid plan, and on no other: `false` while the answer has every field, `true` once its organization's overage cap is reached and the answer has the core fields. Lookups answered past the cap are not billed; raising or removing the cap in Billing turns it `false` again."
           }
         },
         "required": [
@@ -5952,7 +5987,7 @@
           },
           "is_disposable": {
             "type": "boolean",
-            "description": "In Disposable Domain. On a paid plan or the trial."
+            "description": "In Disposable Domain. On a paid plan or a free key's full answers."
           },
           "has_a": {
             "type": "boolean",
@@ -5982,7 +6017,7 @@
             "items": {
               "$ref": "#/components/schemas/DomainHost"
             },
-            "description": "The network announcing each address in `dns.a` and then `dns.aaaa`, from IP ASN; `[]` where it resolves to none. On a paid plan or the trial."
+            "description": "The network announcing each address in `dns.a` and then `dns.aaaa`, from IP ASN; `[]` where it resolves to none. On a paid plan or a free key's full answers."
           },
           "cohosted_domains": {
             "$ref": "#/components/schemas/CohostedDomains"
@@ -5996,7 +6031,7 @@
                 "$ref": "#/components/schemas/DisposableDetail"
               }
             ],
-            "description": "`{}` when `is_disposable` is false. On a paid plan or the trial."
+            "description": "`{}` when `is_disposable` is false. On a paid plan or a free key's full answers."
           },
           "web": {
             "$ref": "#/components/schemas/DomainWeb"
@@ -6009,11 +6044,11 @@
           },
           "trial_expired": {
             "type": "boolean",
-            "description": "On every answer to a key on the free plan, and on no other: `false` while its organization's trial of every field lasts, `true` once the answer has Unlimited's fields."
+            "description": "On every answer to a key on the free plan, and on no other: `false` while its organization's lookups of the UTC day answer every field, `true` once those are used up and the answer has the core fields."
           },
           "cap_reached": {
             "type": "boolean",
-            "description": "On every answer to a key on a paid plan, and on no other: `false` while the answer has every field, `true` once its organization's overage cap is reached and the answer has Unlimited's. Lookups answered past the cap are not billed; raising or removing the cap in Billing turns it `false` again."
+            "description": "On every answer to a key on a paid plan, and on no other: `false` while the answer has every field, `true` once its organization's overage cap is reached and the answer has the core fields. Lookups answered past the cap are not billed; raising or removing the cap in Billing turns it `false` again."
           }
         },
         "required": [
@@ -6073,7 +6108,7 @@
           "total",
           "domains"
         ],
-        "description": "From IP Hosted Domains: the other registered domains on the domain's first IPv4 address, how many and the 10 most popular. On a paid plan or the trial."
+        "description": "From IP Hosted Domains: the other registered domains on the domain's first IPv4 address, how many and the 10 most popular. On a paid plan or a free key's full answers."
       },
       "DomainWeb": {
         "type": "object",
@@ -6105,7 +6140,7 @@
           "last_seen",
           "links"
         ],
-        "description": "What our crawl last read of the domain's own home page, every member empty where it holds none. On a paid plan or the trial."
+        "description": "What our crawl last read of the domain's own home page, every member empty where it holds none. On a paid plan or a free key's full answers."
       },
       "DomainWebLinks": {
         "type": "object",
@@ -6147,7 +6182,7 @@
           "total",
           "domains"
         ],
-        "description": "The registered domains whose home page redirects to this one, how many and the 10 most popular. On a paid plan or the trial."
+        "description": "The registered domains whose home page redirects to this one, how many and the 10 most popular. On a paid plan or a free key's full answers."
       },
       "DomainBacklinks": {
         "type": "object",
@@ -6168,7 +6203,7 @@
           "total",
           "domains"
         ],
-        "description": "The registered domains whose home page links to this one, how many and the 10 most popular. On a paid plan or the trial."
+        "description": "The registered domains whose home page links to this one, how many and the 10 most popular. On a paid plan or a free key's full answers."
       },
       "DomainDns": {
         "type": "object",
@@ -6211,7 +6246,7 @@
           "ns",
           "cname"
         ],
-        "description": "Its records in Domain DNS, up to 100 a type. On a paid plan or the trial."
+        "description": "Its records in Domain DNS, up to 100 a type. On a paid plan or a free key's full answers."
       },
       "DnsAddressRecord": {
         "type": "object",
@@ -6324,7 +6359,7 @@
           "ipv4",
           "ranges"
         ],
-        "description": "The organization's IP ranges, from Domain IP Ranges. On a paid plan or the trial."
+        "description": "The organization's IP ranges, from Domain IP Ranges. On a paid plan or a free key's full answers."
       },
       "DomainIpRange": {
         "type": "object",
@@ -6534,12 +6569,12 @@
         "properties": {
           "key": {
             "type": "string",
-            "description": "The plan the organization is on, as an identifier that is never\nrenamed or reused: `free` for the free plan, or a paid plan's key.\nCompare against it and show `name`. On `free`, usage counts its\ntrial, the lookups answered with every field. The Data plan is a key\nper quota (`data_1`, `data_2` and on), each named Data.\n",
+            "description": "The plan the organization is on, as an identifier that is never\nrenamed or reused: `free` for the free plan, or a paid plan's key.\nCompare against it and show `name`. On `free`, usage counts the UTC\nday's lookups answered with every field. The Data plan is a key\nper quota (`data_1`, `data_2` and on), each named Data.\n",
             "example": "data_4"
           },
           "name": {
             "type": "string",
-            "description": "The plan's name, as the site and console show it: `Unlimited` for\nthe free plan. Show this rather than a name built from `key`: a\nplan's name can change, and its key never does.\n",
+            "description": "The plan's name, as the site and console show it: `Free` for\nthe free plan. Show this rather than a name built from `key`: a\nplan's name can change, and its key never does.\n",
             "example": "Data"
           },
           "tier": {
@@ -6578,17 +6613,17 @@
             "type": "integer",
             "format": "int64",
             "nullable": true,
-            "description": "Where full answers stop: past it, a paid key is answered with\nUnlimited's fields and `cap_reached: true`, uncharged, until the\nwindow ends or the cap is raised. `null` means never, which is the\nnormal state of an uncapped paid plan and is not the same as zero.\nAbove the quota and below this, requests are served and billed as\noverage.\n"
+            "description": "Where full answers stop: past it, a paid key is answered with\nthe core fields and `cap_reached: true`, uncharged, until the\nwindow ends or the cap is raised. `null` means never, which is the\nnormal state of an uncapped paid plan and is not the same as zero.\nAbove the quota and below this, requests are served and billed as\noverage.\n"
           },
           "window_start": {
             "type": "string",
             "format": "date-time",
-            "description": "When the current allowance period began. On the free plan, when\nits trial began, or now before a first lookup starts it.\n"
+            "description": "When the current allowance period began. On the free plan, the\nstart of the UTC day.\n"
           },
           "window_end": {
             "type": "string",
             "format": "date-time",
-            "description": "When the allowance next resets. On the free plan, when its trial\nends, which it does once.\n"
+            "description": "When the allowance next resets. On the free plan, the start of the\nnext UTC day.\n"
           }
         }
       },
