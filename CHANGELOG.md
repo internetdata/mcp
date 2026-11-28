@@ -2,11 +2,17 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.1.7 are described by their release commits.
 
+## 3.8.3 - 2026-11-28
+
+### Fixes
+
+- Re-pin the spec to 2026.11.28: the free plan is Free, its full answers daily ([`1ab1a86`](https://github.com/internetdata/mcp/commit/1ab1a86117ec7afbf0897271f8d2c49cc3119c4f))
+
 ## 3.8.2 - 2026-11-28
 
 ### Fixes
 
-- Re-pin the spec to 2026.11.27: the Data plan's keys run on past data_7 ([`25e3e02`](https://github.com/internetdata/mcp/commit/25e3e025c2a0cdc7babfbb79e72606730ff4efa1))
+- Re-pin the spec to 2026.11.27: the plan key's description gives no count of Data plan keys ([`25e3e02`](https://github.com/internetdata/mcp/commit/25e3e025c2a0cdc7babfbb79e72606730ff4efa1))
 
 ## 3.8.1 - 2026-11-27
 
